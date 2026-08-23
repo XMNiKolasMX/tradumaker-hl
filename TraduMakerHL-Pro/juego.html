@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Juego - TraduMaker HL</title>
+    <!-- Tus fuentes e iconos originales y nuevos -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Navegación -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 100px;">
+        <div class="container" id="contenedor-dinamico">
+            <!-- Loader -->
+            <div style="text-align: center; padding: 50px; color: white;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: #6366f1;"></i>
+                <p style="margin-top: 15px;">Cargando información del juego...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // PON TUS CREDENCIALES REALES AQUÍ
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function cargarJuego() {
+            const container = document.getElementById('contenedor-dinamico');
+            const params = new URLSearchParams(window.location.search);
+            const juegoId = parseInt(params.get('id'), 10);
+
+            if (!juegoId) {
+                container.innerHTML = `<h2 style="color:white; text-align:center;">Juego no especificado. <a href="catalogo.html" style="color:#6366f1;">Volver</a></h2>`;
+                return;
+            }
+
+            try {
+                // Traemos el juego de la base de datos
+                const { data: juego, error } = await supabaseClient
+                    .from('juegos')
+                    .select('*')
+                    .eq('id', juegoId)
+                    .single();
+
+                if (error) throw error;
+
+                // Renderizamos usando la estructura de tu diseño antiguo, pero con clases modernas
+                container.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
+                        
+                        <!-- Columna Izquierda (Imagen y botones) -->
+                        <div class="juego-info" style="display: flex; flex-direction: column; gap: 20px;">
+                            <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 100%; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                            
+                            <div class="juego-desc">
+                                <h2 style="font-family: 'Cinzel', serif; color: white; font-size: 2rem; margin-bottom: 10px;">${juego.titulo}</h2>
+                                <p style="color: #a0a0b0; font-family: 'Poppins', sans-serif; margin-bottom: 20px;">
+                                    ${juego.descripcion || 'Sin descripción disponible por el momento.'}
+                                </p>
+                                
+                                <div style="display: flex; gap: 15px;">
+                                    <a href="${juego.enlace || '#'}" target="_blank" class="btn-primary" style="flex: 1; text-align: center;"><i class="fa-solid fa-download"></i> Descargar</a>
+                                    ${juego.enlace_original ? `<a href="${juego.enlace_original}" target="_blank" class="btn-secondary" style="flex: 1; text-align: center; background: #2a2f3f; color: white;"><i class="fa-solid fa-cart-shopping"></i> Original</a>` : ''}
+                                </div>
+                                
+                                ${juego.enlace_original ? `<p style="font-size: 0.8rem; margin-top: 15px; color: #888;">* Por favor, apoya al creador comprando el juego original.</p>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha (Info Técnica) -->
+                        <div class="detalles-columna" style="display: flex; flex-direction: column; gap: 30px;">
+                            
+                            <section style="background: #111520; padding: 25px; border-radius: 8px;">
+                                <h3 style="color: white; margin-bottom: 15px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px;">Información Técnica</h3>
+                                <ul style="list-style: none; padding: 0; color: #a0a0b0; display: flex; flex-direction: column; gap: 10px;">
+                                    <li><strong style="color: white;">Sistema:</strong> Windows 7/8/10</li>
+                                    <li><strong style="color: white;">RAM:</strong> ${juego.ram || 'No especificado'}</li>
+                                    <li><strong style="color: white;">Espacio:</strong> ${juego.peso || 'No especificado'}</li>
+                                    <li><strong style="color: white;">Motor:</strong> ${juego.categoria || 'RPG Maker'}</li>
+                                </ul>
+                                <p style="margin-top: 15px; color: #a0a0b0;"><strong style="color: white;">Desarrollador:</strong> ${juego.desarrollador || 'Desconocido'}</p>
+                            </section>
+
+                            <section style="background: #111520; padding: 25px; border-radius: 8px;">
+                                <h3 style="color: white; margin-bottom: 15px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px;">¿Encontraste un error?</h3>
+                                <p style="color: #a0a0b0; margin-bottom: 15px;">Reporta cualquier fallo en nuestro canal de Discord. Revisamos los reportes constantemente.</p>
+                                <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="btn-secondary" style="background: #5865F2; color: white; border: none;"><i class="fa-brands fa-discord"></i> Únete al Discord oficial</a>
+                            </section>
+
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error("Error al cargar de Supabase:", error);
+                container.innerHTML = `
+                    <div style="background: #1a1e29; padding: 40px; border-radius: 12px; text-align: center;">
+                        <h2 style="color: white; margin-bottom: 15px;">Error al cargar</h2>
+                        <p style="color: #a0a0b0; margin-bottom: 20px;">No se pudo obtener la información de este juego. Asegúrate de haber puesto las claves correctas y de que el juego exista.</p>
+                        <a href="catalogo.html" class="btn-primary">Volver al Catálogo</a>
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarJuego);
+    </script>
+</body>
+</html>

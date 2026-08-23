@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraduMaker HL - Apóyanos | RPG Maker en Español</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    <style>
+        /* Estilos específicos para la sección de Donaciones / Apoyo */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+        .support-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .support-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+        .support-card.featured {
+            border-color: #a78bfa;
+            background: linear-gradient(180deg, rgba(124, 58, 237, 0.08) 0%, var(--bg-card) 100%);
+        }
+        .support-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+        }
+        .support-card.yape .support-icon { color: #8327c4; }
+        .support-card.paypal .support-icon { color: #0079c1; }
+        .support-card.community .support-icon { color: #5865f2; }
+
+        .support-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: white;
+        }
+        .support-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.8rem;
+        }
+        .support-badge {
+            display: inline-block;
+            background: rgba(131, 39, 196, 0.2);
+            color: #d8b4fe;
+            border: 1px solid rgba(131, 39, 196, 0.4);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .btn-support {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: filter 0.2s;
+        }
+        .btn-paypal {
+            background: #0079c1;
+            color: white;
+        }
+        .btn-paypal:hover { background: #0090e7; }
+
+        .btn-discord {
+            background: #5865f2;
+            color: white;
+        }
+        .btn-discord:hover { background: #6a75f3; }
+
+        /* Contenedor del Código QR de Yape */
+        .yape-qr-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .yape-qr-img {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+        .yape-owner {
+            font-size: 0.85rem;
+            color: #d8b4fe;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navegación Profesional Multi-página -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+                <span class="badge-v2">v2.0</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                <a href="apoyanos.html" class="active"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+            </nav>
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal: Apóyanos -->
+    <main class="main-content">
+        <section class="container about-page-section">
+            <div class="catalog-header-banner">
+                <h1>Fondo de la Taberna (Apóyanos)</h1>
+                <p>Mantener los servidores activos, comprar licencias de herramientas y dedicarle horas a la traducción requiere un empujón extra. Si te gusta el trabajo, ¡puedes dejar una propina!</p>
+            </div>
+
+            <div class="support-grid">
+                <!-- Método 1: Yape (Solo Perú - Mediante QR) -->
+                <div class="support-card yape">
+                    <span class="support-badge">🇵🇪 Exclusivo para Perú</span>
+                    <div class="support-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <h3>Yape</h3>
+                    <p>¿Estás en Perú? Escanea el código QR directamente desde tu aplicación móvil para apoyarnos, Cualquier valos de la moneda es válido.</p>
+                    
+                    <div class="yape-qr-box">
+                        <!-- Reemplaza 'img/qr-yape.png' por la ruta o enlace real de tu imagen QR -->
+                        <img src="yape.jpeg" alt="QR Yape TraduMaker HL" class="yape-qr-img" onerror="this.src='https://via.placeholder.com/160?text=Tu+QR+Aqui'">
+                        <span class="yape-owner">Titular: Nicolas</span>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                        Abre tu app de Yape o Plin, escanea y ¡listo! Muchas gracias por el aguante.
+                    </div>
+                </div>
+
+<!-- Método 2: PayPal (Internacional) -->
+<div class="support-card paypal featured">
+    <span class="support-badge" style="background: rgba(0, 121, 193, 0.2); color: #73bfff; border-color: rgba(0, 121, 193, 0.4);">🌐 Internacional</span>
+    <div class="support-icon"><i class="fa-brands fa-paypal"></i></div>
+    <h3>PayPal</h3>
+    <p>Ideal si nos ves desde cualquier otro país del mundo. Cualquier aporte mediante PayPal va directo a cubrir costos de alojamiento web y café para las madrugadas de traducción.</p>
+    
+    <!-- Aquí colocas el correo con el que inicias sesión en PayPal -->
+    <div class="yape-qr-box" style="margin-bottom: 1.2rem;">
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">CORREO DE PAYPAL:</span>
+        <span class="yape-owner" style="font-size: 0.95rem; user-select: all;">nicolas123xzx@gmail.com</span>
+    </div>
+
+    <a href="https://www.paypal.com" target="_blank" class="btn-support btn-paypal"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ir a PayPal para Donar</a>
+</div>
+
+                <!-- Método 3: Apoyo Comunitario (Discord / Compartir) -->
+                <div class="support-card community">
+                    <span class="support-badge" style="background: rgba(88, 101, 242, 0.2); color: #a1aab2; border-color: rgba(88, 101, 242, 0.4);">💖 Sin Dinero</span>
+                    <div class="support-icon"><i class="fa-solid fa-users-rectangle"></i></div>
+                    <h3>Comparte la Voz</h3>
+                    <p>¿No puedes donar? No te preocupes, el mejor apoyo que podemos recibir es que compartas nuestras traducciones.</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -10px; margin-bottom: 1.5rem;">¡Unirse al Discord suma muchísimo!</p>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="btn-support btn-discord"><i class="fa-brands fa-discord"></i> Unirse al Discord</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Profesional -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
+                <p>El refugio definitivo para jugar RPGs independientes en español, hecho por fans para fans.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Mapa del Sitio</h4>
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="nosotros.html">Sobre Nosotros</a>
+                <a href="apoyanos.html">Apóyanos</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Pásate a saludar</h4>
+                <div class="social-icons">
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TraduMaker HL. ¡Gracias por respaldar el proyecto!</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraduMaker HL - Inicio | RPG Maker en Español</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos adicionales para las nuevas secciones (Horario y Proceso) */
+        .guild-section {
+            margin: 4rem auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .guild-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .guild-card:hover {
+            border-color: var(--accent);
+        }
+        .guild-card h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .guild-card h2 i { color: var(--gold); }
+        
+        /* Horario Estilo RPG */
+        .schedule-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .schedule-time {
+            font-size: 1.3rem;
+            font-family: 'Cinzel', serif;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .schedule-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Pasos del proceso */
+        .process-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .process-step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            font-family: 'Cinzel', serif;
+        }
+        .step-content h4 {
+            font-size: 1rem;
+            color: white;
+            margin-bottom: 2px;
+        }
+        .step-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navegación Profesional Multi-página -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+                <span class="badge-v2">v2.0</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                <!-- Cuenta - Muy Pronto -->
+                <a href="#" style="position: relative; opacity: 0.7; cursor: default;" onclick="return false;">
+                    <i class="fa-solid fa-user"></i> Cuenta 
+                    <span style="font-size: 0.65rem; background: #6366f1; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle; font-weight: 600;">Muy Pronto</span>
+                </a>
+            </nav>
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal: Inicio -->
+    <main class="main-content">
+        <!-- Hero Section de Alta Gama -->
+        <section class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fa-solid fa-star"></i> Traducciones Oficiales al Español</div>
+                <h1>El Universo de <span>RPG Maker</span> a tu Alcance</h1>
+                <p>Descubre historias inolvidables, joyas ocultas y mundos independientes traducidos con calidad profesional por apasionados para apasionados.</p>
+                <div class="hero-buttons">
+                    <a href="catalogo.html" class="btn-primary"><i class="fa-solid fa-compass"></i> Explorar Catálogo <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="apoyanos.html" class="btn-secondary"><i class="fa-solid fa-heart"></i> Apoyar Proyecto</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas Rápidas / Características Pro -->
+        <section class="features-bar">
+            <div class="container features-grid">
+                <div class="feature-item">
+                    <i class="fa-solid fa-language"></i>
+                    <div>
+                        <h3>100% en Español</h3>
+                        <p>Traducciones cuidadas y testeadas</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <div>
+                        <h3>Cloud Database</h3>
+                        <p>Sincronización instantánea con nuestra base de datos</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <div>
+                        <h3>Acceso Directo</h3>
+                        <p>Sin esperas ni acortadores molestos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
+        <section class="container recent-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
+                    <p>Los 5 juegos más recientes añadidos a nuestra base de datos</p>
+                </div>
+                <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div id="grid-recientes" class="games-grid">
+                <!-- Se inyecta dinámicamente desde Supabase -->
+                <div class="loading-skeleton">Cargando catálogo completo, espere por favor.</div>
+            </div>
+        </section>
+
+        <!-- NUEVA SECCIÓN: Horario del Gremio y Proceso de Traducción -->
+        <section class="container">
+            <div class="guild-section">
+                <!-- Horario de Traducción -->
+                <div class="guild-card">
+                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
+                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
+                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
+                    <p class="schedule-desc">Estos son los horarios que traducimos los juegos</p>
+                </div>
+
+                <!-- Proceso de Traducción -->
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
+                    <div class="process-list">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                               <h4>Caza de la Obra</h4>
+                               <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena traerlo al español.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                               <h4>Extracción de Textos</h4>
+                               <p>Sacamos todas las líneas de código y diálogos directos a un bloc de notas o Word limpio.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                               <h4>Traducción Base</h4>
+                               <p>Pasamos todo al español cuidando cada onomatopeya, nombres de ciudades y términos clave del lore.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                               <h4>Adaptación y Pulido</h4>
+                               <p>Reestructuramos párrafos enteros y bromas locales para que el mensaje golpee con la misma fuerza que el original.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                               <h4>¡Listo para la Aventura!</h4>
+                               <p>Empaquetamos el parche, se prueba en partida y se sube directo a la nube para que lo descargues sin vueltas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Profesional -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
+                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="nosotros.html">Sobre Nosotros</a>
+                <a href="apoyanos.html">Apóyanos</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Síguenos</h4>
+                <div class="social-icons">
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script de Conexión a Supabase para el Inicio -->
+    <script>
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const contenedor = document.getElementById('grid-recientes');
+            try {
+                const { data, error } = await supabaseClient
+                    .from('juegos')
+                    .select('*')
+                    .order('id', { ascending: false })
+                    .limit(5); // Trae exactamente los últimos 5
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    contenedor.innerHTML = '<p class="no-games">No hay juegos registrados todavía en Supabase.</p>';
+                    return;
+                }
+
+                contenedor.innerHTML = data.map(juego => `
+                    <div class="game-card">
+                        <div class="game-img-container">
+                            <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                            <span class="game-tag">RPG Maker</span>
+                        </div>
+                        <div class="game-info">
+                            <h3 class="game-title">${juego.titulo}</h3>
+                            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = '<p class="error-msg">Error al conectar con Supabase. Verifica tus credenciales.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
