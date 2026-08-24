@@ -6,9 +6,102 @@
     <title>TraduMaker HL - Catálogo Completo | RPG Maker en Español</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="inicio.css"> <!-- Puedes usar la misma hoja de estilos o una específica -->
+    <link rel="stylesheet" href="inicio.css">
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos esenciales para la cuadrícula y vistas dinámicas */
+        .catalog-top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card, #161b22);
+            border: 1px solid var(--border-color, #30363d);
+            border-radius: 8px;
+            padding: 8px 12px;
+            flex: 1;
+            min-width: 250px;
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: inherit;
+            outline: none;
+            width: 100%;
+            margin-left: 8px;
+        }
+        .sort-control select {
+            background: var(--bg-card, #161b22);
+            color: var(--text-main, #fff);
+            border: 1px solid var(--border-color, #30363d);
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+        .view-buttons {
+            display: flex;
+            gap: 6px;
+        }
+        .btn-view {
+            background: var(--bg-card, #161b22);
+            color: var(--text-muted, #8b949e);
+            border: 1px solid var(--border-color, #30363d);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-view.active, .btn-view:hover {
+            background: #73bfff;
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Modos de visualización del contenedor */
+        .games-grid.mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .games-grid.mode-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .games-grid.mode-list .game-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .games-grid.mode-list .game-img-container {
+            width: 140px;
+            min-width: 140px;
+            height: 90px;
+        }
+        .games-grid.mode-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .games-grid.mode-compact .game-card {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .games-grid.mode-compact .game-img-container,
+        .games-grid.mode-compact .game-tag {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -39,16 +132,29 @@
                 <p>Explora todos los juegos disponibles en nuestra base de datos en la nube.</p>
             </div>
 
-            <!-- Barra de Búsqueda y Filtros -->
-            <div class="catalog-controls">
+            <!-- Controles de Búsqueda, Orden y Vistas -->
+            <div class="catalog-top-controls">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="input-buscar" placeholder="Buscar juego por título...">
                 </div>
+
+                <div class="sort-control">
+                    <select id="sortSelect" onchange="aplicarFiltrosYOrden()">
+                        <option value="asc">Alfabético (A - Z)</option>
+                        <option value="desc">Alfabético (Z - A)</option>
+                    </select>
+                </div>
+
+                <div class="view-buttons">
+                    <button onclick="cambiarVista('grid')" class="btn-view active" title="Cuadrícula"><i class="fa-solid fa-table-cells"></i></button>
+                    <button onclick="cambiarVista('list')" class="btn-view" title="Lista"><i class="fa-solid fa-bars"></i></button>
+                    <button onclick="cambiarVista('compact')" class="btn-view" title="Solo Nombres"><i class="fa-solid fa-list"></i></button>
+                </div>
             </div>
 
             <!-- Contenedor Dinámico del Catálogo -->
-            <div id="grid-catalogo" class="games-grid">
+            <div id="grid-catalogo" class="games-grid mode-grid">
                 <div class="loading-skeleton">Cargando catálogo completo, espere por favor.</div>
             </div>
         </section>
@@ -89,23 +195,46 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let todosLosJuegos = [];
+        let vistaActual = 'grid';
 
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
                 const { data, error } = await supabaseClient
                     .from('juegos')
-                    .select('*')
-                    .order('id', { ascending: false });
+                    .select('*');
 
                 if (error) throw error;
 
                 todosLosJuegos = data || [];
-                renderizarJuegos(todosLosJuegos);
+                aplicarFiltrosYOrden();
             } catch (err) {
                 console.error(err);
                 contenedor.innerHTML = '<p class="error-msg">Error al conectar con Supabase. Verifica tus credenciales.</p>';
             }
+        }
+
+        function aplicarFiltrosYOrden() {
+            const textoBusqueda = document.getElementById('input-buscar').value.toLowerCase();
+            const orden = document.getElementById('sortSelect').value;
+
+            // 1. Filtrar por texto
+            let juegosFiltrados = todosLosJuegos.filter(juego => 
+                juego.titulo.toLowerCase().includes(textoBusqueda)
+            );
+
+            // 2. Ordenar alfabéticamente (A-Z / Z-A)
+            juegosFiltrados.sort((a, b) => {
+                const tituloA = a.titulo.toLowerCase();
+                const tituloB = b.titulo.toLowerCase();
+                if (orden === 'asc') {
+                    return tituloA.localeCompare(tituloB);
+                } else {
+                    return tituloB.localeCompare(tituloA);
+                }
+            });
+
+            renderizarJuegos(juegosFiltrados);
         }
 
         function renderizarJuegos(juegos) {
@@ -124,17 +253,23 @@
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">${juego.titulo}</h3>
-<a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>            `).join('');
+                        <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Filtro de búsqueda en tiempo real
-        document.getElementById('input-buscar').addEventListener('input', (e) => {
-            const texto = e.target.value.toLowerCase();
-            const filtrados = todosLosJuegos.filter(juego => 
-                juego.titulo.toLowerCase().includes(texto)
-            );
-            renderizarJuegos(filtrados);
-        });
+        function cambiarVista(modo) {
+            vistaActual = modo;
+            const contenedor = document.getElementById('grid-catalogo');
+            contenedor.className = `games-grid mode-${modo}`;
+
+            document.querySelectorAll('.btn-view').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Escuchar cambios en la barra de búsqueda
+        document.getElementById('input-buscar').addEventListener('input', aplicarFiltrosYOrden);
 
         document.addEventListener('DOMContentLoaded', cargarCatalogo);
     </script>
