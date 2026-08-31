@@ -359,17 +359,17 @@
                     contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos registrados todavía en Supabase.</p>';
                 } else {
                     contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
-                        <div class="game-card">
-                            <div class="game-img-container">
-                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                                <span class="game-tag">RPG Maker</span>
-                            </div>
-                            <div class="game-info">
-                                <h3 class="game-title">${juego.titulo}</h3>
-                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            </div>
-                        </div>
-                    `).join('');
+    <div class="game-card">
+        <div class="game-img-container">
+            <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+            <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
+        </div>
+        <div class="game-info">
+            <h3 class="game-title">${juego.titulo}</h3>
+            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+    </div>
+`).join('');
                 }
 
                 // 2. Cargar Estado de Traducciones (Únicamente los que están en proceso: traducido = false)
