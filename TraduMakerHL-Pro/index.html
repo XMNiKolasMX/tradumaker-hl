@@ -146,12 +146,6 @@
             letter-spacing: 0.5px;
             flex-shrink: 0;
         }
-        .status-badge.completed {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.3);
-            box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
-        }
         .status-badge.progress {
             background: rgba(245, 158, 11, 0.15);
             color: var(--gold);
@@ -257,7 +251,7 @@
                     <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
                 </div>
 
-                <!-- 2. Estado de Proyectos (Dinámico desde Supabase) -->
+                <!-- 2. Estado de Proyectos (Dinámico desde Supabase - Solo en Proceso) -->
                 <div class="guild-card">
                     <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
                     <ul class="sidebar-list" id="sidebar-translations-list">
@@ -341,7 +335,7 @@
         </div>
     </footer>
 
-    <!-- Script de Conexión a Supabase -->
+    <!-- Script de Conexión a Supabase (Actualizado con filtro .eq('traducido', false)) -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -378,28 +372,24 @@
                     `).join('');
                 }
 
-                // 2. Cargar Estado de Traducciones para la nueva tarjeta
+                // 2. Cargar Estado de Traducciones (Únicamente los que están en proceso: traducido = false)
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
                     .from('juegos')
                     .select('titulo, traducido')
+                    .eq('traducido', false)
                     .order('id', { ascending: false });
 
                 if (errorEstados) throw errorEstados;
 
                 if (!juegosEstados || juegosEstados.length === 0) {
-                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay registros</span></li>';
+                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
                 } else {
                     listaSidebar.innerHTML = juegosEstados.map(juego => {
-                        const isTraducido = juego.traducido;
-                        const badgeClass = isTraducido ? 'completed' : 'progress';
-                        const iconClass = isTraducido ? 'fa-check' : 'fa-hourglass-half';
-                        const textStatus = isTraducido ? 'Traducido' : 'Traduciendo';
-
                         return `
                             <li class="sidebar-item">
                                 <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
-                                <span class="status-badge ${badgeClass}">
-                                    <i class="fa-solid ${iconClass}"></i> ${textStatus}
+                                <span class="status-badge progress">
+                                    <i class="fa-solid fa-hourglass-half"></i> Traduciendo
                                 </span>
                             </li>
                         `;
@@ -408,8 +398,8 @@
 
             } catch (err) {
                 console.error(err);
-                contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
-                listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
+                if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
+                if (listaSidebar) listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
             }
         });
     </script>
