@@ -467,3 +467,84 @@ body {
         padding: 1.5rem;
     }
 }
+
+/* ========================================================================== */
+/* MENÚ LATERAL Y BADGES DE TRADUCCIÓN (PROFESIONAL RPG)                     */
+/* ========================================================================== */
+
+.sidebar-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sidebar-header {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: white;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.8rem;
+}
+
+.sidebar-header i { color: var(--accent); }
+
+.sidebar-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-main);
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.sidebar-game-title {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+/* Badges de Estado de Traducción (Check / X o Iconos) */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
+}
+
+.status-badge.progress {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--gold);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+}
