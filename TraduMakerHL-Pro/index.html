@@ -101,6 +101,63 @@
             color: var(--text-muted);
             line-height: 1.4;
         }
+
+        /* Estilos del Widget de Estado de Traducciones (Supabase) */
+        .sidebar-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .sidebar-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .sidebar-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+        .sidebar-game-title {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .status-badge.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
+        }
+        .status-badge.progress {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -177,29 +234,40 @@
             <div class="section-header">
                 <div>
                     <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
-                    <p>Los 4 juegos más recientes añadidos a nuestra base de datos</p>
+                    <p>Los juegos más recientes añadidos a nuestra base de datos</p>
                 </div>
                 <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
             </div>
 
             <div id="grid-recientes" class="games-grid">
                 <!-- Se inyecta dinámicamente desde Supabase -->
-                <div class="loading-skeleton">Cargando catálogo completo, espere por favor.</div>
+                <div class="loading-skeleton">Cargando catálogo, espere por favor.</div>
             </div>
         </section>
 
-        <!-- NUEVA SECCIÓN: Horario del Gremio y Proceso de Traducción -->
+        <!-- SECCIÓN: Horario, Estado de Juegos y Proceso -->
         <section class="container">
             <div class="guild-section">
-                <!-- Horario de Traducción -->
+                
+                <!-- 1. Horario de Traducción -->
                 <div class="guild-card">
                     <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
                     <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
                     <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
-                    <p class="schedule-desc">Estos son los horarios que traducimos los juegos</p>
+                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
                 </div>
 
-                <!-- Proceso de Traducción -->
+                <!-- 2. Estado de Proyectos (Dinámico desde Supabase) -->
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
+                    <ul class="sidebar-list" id="sidebar-translations-list">
+                        <li class="sidebar-item">
+                            <span class="sidebar-game-title">Cargando estados...</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 3. Proceso de Traducción -->
                 <div class="guild-card">
                     <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
                     <div class="process-list">
@@ -207,39 +275,40 @@
                             <div class="step-number">1</div>
                             <div class="step-content">
                                <h4>Caza de la Obra</h4>
-                               <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena traerlo al español.</p>
+                               <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">2</div>
                             <div class="step-content">
                                <h4>Extracción de Textos</h4>
-                               <p>Sacamos todas las líneas de código y diálogos directos a un bloc de notas o Word limpio.</p>
+                               <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">3</div>
                             <div class="step-content">
                                <h4>Traducción Base</h4>
-                               <p>Pasamos todo al español cuidando cada onomatopeya, nombres de ciudades y términos clave del lore.</p>
+                               <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">4</div>
                             <div class="step-content">
                                <h4>Adaptación y Pulido</h4>
-                               <p>Reestructuramos párrafos enteros y bromas locales para que el mensaje golpee con la misma fuerza que el original.</p>
+                               <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">5</div>
                             <div class="step-content">
                                <h4>¡Listo para la Aventura!</h4>
-                               <p>Empaquetamos el parche, se prueba en partida y se sube directo a la nube para que lo descargues sin vueltas.</p>
+                               <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </main>
@@ -272,43 +341,75 @@
         </div>
     </footer>
 
-    <!-- Script de Conexión a Supabase para el Inicio -->
+    <!-- Script de Conexión a Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const contenedor = document.getElementById('grid-recientes');
+            const contenedorRecientes = document.getElementById('grid-recientes');
+            const listaSidebar = document.getElementById('sidebar-translations-list');
+
             try {
-                const { data, error } = await supabaseClient
+                // 1. Cargar Últimos Lanzamientos (4 juegos)
+                const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
                     .from('juegos')
                     .select('*')
                     .order('id', { ascending: false })
-                    .limit(4); // Trae exactamente los últimos 5
+                    .limit(4);
 
-                if (error) throw error;
+                if (errorRecientes) throw errorRecientes;
 
-                if (!data || data.length === 0) {
-                    contenedor.innerHTML = '<p class="no-games">No hay juegos registrados todavía en Supabase.</p>';
-                    return;
+                if (!juegosRecientes || juegosRecientes.length === 0) {
+                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos registrados todavía en Supabase.</p>';
+                } else {
+                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
+                        <div class="game-card">
+                            <div class="game-img-container">
+                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                                <span class="game-tag">RPG Maker</span>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">${juego.titulo}</h3>
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
                 }
 
-                contenedor.innerHTML = data.map(juego => `
-                    <div class="game-card">
-                        <div class="game-img-container">
-                            <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                            <span class="game-tag">RPG Maker</span>
-                        </div>
-                        <div class="game-info">
-                            <h3 class="game-title">${juego.titulo}</h3>
-                            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                        </div>
-                    </div>
-                `).join('');
+                // 2. Cargar Estado de Traducciones para la nueva tarjeta
+                const { data: juegosEstados, error: errorEstados } = await supabaseClient
+                    .from('juegos')
+                    .select('titulo, traducido')
+                    .order('id', { ascending: false });
+
+                if (errorEstados) throw errorEstados;
+
+                if (!juegosEstados || juegosEstados.length === 0) {
+                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay registros</span></li>';
+                } else {
+                    listaSidebar.innerHTML = juegosEstados.map(juego => {
+                        const isTraducido = juego.traducido;
+                        const badgeClass = isTraducido ? 'completed' : 'progress';
+                        const iconClass = isTraducido ? 'fa-check' : 'fa-hourglass-half';
+                        const textStatus = isTraducido ? 'Traducido' : 'Traduciendo';
+
+                        return `
+                            <li class="sidebar-item">
+                                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
+                                <span class="status-badge ${badgeClass}">
+                                    <i class="fa-solid ${iconClass}"></i> ${textStatus}
+                                </span>
+                            </li>
+                        `;
+                    }).join('');
+                }
+
             } catch (err) {
                 console.error(err);
-                contenedor.innerHTML = '<p class="error-msg">Error al conectar con Supabase. Verifica tus credenciales.</p>';
+                contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
+                listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
             }
         });
     </script>
