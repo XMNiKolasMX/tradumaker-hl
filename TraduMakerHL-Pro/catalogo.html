@@ -200,9 +200,11 @@
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
+                // Solo cargamos los juegos que ya están traducidos (true) para el catálogo público
                 const { data, error } = await supabaseClient
                     .from('juegos')
-                    .select('*');
+                    .select('*')
+                    .eq('traducido', true);
 
                 if (error) throw error;
 
@@ -249,7 +251,7 @@
                 <div class="game-card">
                     <div class="game-img-container">
                         <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                        <span class="game-tag">RPG Maker</span>
+                        <span class="game-tag">${juego.categoria || 'General'}</span>
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">${juego.titulo}</h3>
