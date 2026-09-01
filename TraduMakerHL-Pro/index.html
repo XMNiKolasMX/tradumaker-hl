@@ -335,7 +335,7 @@
         </div>
     </footer>
 
-    <!-- Script de Conexión a Supabase (Actualizado con filtro .eq('traducido', false)) -->
+    <!-- Script de Conexión a Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -346,30 +346,31 @@
             const listaSidebar = document.getElementById('sidebar-translations-list');
 
             try {
-                // 1. Cargar Últimos Lanzamientos (4 juegos)
+                // 1. Cargar Últimos Lanzamientos (4 juegos ya traducidos)
                 const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
                     .from('juegos')
                     .select('*')
+                    .eq('traducido', true) // <-- Filtro añadido para mostrar solo los terminados
                     .order('id', { ascending: false })
                     .limit(4);
 
                 if (errorRecientes) throw errorRecientes;
 
                 if (!juegosRecientes || juegosRecientes.length === 0) {
-                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos registrados todavía en Supabase.</p>';
+                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
                 } else {
                     contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
-    <div class="game-card">
-        <div class="game-img-container">
-            <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-            <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
-        </div>
-        <div class="game-info">
-            <h3 class="game-title">${juego.titulo}</h3>
-            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        </div>
-    </div>
-`).join('');
+                        <div class="game-card">
+                            <div class="game-img-container">
+                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">${juego.titulo}</h3>
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
                 }
 
                 // 2. Cargar Estado de Traducciones (Únicamente los que están en proceso: traducido = false)
