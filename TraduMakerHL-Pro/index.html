@@ -492,7 +492,7 @@
 
             // Mostrar la imagen del juego en el panel si existe el campo
             const imgEl = document.getElementById('detail-img');
-            if (juego.imagen) {
+            if (juego.imagen && juego.imagen.trim() !== '') {
                 imgEl.src = juego.imagen;
                 imgEl.style.display = 'block';
             } else {
