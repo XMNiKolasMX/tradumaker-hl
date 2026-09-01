@@ -412,31 +412,30 @@
                     `).join('');
                 }
 
-                // 2. Cargar Estado de Proyectos (Desde la nueva tabla 'estado_juegos')
-                const { data: juegosEstados, error: errorEstados } = await supabaseClient
-                    .from('estado_juegos')
-                    .select('*')
-                    .order('id', { ascending: false });
+                // 2. Cargar Estado de Proyectos (Desde la tabla 'estado_juegos')
+const { data: juegosEstados, error: errorEstados } = await supabaseClient
+    .from('estado_juegos')
+    .select('*')
+    .order('id', { ascending: false });
 
-                if (errorEstados) throw errorEstados;
+if (errorEstados) throw errorEstados;
 
-                if (!juegosEstados || juegosEstados.length === 0) {
-                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
-                } else {
-                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
-                        return `
-                            <li class="sidebar-item" onclick="mostrarDetallesJuego(${index})">
-                                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
-                                <span class="status-badge progress">
-                                    <i class="fa-solid fa-eye"></i> Ver más
-                                </span>
-                            </li>
-                        `;
-                    }).join('');
+if (!juegosEstados || juegosEstados.length === 0) {
+    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
+} else {
+    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
+        return `
+            <li class="sidebar-item" onclick="mostrarDetallesJuego(${index})">
+                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
+                <span class="status-badge progress">
+                    <i class="fa-solid fa-spinner fa-spin"></i> ${juego.porcentaje !== null ? juego.porcentaje + '%' : '0%'}
+                </span>
+            </li>
+        `;
+    }).join('');
 
-                    // Guardamos los proyectos en curso globalmente para usarlos al hacer clic
-                    window.proyectosEnProceso = juegosEstados;
-                }
+    window.proyectosEnProceso = juegosEstados;
+}
 
             } catch (err) {
                 console.error(err);
