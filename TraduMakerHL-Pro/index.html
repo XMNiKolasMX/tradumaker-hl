@@ -108,7 +108,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 320px;
+            max-height: 250px;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -121,6 +121,7 @@
             border-radius: 8px;
             border: 1px solid var(--border);
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         .sidebar-item:hover {
             border-color: var(--accent);
@@ -151,6 +152,36 @@
             color: var(--gold);
             border: 1px solid rgba(245, 158, 11, 0.3);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+        }
+
+        /* Panel desplegable de detalles */
+        .game-details-panel {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-main);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .game-details-panel h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .game-details-panel p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .game-details-panel a {
+            color: #a78bfa;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -251,7 +282,7 @@
                     <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
                 </div>
 
-                <!-- 2. Estado de Proyectos (Dinámico desde Supabase - Solo en Proceso) -->
+                <!-- 2. Estado de Proyectos (Dinámico desde Supabase con Panel Desplegable) -->
                 <div class="guild-card">
                     <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
                     <ul class="sidebar-list" id="sidebar-translations-list">
@@ -259,6 +290,14 @@
                             <span class="sidebar-game-title">Cargando estados...</span>
                         </li>
                     </ul>
+                    <!-- Cuadro desplegable de información -->
+                    <div id="game-details-panel" class="game-details-panel">
+                        <h3 id="detail-title"></h3>
+                        <p><strong>Enlace Original:</strong> <a id="detail-link" href="#" target="_blank">Ver fuente</a></p>
+                        <p><strong>Porcentaje:</strong> <span id="detail-percentage" style="color: #34d399; font-weight: bold;">0%</span></p>
+                        <p><strong>Motor / Plataforma:</strong> <span id="detail-engine">-</span></p>
+                        <p><strong>Notas:</strong> <span id="detail-desc">Ninguna</span></p>
+                    </div>
                 </div>
 
                 <!-- 3. Proceso de Traducción -->
@@ -350,7 +389,7 @@
                 const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
                     .from('juegos')
                     .select('*')
-                    .eq('traducido', true) // <-- Filtro añadido para mostrar solo los terminados
+                    .eq('traducido', true)
                     .order('id', { ascending: false })
                     .limit(4);
 
@@ -376,7 +415,7 @@
                 // 2. Cargar Estado de Traducciones (Únicamente los que están en proceso: traducido = false)
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
                     .from('juegos')
-                    .select('titulo, traducido')
+                    .select('*') // Obtenemos todas las columnas para los detalles expandidos
                     .eq('traducido', false)
                     .order('id', { ascending: false });
 
@@ -385,16 +424,19 @@
                 if (!juegosEstados || juegosEstados.length === 0) {
                     listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
                 } else {
-                    listaSidebar.innerHTML = juegosEstados.map(juego => {
+                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
                         return `
-                            <li class="sidebar-item">
+                            <li class="sidebar-item" onclick="mostrarDetallesJuego(${index})">
                                 <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
                                 <span class="status-badge progress">
-                                    <i class="fa-solid fa-hourglass-half"></i> Traduciendo
+                                    <i class="fa-solid fa-eye"></i> Ver más
                                 </span>
                             </li>
                         `;
                     }).join('');
+
+                    // Guardamos los proyectos en curso globalmente para usarlos al hacer clic
+                    window.proyectosEnProceso = juegosEstados;
                 }
 
             } catch (err) {
@@ -403,6 +445,30 @@
                 if (listaSidebar) listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
             }
         });
+
+        // Función para desplegar la información detallada al hacer clic en un juego en proceso
+        function mostrarDetallesJuego(index) {
+            const juego = window.proyectosEnProceso[index];
+            const panel = document.getElementById('game-details-panel');
+            
+            document.getElementById('detail-title').innerText = juego.titulo;
+            
+            const linkEl = document.getElementById('detail-link');
+            if (juego.enlace_original) {
+                linkEl.href = juego.enlace_original;
+                linkEl.innerText = juego.enlace_original;
+                linkEl.style.display = 'inline';
+            } else {
+                linkEl.href = '#';
+                linkEl.innerText = 'No disponible';
+            }
+
+            document.getElementById('detail-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null) ? juego.porcentaje + '%' : 'En proceso';
+            document.getElementById('detail-engine').innerText = juego.motor || 'RPG Maker';
+            document.getElementById('detail-desc').innerText = juego.descripcion || juego.notas || 'Sin notas adicionales por el momento.';
+
+            panel.style.display = 'block';
+        }
     </script>
 </body>
 </html>
