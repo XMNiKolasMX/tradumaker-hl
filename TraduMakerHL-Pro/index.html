@@ -121,11 +121,6 @@
             border-radius: 8px;
             border: 1px solid var(--border);
             transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .sidebar-item:hover {
-            border-color: var(--accent);
-            transform: translateX(4px);
         }
         .sidebar-item.active-detail {
             border-color: var(--accent);
@@ -140,22 +135,27 @@
             text-overflow: ellipsis;
             max-width: 170px;
         }
-        .status-badge {
+        
+        /* Botón interactivo de Ver más / Ver menos */
+        .status-btn-action {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 20px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             flex-shrink: 0;
-        }
-        .status-badge.progress {
             background: rgba(245, 158, 11, 0.15);
             color: var(--gold);
             border: 1px solid rgba(245, 158, 11, 0.3);
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .status-btn-action:hover {
+            background: rgba(245, 158, 11, 0.3);
+            transform: scale(1.05);
         }
 
         /* Panel desplegable de detalles */
@@ -431,11 +431,11 @@
                 } else {
                     listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
                         return `
-                            <li class="sidebar-item" id="sidebar-item-${index}" onclick="toggleDetallesJuego(${index})">
+                            <li class="sidebar-item" id="sidebar-item-${index}">
                                 <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
-                                <span class="status-badge progress">
-                                    <i class="fa-solid fa-spinner fa-spin"></i> ${juego.porcentaje !== null ? juego.porcentaje + '%' : '0%'}
-                                </span>
+                                <button class="status-btn-action" id="btn-action-${index}" onclick="toggleDetallesJuego(${index})">
+                                    <i class="fa-solid fa-eye"></i> Ver más
+                                </button>
                             </li>
                         `;
                     }).join('');
@@ -450,29 +450,36 @@
             }
         });
 
-        // Función para alternar entre mostrar y ocultar detalles (Ver más / Ver menos dinámico)
+        // Función para alternar el panel de detalles y cambiar dinámicamente entre "Ver más" y "Ver menos"
         function toggleDetallesJuego(index) {
             const panel = document.getElementById('game-details-panel');
-            
-            // Si hace clic en el mismo que ya está abierto, lo cerramos ("Ver menos")
+            const botonActual = document.getElementById(`btn-action-${index}`);
+            const itemActual = document.getElementById(`sidebar-item-${index}`);
+
+            // Si el usuario hace clic en el mismo que ya está abierto, lo cerramos ("Ver menos" -> "Ver más")
             if (juegoSeleccionadoActual === index && panel.style.display === 'block') {
                 panel.style.display = 'none';
-                document.getElementById(`sidebar-item-${index}`).classList.remove('active-detail');
+                itemActual.classList.remove('active-detail');
+                botonActual.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
                 juegoSeleccionadoActual = null;
                 return;
             }
 
-            // Si abre uno nuevo o cambia de juego
-            // Quitamos la clase activa anterior si existía
+            // Si había otro abierto previamente, restablecemos su botón y su estilo
             if (juegoSeleccionadoActual !== null) {
-                const anteriorItem = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
-                if (anteriorItem) anteriorItem.classList.remove('active-detail');
+                const botonAnterior = document.getElementById(`btn-action-${juegoSeleccionadoActual}`);
+                const itemAnterior = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
+                if (botonAnterior) botonAnterior.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
+                if (itemAnterior) itemAnterior.classList.remove('active-detail');
             }
 
+            // Cargamos la información del nuevo juego seleccionado
             const juego = window.proyectosEnProceso[index];
             juegoSeleccionadoActual = index;
 
-            document.getElementById(`sidebar-item-${index}`).classList.add('active-detail');
+            itemActual.classList.add('active-detail');
+            botonActual.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ver menos';
+
             document.getElementById('detail-title').innerText = juego.titulo;
             
             const linkEl = document.getElementById('detail-link');
