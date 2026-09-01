@@ -127,6 +127,10 @@
             border-color: var(--accent);
             transform: translateX(4px);
         }
+        .sidebar-item.active-detail {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.1);
+        }
         .sidebar-game-title {
             font-size: 0.9rem;
             color: var(--text-main);
@@ -307,36 +311,36 @@
                         <div class="process-step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                               <h4>Caza de la Obra</h4>
-                               <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
+                                <h4>Caza de la Obra</h4>
+                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                               <h4>Extracción de Textos</h4>
-                               <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
+                                <h4>Extracción de Textos</h4>
+                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                               <h4>Traducción Base</h4>
-                               <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
+                                <h4>Traducción Base</h4>
+                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">4</div>
                             <div class="step-content">
-                               <h4>Adaptación y Pulido</h4>
-                               <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
+                                <h4>Adaptación y Pulido</h4>
+                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
                             </div>
                         </div>
                         <div class="process-step">
                             <div class="step-number">5</div>
                             <div class="step-content">
-                               <h4>¡Listo para la Aventura!</h4>
-                               <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
+                                <h4>¡Listo para la Aventura!</h4>
+                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
                             </div>
                         </div>
                     </div>
@@ -380,6 +384,8 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let juegoSeleccionadoActual = null; // Variable para rastrear el índice abierto
+
         document.addEventListener('DOMContentLoaded', async () => {
             const contenedorRecientes = document.getElementById('grid-recientes');
             const listaSidebar = document.getElementById('sidebar-translations-list');
@@ -413,29 +419,29 @@
                 }
 
                 // 2. Cargar Estado de Proyectos (Desde la tabla 'estado_juegos')
-const { data: juegosEstados, error: errorEstados } = await supabaseClient
-    .from('estado_juegos')
-    .select('*')
-    .order('id', { ascending: false });
+                const { data: juegosEstados, error: errorEstados } = await supabaseClient
+                    .from('estado_juegos')
+                    .select('*')
+                    .order('id', { ascending: false });
 
-if (errorEstados) throw errorEstados;
+                if (errorEstados) throw errorEstados;
 
-if (!juegosEstados || juegosEstados.length === 0) {
-    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
-} else {
-    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
-        return `
-            <li class="sidebar-item" onclick="mostrarDetallesJuego(${index})">
-                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
-                <span class="status-badge progress">
-                    <i class="fa-solid fa-spinner fa-spin"></i> ${juego.porcentaje !== null ? juego.porcentaje + '%' : '0%'}
-                </span>
-            </li>
-        `;
-    }).join('');
+                if (!juegosEstados || juegosEstados.length === 0) {
+                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
+                } else {
+                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
+                        return `
+                            <li class="sidebar-item" id="sidebar-item-${index}" onclick="toggleDetallesJuego(${index})">
+                                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
+                                <span class="status-badge progress">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> ${juego.porcentaje !== null ? juego.porcentaje + '%' : '0%'}
+                                </span>
+                            </li>
+                        `;
+                    }).join('');
 
-    window.proyectosEnProceso = juegosEstados;
-}
+                    window.proyectosEnProceso = juegosEstados;
+                }
 
             } catch (err) {
                 console.error(err);
@@ -444,11 +450,29 @@ if (!juegosEstados || juegosEstados.length === 0) {
             }
         });
 
-        // Función para desplegar la información detallada al hacer clic en un juego en proceso
-        function mostrarDetallesJuego(index) {
-            const juego = window.proyectosEnProceso[index];
+        // Función para alternar entre mostrar y ocultar detalles (Ver más / Ver menos dinámico)
+        function toggleDetallesJuego(index) {
             const panel = document.getElementById('game-details-panel');
             
+            // Si hace clic en el mismo que ya está abierto, lo cerramos ("Ver menos")
+            if (juegoSeleccionadoActual === index && panel.style.display === 'block') {
+                panel.style.display = 'none';
+                document.getElementById(`sidebar-item-${index}`).classList.remove('active-detail');
+                juegoSeleccionadoActual = null;
+                return;
+            }
+
+            // Si abre uno nuevo o cambia de juego
+            // Quitamos la clase activa anterior si existía
+            if (juegoSeleccionadoActual !== null) {
+                const anteriorItem = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
+                if (anteriorItem) anteriorItem.classList.remove('active-detail');
+            }
+
+            const juego = window.proyectosEnProceso[index];
+            juegoSeleccionadoActual = index;
+
+            document.getElementById(`sidebar-item-${index}`).classList.add('active-detail');
             document.getElementById('detail-title').innerText = juego.titulo;
             
             const linkEl = document.getElementById('detail-link');
