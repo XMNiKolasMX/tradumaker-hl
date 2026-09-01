@@ -282,7 +282,7 @@
                     <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
                 </div>
 
-                <!-- 2. Estado de Proyectos (Dinámico desde Supabase con Panel Desplegable) -->
+                <!-- 2. Estado de Proyectos (Dinámico desde la tabla estado_juegos) -->
                 <div class="guild-card">
                     <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
                     <ul class="sidebar-list" id="sidebar-translations-list">
@@ -385,7 +385,7 @@
             const listaSidebar = document.getElementById('sidebar-translations-list');
 
             try {
-                // 1. Cargar Últimos Lanzamientos (4 juegos ya traducidos)
+                // 1. Cargar Últimos Lanzamientos (4 juegos ya traducidos de la tabla 'juegos')
                 const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
                     .from('juegos')
                     .select('*')
@@ -412,11 +412,10 @@
                     `).join('');
                 }
 
-                // 2. Cargar Estado de Traducciones (Únicamente los que están en proceso: traducido = false)
+                // 2. Cargar Estado de Proyectos (Desde la nueva tabla 'estado_juegos')
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
-                    .from('juegos')
-                    .select('*') // Obtenemos todas las columnas para los detalles expandidos
-                    .eq('traducido', false)
+                    .from('estado_juegos')
+                    .select('*')
                     .order('id', { ascending: false });
 
                 if (errorEstados) throw errorEstados;
@@ -465,7 +464,7 @@
 
             document.getElementById('detail-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null) ? juego.porcentaje + '%' : 'En proceso';
             document.getElementById('detail-engine').innerText = juego.motor || 'RPG Maker';
-            document.getElementById('detail-desc').innerText = juego.descripcion || juego.notas || 'Sin notas adicionales por el momento.';
+            document.getElementById('detail-desc').innerText = juego.descripcion || 'Sin notas adicionales por el momento.';
 
             panel.style.display = 'block';
         }
