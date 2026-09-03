@@ -401,9 +401,13 @@
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
-                    const enDesarrollo = juego.en_desarrollo;
-                    const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
-                    const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
+                    // Condición para mostrar el badge solo si en_desarrollo es TRUE o FALSE (ignora si es null/undefined)
+                    let badgeHtml = '';
+                    if (juego.en_desarrollo === true) {
+                        badgeHtml = `<span class="badge-estado badge-true">✨ Se va a traducir (True)</span>`;
+                    } else if (juego.en_desarrollo === false) {
+                        badgeHtml = `<span class="badge-estado badge-false">❌ No se va a traducir (False)</span>`;
+                    }
 
                     const tipoVotoPrevio = votosClienteMap[juego.id];
                     const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
@@ -411,7 +415,6 @@
                     // Procesar la URL para permitir enlaces de páginas web mediante un proxy visualizador
                     let imagenUrl = juego.imagen || '';
                     if (imagenUrl && !imagenUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
-                        // Si no es un archivo de imagen directo, usamos el servicio wsrv.nl para extraer vista previa/imagen de la web
                         imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
                     }
 
@@ -423,7 +426,7 @@
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
-                                    <span class="badge-estado ${badgeClase}">${badgeTexto}</span>
+                                    ${badgeHtml}
                                 </div>
                                 <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
                                 <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción.'}</p>
@@ -511,7 +514,7 @@
 
             const { error } = await supabaseClient
                 .from('votaciones')
-                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0, en_desarrollo: false }]);
+                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]); // Sin en_desarrollo para que quede NULL por defecto
 
             if (error) {
                 console.error(error);
