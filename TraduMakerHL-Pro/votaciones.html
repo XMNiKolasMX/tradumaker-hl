@@ -1,1 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Próximas Traducciones (Beta) - TraduMaker HL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .votacion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .votacion-card {
+            background: #1a1e29;
+            border: 1px solid #2a2f3f;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .votacion-card:hover {
+            transform: translateY(-5px);
+            border-color: #6366f1;
+        }
+        .votacion-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .votacion-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .btn-votar {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+            margin-top: 15px;
+        }
+        .btn-votar:hover {
+            background: #4f46e5;
+        }
+        .btn-votar.votado {
+            background: #10b981;
+            cursor: default;
+        }
+        .badge-beta {
+            background: #f59e0b;
+            color: #111520;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            vertical-align: middle;
+            margin-left: 8px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
 
+    <!-- Navegación -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                <a href="votaciones.html" class="active" style="color: #6366f1;"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span class="badge-beta" style="font-size: 0.6rem; padding: 2px 5px;">BETA</span></a>
+                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 100px; padding-bottom: 60px;">
+        <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
+            
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
+                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">FASE BETA</span>
+                </h1>
+                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
+                    ¡Tu opinión cuenta! Vota por tu juego favorito de la lista. Los <strong style="color: white;">5 juegos más votados</strong> tendrán prioridad absoluta en el desarrollo. Las demás propuestas no se quedan atrás: si el tiempo lo permite, ¡iré traduciéndolas uno por uno!
+                </p>
+                <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <strong>Aviso:</strong> Esta sección se encuentra en fase de pruebas (Beta). Las reglas y la lista pueden ajustarse próximamente.
+                </div>
+            </div>
+
+            <!-- Contenedor de Juegos a Votar -->
+            <div id="grid-votaciones" class="votacion-grid">
+                <div style="text-align: center; grid-column: 1 / -1; padding: 40px; color: white;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: #6366f1;"></i>
+                    <p style="margin-top: 15px;">Cargando lista de proyectos...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // CREDENCIALES DE SUPABASE
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function cargarVotaciones() {
+            const grid = document.getElementById('grid-votaciones');
+
+            try {
+                const { data: juegos, error } = await supabaseClient
+                    .from('votaciones')
+                    .select('*')
+                    .order('votos', { ascending: false });
+
+                if (error) throw error;
+
+                if (!juegos || juegos.length === 0) {
+                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación por el momento. ¡Vuelve pronto!</p>`;
+                    return;
+                }
+
+                grid.innerHTML = '';
+                
+                const juegoVotadoLocal = localStorage.getItem('tradu_juego_votado');
+
+                juegos.forEach((juego, index) => {
+                    const yaVotoEste = juegoVotadoLocal == juego.id;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'votacion-card';
+                    card.innerHTML = `
+                        <img src="${juego.imagen || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'}" alt="${juego.titulo}" class="votacion-img">
+                        <div class="votacion-body">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
+                                    <span style="font-size: 0.85rem; color: #a0a0b0;"><i class="fa-solid fa-fire" style="color: #f59e0b;"></i> <span id="votos-${juego.id}">${juego.votos || 0}</span> votos</span>
+                                </div>
+                                <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
+                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4;">${juego.descripcion || 'Sin descripción detallada.'}</p>
+                            </div>
+                            
+                            <button onclick="votarJuego(${juego.id}, ${juego.votos || 0})" id="btn-votar-${juego.id}" class="btn-votar ${yaVotoEste ? 'votado' : ''}">
+                                <i class="fa-solid ${yaVotoEste ? 'fa-check' : 'fa-thumbs-up'}"></i> ${yaVotoEste ? '¡Voto registrado!' : 'Votar por este'}
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Error al cargar votaciones:", err);
+                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar las votaciones. Comprueba tu conexión o la tabla en Supabase.</p>`;
+            }
+        }
+
+        async function votarJuego(idJuego, votosActuales) {
+            const juegoVotadoLocal = localStorage.getItem('tradu_juego_votado');
+
+            if (juegoVotadoLocal) {
+                alert('¡Ya has emitido tu voto en esta encuesta desde este navegador! Gracias por participar.');
+                return;
+            }
+
+            const nuevosVotos = votosActuales + 1;
+
+            const { error } = await supabaseClient
+                .from('votaciones')
+                .update({ votos: nuevosVotos })
+                .eq('id', idJuego);
+
+            if (error) {
+                console.error("Error al registrar voto:", error);
+                alert('Hubo un error al registrar tu voto.');
+                return;
+            }
+
+            localStorage.setItem('tradu_juego_votado', idJuego);
+
+            document.getElementById(`votos-${idJuego}`).innerText = nuevosVotos;
+            const btn = document.getElementById(`btn-votar-${idJuego}`);
+            btn.className = 'btn-votar votado';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Voto registrado!';
+            
+            alert('¡Voto registrado con éxito! Gracias por apoyar este proyecto.');
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarVotaciones);
+    </script>
+</body>
+</html>
