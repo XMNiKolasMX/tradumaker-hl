@@ -291,7 +291,7 @@
                 <h3 style="color: white; font-family: 'Cinzel', serif; margin-bottom: 15px;">Añadir juego a la lista de votación</h3>
                 <form id="form-juego" onsubmit="agregarJuego(event)">
                     <div class="form-group">
-                        <label>Título del Juego</label>
+                        <label>Título del Juego (RPG Maker)</label>
                         <input type="text" id="nuevo-titulo" required placeholder="Ej. Ib, Corpse Party...">
                     </div>
                     <div class="form-group">
@@ -405,7 +405,7 @@
                     const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
                     const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
 
-                    const tipoVotoPrevio = votosClienteMap[juego.id];
+                    const tipoVotoPrevio = votosClienteMap[juego.id]; // 'like', 'dislike' o undefined
                     const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
 
                     const card = document.createElement('div');
