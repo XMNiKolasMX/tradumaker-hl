@@ -13,6 +13,75 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: #6366f1;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #161b22;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border: 1px solid #2a2f3f;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-content a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #6366f1;
+        }
+        .dropdown-content a.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .show {
+            display: block;
+        }
+
         /* Estilos del Easter Egg del logo antiguo */
         #easter-egg-container {
             position: fixed;
@@ -67,18 +136,34 @@
 </head>
 <body>
 
-    <!-- Navegación -->
+    <!-- Navegación con Menú Desplegable -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
-            <nav class="nav-links">
-                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
-                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
-                <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-            </nav>
+            
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
         </div>
     </header>
 
@@ -113,6 +198,24 @@
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Script para el Menú Desplegable (Dropdown)
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
+
+        // Cerrar el menú si el usuario hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
 
         async function cargarJuego() {
             const container = document.getElementById('contenedor-dinamico');
@@ -265,7 +368,6 @@
             const bubbleEgg = document.getElementById('easter-egg-bubble');
 
             if (logoEgg && bubbleEgg) {
-                // Al hacer clic en el logo antiguo, muestra el mensaje y lo oculta a los 5 segundos
                 logoEgg.addEventListener('click', () => {
                     bubbleEgg.classList.toggle('show');
                 });
