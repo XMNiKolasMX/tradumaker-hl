@@ -4,18 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles del Juego - TraduMaker HL</title>
-    <!-- Tus fuentes e iconos originales y nuevos -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
     
-    <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-    <!-- Navegación -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -32,7 +29,6 @@
 
     <main class="main-content" style="padding-top: 100px;">
         <div class="container" id="contenedor-dinamico">
-            <!-- Loader -->
             <div style="text-align: center; padding: 50px; color: white;">
                 <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: #6366f1;"></i>
                 <p style="margin-top: 15px;">Cargando información del juego...</p>
@@ -40,7 +36,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
             <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
@@ -48,7 +43,7 @@
     </footer>
 
     <script>
-        // PON TUS CREDENCIALES REALES AQUÍ
+        // CREDENCIALES DE SUPABASE
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -73,16 +68,15 @@
 
                 if (error) throw error;
 
-                // Renderizamos usando la estructura de tu diseño antiguo, pero con clases modernas
+                // Renderizamos usando la estructura del diseño antiguo + Formulario de Reporte conectado a Supabase
                 container.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
                         
-                        <!-- Columna Izquierda (Imagen y botones) -->
                         <div class="juego-info" style="display: flex; flex-direction: column; gap: 20px;">
                             <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 100%; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
                             
                             <div class="juego-desc">
-                                <h2 style="font-family: 'Cinzel', serif; color: white; font-size: 2rem; margin-bottom: 10px;">${juego.titulo}</h2>
+                                <h2 id="juego-titulo-principal" style="font-family: 'Cinzel', serif; color: white; font-size: 2rem; margin-bottom: 10px;">${juego.titulo}</h2>
                                 <p style="color: #a0a0b0; font-family: 'Poppins', sans-serif; margin-bottom: 20px;">
                                     ${juego.descripcion || 'Sin descripción disponible por el momento.'}
                                 </p>
@@ -96,7 +90,6 @@
                             </div>
                         </div>
 
-                        <!-- Columna Derecha (Info Técnica) -->
                         <div class="detalles-columna" style="display: flex; flex-direction: column; gap: 30px;">
                             
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
@@ -111,14 +104,29 @@
                             </section>
 
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
-                                <h3 style="color: white; margin-bottom: 15px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px;">¿Encontraste un error?</h3>
-                                <p style="color: #a0a0b0; margin-bottom: 15px;">Reporta cualquier fallo en nuestro canal de Discord. Revisamos los reportes constantemente.</p>
-                                <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="btn-secondary" style="background: #5865F2; color: white; border: none;"><i class="fa-brands fa-discord"></i> Únete al Discord oficial</a>
+                                <h3 style="color: white; margin-bottom: 10px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fa-solid fa-bug" style="color: #6366f1;"></i> ¿Encontraste un error?
+                                </h3>
+                                <p style="color: #a0a0b0; font-size: 0.85rem; margin-bottom: 15px;">Reporta faltas ortográficas o fallos de traducción directamente a nuestra base de datos.</p>
+                                
+                                <form id="bug-report-form" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <input type="text" id="bug-tipo" placeholder="Tipo de error (Ej. Ortografía, Texto cortado)" required style="padding: 10px; background: #1a1e29; border: 1px solid #2a2f3f; border-radius: 6px; color: white; font-size: 0.9rem;">
+                                    
+                                    <textarea id="bug-descripcion" placeholder="Describe dónde encontraste el error o qué texto dice mal..." rows="3" required style="padding: 10px; background: #1a1e29; border: 1px solid #2a2f3f; border-radius: 6px; color: white; font-size: 0.9rem; resize: vertical;"></textarea>
+                                    
+                                    <button type="submit" class="btn-primary" style="padding: 10px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fa-solid fa-paper-plane"></i> Enviar Reporte
+                                    </button>
+                                </form>
                             </section>
 
                         </div>
                     </div>
                 `;
+
+                // Activamos el evento del formulario de bugs una vez renderizado
+                configurarFormularioBugs(juego.titulo);
+
             } catch (error) {
                 console.error("Error al cargar de Supabase:", error);
                 container.innerHTML = `
@@ -129,6 +137,36 @@
                     </div>
                 `;
             }
+        }
+
+        function configurarFormularioBugs(tituloJuego) {
+            const form = document.getElementById('bug-report-form');
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const tipo = document.getElementById('bug-tipo').value;
+                const descripcion = document.getElementById('bug-descripcion').value;
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('reportes_bugs')
+                        .insert([{ 
+                            juego_titulo: tituloJuego, 
+                            tipo_error: tipo, 
+                            descripcion: descripcion 
+                        }]);
+
+                    if (error) throw error;
+
+                    alert('¡Gracias! El reporte ha sido enviado con éxito.');
+                    form.reset();
+                } catch (err) {
+                    console.error(err);
+                    alert('Hubo un error al enviar el reporte. Inténtalo de nuevo.');
+                }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', cargarJuego);
