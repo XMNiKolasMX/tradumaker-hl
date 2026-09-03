@@ -13,6 +13,75 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: #6366f1;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #161b22;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border: 1px solid #2a2f3f;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-content a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #6366f1;
+        }
+        .dropdown-content a.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .show {
+            display: block;
+        }
+
         .votacion-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -60,15 +129,19 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: background 0.2s;
+            transition: background 0.2s, opacity 0.2s;
             font-size: 0.85rem;
+        }
+        .btn-voto:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .btn-like {
             background: rgba(16, 185, 129, 0.15);
             color: #10b981;
             border: 1px solid #10b981;
         }
-        .btn-like:hover {
+        .btn-like:hover:not(:disabled) {
             background: #10b981;
             color: white;
         }
@@ -77,7 +150,7 @@
             color: #ef4444;
             border: 1px solid #ef4444;
         }
-        .btn-dislike:hover {
+        .btn-dislike:hover:not(:disabled) {
             background: #ef4444;
             color: white;
         }
@@ -155,19 +228,34 @@
 </head>
 <body>
 
-    <!-- Navegación -->
+    <!-- Navegación con Menú Desplegable -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
-            <nav class="nav-links">
-                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
-                <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                <a href="votaciones.html" class="active" style="color: #6366f1;"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span class="badge-beta" style="font-size: 0.6rem; padding: 2px 5px;">BETA</span></a>
-                <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
-                <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-            </nav>
+            
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="votaciones.html" class="active"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
         </div>
     </header>
 
@@ -179,7 +267,7 @@
                     ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 50 JUEGOS</span>
                 </h1>
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    Vota por tus favoritos. La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">top 5 juegos más votados</strong> serán los elegidos para traducción oficial.
+                    Vota por tus favoritos (solo se permite un voto en total por usuario/dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">top 5 juegos más votados</strong> serán los elegidos para traducción oficial.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
                     <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/50 juegos registrados.
@@ -238,6 +326,24 @@
 
         let totalJuegosActuales = 0;
 
+        // Script para el Menú Desplegable (Dropdown)
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
+
+        // Cerrar el menú si el usuario hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
         function toggleFormulario() {
             if (totalJuegosActuales >= 50) {
                 alert('Se ha alcanzado el límite máximo de 50 juegos en votación.');
@@ -247,16 +353,32 @@
             form.classList.toggle('activo');
         }
 
+        // Obtener un identificador único persistente para el dispositivo/navegador
+        function obtenerClientId() {
+            let clientId = localStorage.getItem('tradu_client_id');
+            if (!clientId) {
+                clientId = 'client_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('tradu_client_id', clientId);
+            }
+            return clientId;
+        }
+
         async function cargarVotaciones() {
             const grid = document.getElementById('grid-votaciones');
+            const clientId = obtenerClientId();
 
             try {
-                const { data: juegos, error } = await supabaseClient
-                    .from('votaciones')
-                    .select('*')
-                    .order('likes', { ascending: false });
+                // Consultar juegos y el registro de votos de este dispositivo simultáneamente
+                const [resJuegos, resVotos] = await Promise.all([
+                    supabaseClient.from('votaciones').select('*').order('likes', { ascending: false }),
+                    supabaseClient.from('registro_votos').select('juego_id').eq('client_id', clientId)
+                ]);
 
-                if (error) throw error;
+                if (resJuegos.error) throw resJuegos.error;
+
+                const juegos = resJuegos.data;
+                const juegosYaVotadosPorCliente = new Set((resVotos.data || []).map(v => v.juego_id));
+                const yaVotoEnAlgunLado = juegosYaVotadosPorCliente.size > 0;
 
                 totalJuegosActuales = juegos ? juegos.length : 0;
                 document.getElementById('contador-limite').innerText = totalJuegosActuales;
@@ -277,6 +399,10 @@
                     const enDesarrollo = juego.en_desarrollo;
                     const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
                     const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
+
+                    // Determinar si este juego específico fue votado por este cliente, o si ya votó por cualquier otro juego (bloqueo global por IP/dispositivo)
+                    const votadoEste = juegosYaVotadosPorCliente.has(juego.id);
+                    const deshabilitarBotones = yaVotoEnAlgunLado;
 
                     const card = document.createElement('div');
                     card.className = 'votacion-card';
@@ -305,11 +431,11 @@
                             </div>
                             
                             <div class="acciones-votos">
-                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like">
-                                    <i class="fa-solid fa-thumbs-up"></i> Sí
+                                <button onclick="votar(${juego.id}, 'like')" id="btn-like-${juego.id}" class="btn-voto btn-like" ${deshabilitarBotones ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-up"></i> ${votadoEste ? 'Tu Voto (Sí)' : 'Sí'}
                                 </button>
-                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike">
-                                    <i class="fa-solid fa-thumbs-down"></i> No
+                                <button onclick="votar(${juego.id}, 'dislike')" id="btn-dislike-${juego.id}" class="btn-voto btn-dislike" ${deshabilitarBotones ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-down"></i> ${votadoEste ? 'Tu Voto (No)' : 'No'}
                                 </button>
                             </div>
                         </div>
@@ -324,13 +450,43 @@
         }
 
         async function votar(idJuego, tipo) {
+            const clientId = obtenerClientId();
+
+            // Verificar doblemente en servidor si ya emitió un voto desde este dispositivo/IP
+            const { data: yaVotoCheck, error: errCheck } = await supabaseClient
+                .from('registro_votos')
+                .select('*')
+                .eq('client_id', clientId);
+
+            if (errCheck) {
+                alert('Error al verificar el estado de tu voto.');
+                return;
+            }
+
+            if (yaVotoCheck && yaVotoCheck.length > 0) {
+                alert('Ya has emitido tu voto en este dispositivo o red. Solo se permite un voto por usuario.');
+                cargarVotaciones(); // Recargar para sincronizar estado de botones
+                return;
+            }
+
+            // Registrar el voto en la tabla de control para bloquear futuras votaciones desde esta IP/equipo
+            const { error: errRegistro } = await supabaseClient
+                .from('registro_votos')
+                .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo }]);
+
+            if (errRegistro) {
+                alert('No se pudo registrar tu voto (es posible que ya hayas votado anteriormente).');
+                return;
+            }
+
+            // Obtener datos actuales del juego para actualizar los contadores
             const { data: juegoActual, error: errorFetch } = await supabaseClient
                 .from('votaciones')
                 .select('likes, dislikes')
                 .eq('id', idJuego)
                 .single();
 
-            if (errorFetch) return alert('No se pudo procesar el voto.');
+            if (errorFetch) return alert('No se pudo actualizar el contador del juego.');
 
             let nuevosLikes = juegoActual.likes || 0;
             let nuevosDislikes = juegoActual.dislikes || 0;
@@ -343,18 +499,10 @@
                 .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
                 .eq('id', idJuego);
 
-            if (errorUpdate) return alert('Hubo un error al registrar tu voto.');
+            if (errorUpdate) return alert('Hubo un error al actualizar los puntos del juego.');
 
-            document.getElementById(`likes-${idJuego}`).innerText = nuevosLikes;
-            document.getElementById(`dislikes-${idJuego}`).innerText = nuevosDislikes;
-
-            const total = nuevosLikes + nuevosDislikes;
-            const porcentaje = total > 0 ? Math.round((likes / total) * 100) : 50; // se mantiene con la lógica segura
-            
-            // Recálculo exacto para la vista dinámica
-            const porcentajeFinal = total > 0 ? Math.round((nuevosLikes / total) * 100) : 50;
-            document.getElementById(`porcentaje-${idJuego}`).innerText = `${porcentajeFinal}%`;
-            document.getElementById(`barra-${idJuego}`).style.width = `${porcentajeFinal}%`;
+            alert('¡Gracias por votar! Tu voto ha sido registrado con éxito.');
+            cargarVotaciones(); // Recargar interfaz para bloquear el resto de botones de voto
         }
 
         async function agregarJuego(event) {
