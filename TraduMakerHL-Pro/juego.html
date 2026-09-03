@@ -11,6 +11,59 @@
     
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Estilos del Easter Egg del logo antiguo */
+        #easter-egg-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            transition: all 0.5s ease;
+        }
+
+        #easter-egg-logo {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 2px solid #6366f1;
+            object-fit: cover;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            background: #1a1e29;
+            transition: transform 0.3s ease;
+        }
+
+        #easter-egg-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        #easter-egg-bubble {
+            background: #1a1e29;
+            border: 1px solid #6366f1;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+            max-width: 240px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        #easter-egg-bubble.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -39,6 +92,15 @@
         </div>
     </main>
 
+    <!-- Easter Egg Widget (Logo Antiguo) -->
+    <div id="easter-egg-container">
+        <div id="easter-egg-bubble">
+            ¡Miau! Aunque ya cambié de fachada, ¡aún sigo formando parte del alma y la historia de TraduMaker HL! 🐾✨
+        </div>
+        <!-- Asegúrate de guardar tu logo antiguo en la misma carpeta con este nombre o cambia el src -->
+        <img src="logo-antiguo.webp" alt="Logo Antiguo Team HL" id="easter-egg-logo" title="¡Un guiño al pasado!">
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
@@ -63,7 +125,6 @@
             }
 
             try {
-                // Traemos el juego de la base de datos
                 const { data: juego, error } = await supabaseClient
                     .from('juegos')
                     .select('*')
@@ -72,11 +133,9 @@
 
                 if (error) throw error;
 
-                // Renderizamos la estructura
                 container.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
                         
-                        <!-- Columna Izquierda (Imagen y botones) -->
                         <div class="juego-info" style="display: flex; flex-direction: column; gap: 20px;">
                             <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 100%; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
                             
@@ -87,7 +146,6 @@
                                 </p>
                                 
                                 <div style="display: flex; gap: 15px;">
-                                    <!-- Botón transformado a tipo 'button' para controlar la acción de forma segura -->
                                     <button id="btn-descargar" class="btn-primary" style="flex: 1; text-align: center; border: none; cursor: pointer; padding: 12px; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                         <i class="fa-solid fa-download"></i> Descargar
                                     </button>
@@ -98,7 +156,6 @@
                             </div>
                         </div>
 
-                        <!-- Columna Derecha (Info Técnica + Reporte de Bugs) -->
                         <div class="detalles-columna" style="display: flex; flex-direction: column; gap: 30px;">
                             
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
@@ -113,7 +170,6 @@
                                 <p style="margin-top: 15px; color: #a0a0b0;"><strong style="color: white;">Desarrollador:</strong> ${juego.desarrollador || 'Desconocido'}</p>
                             </section>
 
-                            <!-- Formulario de Reporte de Bugs -->
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
                                 <h3 style="color: white; margin-bottom: 10px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fa-solid fa-bug" style="color: #6366f1;"></i> ¿Encontraste un error?
@@ -135,7 +191,6 @@
                     </div>
                 `;
 
-                // Activamos la lógica segura del botón de descarga y del formulario
                 configurarContadorDescargas(juegoId, juego.descargas || 0, juego.enlace);
                 configurarFormularioBugs(juego.titulo);
 
@@ -144,14 +199,13 @@
                 container.innerHTML = `
                     <div style="background: #1a1e29; padding: 40px; border-radius: 12px; text-align: center;">
                         <h2 style="color: white; margin-bottom: 15px;">Error al cargar</h2>
-                        <p style="color: #a0a0b0; margin-bottom: 20px;">No se pudo obtener la información de este juego. Asegúrate de haber puesto las claves correctas y de que el juego exista.</p>
+                        <p style="color: #a0a0b0; margin-bottom: 20px;">No se pudo obtener la información de este juego. Asegúrate de que el juego exista.</p>
                         <a href="catalogo.html" class="btn-primary">Volver al Catálogo</a>
                     </div>
                 `;
             }
         }
 
-        // Función que actualiza la base de datos de manera segura antes de abrir MediaFire / Workupload
         function configurarContadorDescargas(juegoId, descargasActuales, enlaceDescarga) {
             const btnDescargar = document.getElementById('btn-descargar');
             if (!btnDescargar) return;
@@ -159,7 +213,6 @@
             btnDescargar.addEventListener('click', async () => {
                 const nuevasDescargas = descargasActuales + 1;
                 
-                // Actualizamos primero en Supabase
                 const { error } = await supabaseClient
                     .from('juegos')
                     .update({ descargas: nuevasDescargas })
@@ -172,7 +225,6 @@
                     console.error("Error al actualizar descarga:", error);
                 }
 
-                // Abrimos el enlace de MediaFire / Workupload en una pestaña nueva de forma segura
                 if (enlaceDescarga && enlaceDescarga !== '#') {
                     window.open(enlaceDescarga, '_blank');
                 } else {
@@ -187,31 +239,38 @@
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
                 const tipo = document.getElementById('bug-tipo').value;
                 const descripcion = document.getElementById('bug-descripcion').value;
 
                 try {
                     const { error } = await supabaseClient
                         .from('reportes_bugs')
-                        .insert([{ 
-                            juego_titulo: tituloJuego, 
-                            tipo_error: tipo, 
-                            descripcion: descripcion 
-                        }]);
+                        .insert([{ juego_titulo: tituloJuego, tipo_error: tipo, descripcion: descripcion }]);
 
                     if (error) throw error;
-
                     alert('¡Gracias! El reporte ha sido enviado con éxito.');
                     form.reset();
                 } catch (err) {
                     console.error(err);
-                    alert('Hubo un error al enviar el reporte. Inténtalo de nuevo.');
+                    alert('Hubo un error al enviar el reporte.');
                 }
             });
         }
 
-        document.addEventListener('DOMContentLoaded', cargarJuego);
+        // Lógica del Easter Egg intermitente / interactivo
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarJuego();
+
+            const logoEgg = document.getElementById('easter-egg-logo');
+            const bubbleEgg = document.getElementById('easter-egg-bubble');
+
+            if (logoEgg && bubbleEgg) {
+                // Al hacer clic en el logo antiguo, muestra el mensaje y lo oculta a los 5 segundos
+                logoEgg.addEventListener('click', () => {
+                    bubbleEgg.classList.toggle('show');
+                });
+            }
+        });
     </script>
 </body>
 </html>
