@@ -72,7 +72,7 @@
 
                 if (error) throw error;
 
-                // Renderizamos incluyendo el contador de descargas y el evento de clic
+                // Renderizamos la estructura
                 container.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
                         
@@ -87,15 +87,18 @@
                                 </p>
                                 
                                 <div style="display: flex; gap: 15px;">
-                                    <a href="${juego.enlace || '#'}" target="_blank" id="btn-descargar" class="btn-primary" style="flex: 1; text-align: center;"><i class="fa-solid fa-download"></i> Descargar</a>
-                                    ${juego.enlace_original ? `<a href="${juego.enlace_original}" target="_blank" class="btn-secondary" style="flex: 1; text-align: center; background: #2a2f3f; color: white;"><i class="fa-solid fa-cart-shopping"></i> Original</a>` : ''}
+                                    <!-- Botón transformado a tipo 'button' para controlar la acción de forma segura -->
+                                    <button id="btn-descargar" class="btn-primary" style="flex: 1; text-align: center; border: none; cursor: pointer; padding: 12px; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fa-solid fa-download"></i> Descargar
+                                    </button>
+                                    ${juego.enlace_original ? `<a href="${juego.enlace_original}" target="_blank" class="btn-secondary" style="flex: 1; text-align: center; background: #2a2f3f; color: white; display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 6px;"><i class="fa-solid fa-cart-shopping"></i> Original</a>` : ''}
                                 </div>
                                 
                                 ${juego.enlace_original ? `<p style="font-size: 0.8rem; margin-top: 15px; color: #888;">* Por favor, apoya al creador comprando el juego original.</p>` : ''}
                             </div>
                         </div>
 
-                        <!-- Columna Derecha (Info Técnica, Descargas + Reporte de Bugs) -->
+                        <!-- Columna Derecha (Info Técnica + Reporte de Bugs) -->
                         <div class="detalles-columna" style="display: flex; flex-direction: column; gap: 30px;">
                             
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
@@ -132,8 +135,8 @@
                     </div>
                 `;
 
-                // Activamos la lógica del botón de descarga y del formulario
-                configurarContadorDescargas(juegoId, juego.descargas || 0);
+                // Activamos la lógica segura del botón de descarga y del formulario
+                configurarContadorDescargas(juegoId, juego.descargas || 0, juego.enlace);
                 configurarFormularioBugs(juego.titulo);
 
             } catch (error) {
@@ -148,15 +151,15 @@
             }
         }
 
-        // Función para incrementar el contador de descargas en Supabase al hacer clic
-        function configurarContadorDescargas(juegoId, descargasActuales) {
+        // Función que actualiza la base de datos de manera segura antes de abrir MediaFire / Workupload
+        function configurarContadorDescargas(juegoId, descargasActuales, enlaceDescarga) {
             const btnDescargar = document.getElementById('btn-descargar');
             if (!btnDescargar) return;
 
             btnDescargar.addEventListener('click', async () => {
                 const nuevasDescargas = descargasActuales + 1;
                 
-                // Actualizamos en la base de datos de manera silenciosa
+                // Actualizamos primero en Supabase
                 const { error } = await supabaseClient
                     .from('juegos')
                     .update({ descargas: nuevasDescargas })
@@ -164,7 +167,16 @@
 
                 if (!error) {
                     descargasActuales = nuevasDescargas;
-                    document.getElementById('contador-descargas').innerText = nuevaDescargas;
+                    document.getElementById('contador-descargas').innerText = nuevasDescargas;
+                } else {
+                    console.error("Error al actualizar descarga:", error);
+                }
+
+                // Abrimos el enlace de MediaFire / Workupload en una pestaña nueva de forma segura
+                if (enlaceDescarga && enlaceDescarga !== '#') {
+                    window.open(enlaceDescarga, '_blank');
+                } else {
+                    alert('Enlace de descarga no disponible.');
                 }
             });
         }
