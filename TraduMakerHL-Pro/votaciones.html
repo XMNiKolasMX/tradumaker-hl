@@ -411,8 +411,7 @@
                     const card = document.createElement('div');
                     card.className = 'votacion-card';
                     card.innerHTML = `
-                        <img src="${juego.imagen || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'}" alt="${juego.titulo}" class="votacion-img">
-                        <div class="votacion-body">
+                            <img src="${juego.imagen && juego.imagen.startsWith('http') ? juego.imagen : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'}" alt="${juego.titulo}" class="votacion-img" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'">                        <div class="votacion-body">
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
