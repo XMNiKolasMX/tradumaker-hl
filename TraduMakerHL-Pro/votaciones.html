@@ -81,7 +81,6 @@
             background: #ef4444;
             color: white;
         }
-        /* Barra de Progreso */
         .progress-container {
             width: 100%;
             background: #2a2f3f;
@@ -106,7 +105,23 @@
             vertical-align: middle;
             margin-left: 8px;
         }
-        /* Estilos del Formulario Oculto para proponer juego */
+        .badge-estado {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-true {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid #10b981;
+        }
+        .badge-false {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
         .form-proponer {
             background: #1a1e29;
             border: 1px solid #2a2f3f;
@@ -161,14 +176,19 @@
             
             <div style="text-align: center; margin-bottom: 30px;">
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
-                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">FASE BETA</span>
+                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 10 JUEGOS</span>
                 </h1>
-                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 20px;">
-                    Vota con pulgar arriba o abajo por tus juegos favoritos. ¿No encuentras el tuyo? ¡Propón un nuevo juego para que la comunidad pueda votarlo!
+                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
+                    Vota por tus favoritos. La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">5 juegos con mejor aceptación</strong> pasarán a estado oficial de traducción.
                 </p>
-                <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    <i class="fa-solid fa-plus"></i> Proponer un nuevo juego
-                </button>
+                <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
+                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
+                </div>
+                <div>
+                    <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        <i class="fa-solid fa-plus"></i> Proponer un nuevo juego
+                    </button>
+                </div>
             </div>
 
             <!-- Formulario para agregar juego -->
@@ -181,7 +201,7 @@
                     </div>
                     <div class="form-group">
                         <label>Descripción corta</label>
-                        <textarea id="nuevo-descripcion" rows="2" required placeholder="Breve sinopsis de por qué vale la pena traducirlo..."></textarea>
+                        <textarea id="nuevo-descripcion" rows="2" required placeholder="Breve sinopsis..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>URL de la Imagen (Opcional)</label>
@@ -216,7 +236,13 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let totalJuegosActuales = 0;
+
         function toggleFormulario() {
+            if (totalJuegosActuales >= 10) {
+                alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
+                return;
+            }
             const form = document.getElementById('form-proponer-container');
             form.classList.toggle('activo');
         }
@@ -232,8 +258,11 @@
 
                 if (error) throw error;
 
+                totalJuegosActuales = juegos ? juegos.length : 0;
+                document.getElementById('contador-limite').innerText = totalJuegosActuales;
+
                 if (!juegos || juegos.length === 0) {
-                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación por el momento. ¡Sé el primero en proponer uno!</p>`;
+                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
                     return;
                 }
 
@@ -244,6 +273,11 @@
                     const dislikes = juego.dislikes || 0;
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
+                    
+                    // Estado true/false para saber si se va a traducir
+                    const enDesarrollo = juego.en_desarrollo;
+                    const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
+                    const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
 
                     const card = document.createElement('div');
                     card.className = 'votacion-card';
@@ -253,12 +287,11 @@
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
-                                    <span style="font-size: 0.8rem; color: #a0a0b0;">${totalVotos} votos totales</span>
+                                    <span class="badge-estado ${badgeClase}">${badgeTexto}</span>
                                 </div>
                                 <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
-                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción detallada.'}</p>
+                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción.'}</p>
                                 
-                                <!-- Barra de Progreso de Aceptación -->
                                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0a0b0;">
                                     <span>👍 Aprobación</span>
                                     <span id="porcentaje-${juego.id}">${porcentajeLikes}%</span>
@@ -274,10 +307,10 @@
                             
                             <div class="acciones-votos">
                                 <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like">
-                                    <i class="fa-solid fa-thumbs-up"></i> Sí (${likes})
+                                    <i class="fa-solid fa-thumbs-up"></i> Sí
                                 </button>
                                 <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike">
-                                    <i class="fa-solid fa-thumbs-down"></i> No (${dislikes})
+                                    <i class="fa-solid fa-thumbs-down"></i> No
                                 </button>
                             </div>
                         </div>
@@ -287,43 +320,32 @@
 
             } catch (err) {
                 console.error("Error al cargar votaciones:", err);
-                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar las votaciones de Supabase.</p>`;
+                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al conectar con Supabase.</p>`;
             }
         }
 
         async function votar(idJuego, tipo) {
-            // Consultamos los valores actuales de la base de datos para asegurarnos de tener el número exacto
             const { data: juegoActual, error: errorFetch } = await supabaseClient
                 .from('votaciones')
                 .select('likes, dislikes')
                 .eq('id', idJuego)
                 .single();
 
-            if (errorFetch) {
-                alert('No se pudo procesar el voto.');
-                return;
-            }
+            if (errorFetch) return alert('No se pudo procesar el voto.');
 
             let nuevosLikes = juegoActual.likes || 0;
             let nuevosDislikes = juegoActual.dislikes || 0;
 
-            if (tipo === 'like') {
-                nuevosLikes += 1;
-            } else {
-                nuevosDislikes += 1;
-            }
+            if (tipo === 'like') nuevosLikes += 1;
+            else nuevosDislikes += 1;
 
             const { error: errorUpdate } = await supabaseClient
                 .from('votaciones')
                 .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
                 .eq('id', idJuego);
 
-            if (errorUpdate) {
-                alert('Hubo un error al registrar tu voto.');
-                return;
-            }
+            if (errorUpdate) return alert('Hubo un error al registrar tu voto.');
 
-            // Actualizar visualmente en tiempo real sin recargar toda la página
             document.getElementById(`likes-${idJuego}`).innerText = nuevosLikes;
             document.getElementById(`dislikes-${idJuego}`).innerText = nuevosDislikes;
 
@@ -337,13 +359,18 @@
         async function agregarJuego(event) {
             event.preventDefault();
             
+            if (totalJuegosActuales >= 10) {
+                alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
+                return;
+            }
+
             const titulo = document.getElementById('nuevo-titulo').value;
             const descripcion = document.getElementById('nuevo-descripcion').value;
             const imagen = document.getElementById('nuevo-imagen').value || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop';
 
             const { error } = await supabaseClient
                 .from('votaciones')
-                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]); // Empieza con 1 like por defecto de quien lo propone
+                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0, en_desarrollo: false }]);
 
             if (error) {
                 console.error(error);
@@ -351,7 +378,7 @@
                 return;
             }
 
-            alert('¡Propuesta agregada con éxito! Ya aparece en la lista para que todos voten.');
+            alert('¡Propuesta agregada con éxito!');
             document.getElementById('form-juego').reset();
             toggleFormulario();
             cargarVotaciones();
