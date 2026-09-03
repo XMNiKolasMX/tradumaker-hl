@@ -243,6 +243,7 @@
                 <div id="navDropdown" class="dropdown-content">
                     <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
                     <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Estado de Avances</a>
                     <a href="votaciones.html" class="active"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
@@ -266,8 +267,14 @@
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
                     ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 50 JUEGOS</span>
                 </h1>
+                
+                <!-- Aviso de solo RPG Maker -->
+                <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;">
+                    <i class="fa-solid fa-circle-check"></i> Solo juegos desarrollados en RPG Maker
+                </p>
+
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    Vota por tus favoritos (solo se permite un voto en total por usuario/dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">top 5 juegos más votados</strong> serán los elegidos para traducción oficial.
+                    Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
                     <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/50 juegos registrados.
@@ -285,7 +292,7 @@
                 <form id="form-juego" onsubmit="agregarJuego(event)">
                     <div class="form-group">
                         <label>Título del Juego</label>
-                        <input type="text" id="nuevo-titulo" required placeholder="Ej. Xenogears">
+                        <input type="text" id="nuevo-titulo" required placeholder="Ej. Ib, Corpse Party...">
                     </div>
                     <div class="form-group">
                         <label>Descripción corta</label>
@@ -326,12 +333,10 @@
 
         let totalJuegosActuales = 0;
 
-        // Script para el Menú Desplegable (Dropdown)
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
         }
 
-        // Cerrar el menú si el usuario hace clic fuera de él
         window.onclick = function(event) {
             if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -353,7 +358,6 @@
             form.classList.toggle('activo');
         }
 
-        // Obtener un identificador único persistente para el dispositivo/navegador
         function obtenerClientId() {
             let clientId = localStorage.getItem('tradu_client_id');
             if (!clientId) {
@@ -368,17 +372,18 @@
             const clientId = obtenerClientId();
 
             try {
-                // Consultar juegos y el registro de votos de este dispositivo simultáneamente
                 const [resJuegos, resVotos] = await Promise.all([
                     supabaseClient.from('votaciones').select('*').order('likes', { ascending: false }),
-                    supabaseClient.from('registro_votos').select('juego_id').eq('client_id', clientId)
+                    supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('client_id', clientId)
                 ]);
 
                 if (resJuegos.error) throw resJuegos.error;
 
                 const juegos = resJuegos.data;
-                const juegosYaVotadosPorCliente = new Set((resVotos.data || []).map(v => v.juego_id));
-                const yaVotoEnAlgunLado = juegosYaVotadosPorCliente.size > 0;
+                const votosClienteMap = {};
+                (resVotos.data || []).forEach(v => {
+                    votosClienteMap[v.juego_id] = v.tipo_voto;
+                });
 
                 totalJuegosActuales = juegos ? juegos.length : 0;
                 document.getElementById('contador-limite').innerText = totalJuegosActuales;
@@ -400,9 +405,8 @@
                     const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
                     const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
 
-                    // Determinar si este juego específico fue votado por este cliente, o si ya votó por cualquier otro juego
-                    const votadoEste = juegosYaVotadosPorCliente.has(juego.id);
-                    const deshabilitarBotones = yaVotoEnAlgunLado;
+                    const tipoVotoPrevio = votosClienteMap[juego.id];
+                    const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
 
                     const card = document.createElement('div');
                     card.className = 'votacion-card';
@@ -419,23 +423,23 @@
                                 
                                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0a0b0;">
                                     <span>👍 Aprobación</span>
-                                    <span id="porcentaje-${juego.id}">${porcentajeLikes}%</span>
+                                    <span>${porcentajeLikes}%</span>
                                 </div>
                                 <div class="progress-container">
-                                    <div id="barra-${juego.id}" class="progress-bar" style="width: ${porcentajeLikes}%;"></div>
+                                    <div class="progress-bar" style="width: ${porcentajeLikes}%;"></div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #808090; margin-top: 2px;">
-                                    <span><strong id="likes-${juego.id}" style="color: #10b981;">${likes}</strong> Sí</span>
-                                    <span><strong id="dislikes-${juego.id}" style="color: #ef4444;">${dislikes}</strong> No</span>
+                                    <span><strong style="color: #10b981;">${likes}</strong> Sí</span>
+                                    <span><strong style="color: #ef4444;">${dislikes}</strong> No</span>
                                 </div>
                             </div>
                             
                             <div class="acciones-votos">
-                                <button onclick="votar(${juego.id}, 'like')" id="btn-like-${juego.id}" class="btn-voto btn-like" ${deshabilitarBotones ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-up"></i> ${votadoEste ? 'Tu Voto (Sí)' : 'Sí'}
+                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
                                 </button>
-                                <button onclick="votar(${juego.id}, 'dislike')" id="btn-dislike-${juego.id}" class="btn-voto btn-dislike" ${deshabilitarBotones ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-down"></i> ${votadoEste ? 'Tu Voto (No)' : 'No'}
+                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
                                 </button>
                             </div>
                         </div>
@@ -452,34 +456,15 @@
         async function votar(idJuego, tipo) {
             const clientId = obtenerClientId();
 
-            // Verificar doblemente en servidor si ya emitió un voto desde este dispositivo/red
-            const { data: yaVotoCheck, error: errCheck } = await supabaseClient
-                .from('registro_votos')
-                .select('*')
-                .eq('client_id', clientId);
-
-            if (errCheck) {
-                alert('Error al verificar el estado de tu voto.');
-                return;
-            }
-
-            if (yaVotoCheck && yaVotoCheck.length > 0) {
-                alert('Ya has emitido tu voto en este dispositivo o red. Solo se permite un voto por usuario.');
-                cargarVotaciones();
-                return;
-            }
-
-            // Registrar el voto en la tabla de control
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
                 .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo }]);
 
             if (errRegistro) {
-                alert('No se pudo registrar tu voto (es posible que ya hayas votado anteriormente).');
+                alert('Ya has votado por este juego anteriormente.');
                 return;
             }
 
-            // Obtener datos actuales del juego para actualizar contadores
             const { data: juegoActual, error: errorFetch } = await supabaseClient
                 .from('votaciones')
                 .select('likes, dislikes')
@@ -501,7 +486,7 @@
 
             if (errorUpdate) return alert('Hubo un error al actualizar los puntos del juego.');
 
-            alert('¡Gracias por votar! Tu voto ha sido registrado con éxito.');
+            alert('¡Voto registrado con éxito!');
             cargarVotaciones();
         }
 
