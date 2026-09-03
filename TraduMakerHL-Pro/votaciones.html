@@ -176,13 +176,13 @@
             
             <div style="text-align: center; margin-bottom: 30px;">
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
-                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 10 JUEGOS</span>
+                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 50 JUEGOS</span>
                 </h1>
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    Vota por tus favoritos. La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">5 juegos con mejor aceptación</strong> pasarán a estado oficial de traducción.
+                    Vota por tus favoritos. La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>. Los <strong style="color: white;">top 5 juegos más votados</strong> serán los elegidos para traducción oficial.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
-                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
+                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/50 juegos registrados.
                 </div>
                 <div>
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
@@ -239,8 +239,8 @@
         let totalJuegosActuales = 0;
 
         function toggleFormulario() {
-            if (totalJuegosActuales >= 10) {
-                alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
+            if (totalJuegosActuales >= 50) {
+                alert('Se ha alcanzado el límite máximo de 50 juegos en votación.');
                 return;
             }
             const form = document.getElementById('form-proponer-container');
@@ -274,7 +274,6 @@
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
-                    // Estado true/false para saber si se va a traducir
                     const enDesarrollo = juego.en_desarrollo;
                     const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
                     const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
@@ -350,17 +349,19 @@
             document.getElementById(`dislikes-${idJuego}`).innerText = nuevosDislikes;
 
             const total = nuevosLikes + nuevosDislikes;
-            const porcentaje = total > 0 ? Math.round((nuevosLikes / total) * 100) : 50;
+            const porcentaje = total > 0 ? Math.round((likes / total) * 100) : 50; // se mantiene con la lógica segura
             
-            document.getElementById(`porcentaje-${idJuego}`).innerText = `${porcentaje}%`;
-            document.getElementById(`barra-${idJuego}`).style.width = `${porcentaje}%`;
+            // Recálculo exacto para la vista dinámica
+            const porcentajeFinal = total > 0 ? Math.round((nuevosLikes / total) * 100) : 50;
+            document.getElementById(`porcentaje-${idJuego}`).innerText = `${porcentajeFinal}%`;
+            document.getElementById(`barra-${idJuego}`).style.width = `${porcentajeFinal}%`;
         }
 
         async function agregarJuego(event) {
             event.preventDefault();
             
-            if (totalJuegosActuales >= 10) {
-                alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
+            if (totalJuegosActuales >= 50) {
+                alert('Se ha alcanzado el límite máximo de 50 juegos. No se pueden agregar más propuestas.');
                 return;
             }
 
