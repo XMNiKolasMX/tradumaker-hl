@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
     
+    <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
+    <!-- Navegación -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -29,6 +31,7 @@
 
     <main class="main-content" style="padding-top: 100px;">
         <div class="container" id="contenedor-dinamico">
+            <!-- Loader -->
             <div style="text-align: center; padding: 50px; color: white;">
                 <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: #6366f1;"></i>
                 <p style="margin-top: 15px;">Cargando información del juego...</p>
@@ -36,6 +39,7 @@
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
             <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
@@ -68,10 +72,11 @@
 
                 if (error) throw error;
 
-                // Renderizamos usando la estructura del diseño antiguo + Formulario de Reporte conectado a Supabase
+                // Renderizamos incluyendo el contador de descargas y el evento de clic
                 container.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
                         
+                        <!-- Columna Izquierda (Imagen y botones) -->
                         <div class="juego-info" style="display: flex; flex-direction: column; gap: 20px;">
                             <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 100%; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
                             
@@ -82,7 +87,7 @@
                                 </p>
                                 
                                 <div style="display: flex; gap: 15px;">
-                                    <a href="${juego.enlace || '#'}" target="_blank" class="btn-primary" style="flex: 1; text-align: center;"><i class="fa-solid fa-download"></i> Descargar</a>
+                                    <a href="${juego.enlace || '#'}" target="_blank" id="btn-descargar" class="btn-primary" style="flex: 1; text-align: center;"><i class="fa-solid fa-download"></i> Descargar</a>
                                     ${juego.enlace_original ? `<a href="${juego.enlace_original}" target="_blank" class="btn-secondary" style="flex: 1; text-align: center; background: #2a2f3f; color: white;"><i class="fa-solid fa-cart-shopping"></i> Original</a>` : ''}
                                 </div>
                                 
@@ -90,6 +95,7 @@
                             </div>
                         </div>
 
+                        <!-- Columna Derecha (Info Técnica, Descargas + Reporte de Bugs) -->
                         <div class="detalles-columna" style="display: flex; flex-direction: column; gap: 30px;">
                             
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
@@ -99,10 +105,12 @@
                                     <li><strong style="color: white;">RAM:</strong> ${juego.ram || 'No especificado'}</li>
                                     <li><strong style="color: white;">Espacio:</strong> ${juego.peso || 'No especificado'}</li>
                                     <li><strong style="color: white;">Motor:</strong> ${juego.categoria || 'RPG Maker'}</li>
+                                    <li><strong style="color: white;">Descargas:</strong> <span id="contador-descargas" style="color: #34d399; font-weight: bold;">${juego.descargas || 0}</span> veces</li>
                                 </ul>
                                 <p style="margin-top: 15px; color: #a0a0b0;"><strong style="color: white;">Desarrollador:</strong> ${juego.desarrollador || 'Desconocido'}</p>
                             </section>
 
+                            <!-- Formulario de Reporte de Bugs -->
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
                                 <h3 style="color: white; margin-bottom: 10px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
                                     <i class="fa-solid fa-bug" style="color: #6366f1;"></i> ¿Encontraste un error?
@@ -124,7 +132,8 @@
                     </div>
                 `;
 
-                // Activamos el evento del formulario de bugs una vez renderizado
+                // Activamos la lógica del botón de descarga y del formulario
+                configurarContadorDescargas(juegoId, juego.descargas || 0);
                 configurarFormularioBugs(juego.titulo);
 
             } catch (error) {
@@ -137,6 +146,27 @@
                     </div>
                 `;
             }
+        }
+
+        // Función para incrementar el contador de descargas en Supabase al hacer clic
+        function configurarContadorDescargas(juegoId, descargasActuales) {
+            const btnDescargar = document.getElementById('btn-descargar');
+            if (!btnDescargar) return;
+
+            btnDescargar.addEventListener('click', async () => {
+                const nuevasDescargas = descargasActuales + 1;
+                
+                // Actualizamos en la base de datos de manera silenciosa
+                const { error } = await supabaseClient
+                    .from('juegos')
+                    .update({ descargas: nuevasDescargas })
+                    .eq('id', juegoId);
+
+                if (!error) {
+                    descargasActuales = nuevasDescargas;
+                    document.getElementById('contador-descargas').innerText = nuevaDescargas;
+                }
+            });
         }
 
         function configurarFormularioBugs(tituloJuego) {
