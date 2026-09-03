@@ -28,7 +28,7 @@ body {
         radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
 }
 
-/* Navbar Profesional RPG */
+/* Navbar Profesional RPG Optimizada */
 .navbar { 
     background: rgba(10, 13, 20, 0.9); 
     backdrop-filter: blur(14px); 
@@ -41,18 +41,18 @@ body {
 .nav-container { 
     max-width: 1200px; 
     margin: 0 auto; 
-    padding: 1rem 2rem; 
+    padding: 0.8rem 1.5rem; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
 }
 .logo { 
     font-family: 'Cinzel', serif;
-    font-size: 1.4rem; 
+    font-size: 1.3rem; 
     font-weight: 700; 
     display: flex; 
     align-items: center; 
-    gap: 12px; 
+    gap: 8px; 
     color: white; 
     letter-spacing: 0.5px;
 }
@@ -60,24 +60,28 @@ body {
 .logo span { color: var(--accent); }
 .badge-v2 { 
     background: linear-gradient(135deg, var(--accent), #4f46e5); 
-    font-size: 0.65rem; 
-    padding: 3px 8px; 
+    font-size: 0.6rem; 
+    padding: 2px 6px; 
     border-radius: 4px; 
     color: white; 
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    box-shadow: 0 0 10px var(--accent-glow);
 }
-.nav-links { display: flex; gap: 1.8rem; align-items: center; }
+.nav-links { 
+    display: flex; 
+    gap: 1.1rem; /* Espacio equilibrado para que no choquen */
+    align-items: center; 
+}
 .nav-links a { 
     color: var(--text-muted); 
     text-decoration: none; 
     font-weight: 500; 
     transition: all 0.25s ease; 
-    font-size: 0.95rem; 
+    font-size: 0.85rem; /* Letra ligeramente más ligera para ganar espacio */
     display: flex; 
     align-items: center; 
-    gap: 6px; 
+    gap: 5px; 
+    white-space: nowrap; /* Evita que los textos se rompan en dos líneas */
 }
 .nav-links a:hover, .nav-links a.active { 
     color: var(--text-main); 
@@ -85,10 +89,10 @@ body {
 }
 .nav-links a.active { color: var(--gold); }
 .nav-version span { 
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     color: var(--text-muted); 
     background: var(--bg-card); 
-    padding: 6px 12px; 
+    padding: 4px 10px; 
     border-radius: 20px; 
     border: 1px solid var(--border); 
 }
