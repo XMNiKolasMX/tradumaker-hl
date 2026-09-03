@@ -44,27 +44,57 @@
             flex-grow: 1;
             justify-content: space-between;
         }
-        .btn-votar {
-            background: #6366f1;
-            color: white;
-            border: none;
-            padding: 10px;
+        .acciones-votos {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-voto {
+            flex: 1;
+            padding: 8px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             transition: background 0.2s;
-            margin-top: 15px;
+            font-size: 0.85rem;
         }
-        .btn-votar:hover {
-            background: #4f46e5;
+        .btn-like {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid #10b981;
         }
-        .btn-votar.votado {
+        .btn-like:hover {
             background: #10b981;
-            cursor: default;
+            color: white;
+        }
+        .btn-dislike {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .btn-dislike:hover {
+            background: #ef4444;
+            color: white;
+        }
+        /* Barra de Progreso */
+        .progress-container {
+            width: 100%;
+            background: #2a2f3f;
+            border-radius: 4px;
+            height: 8px;
+            margin: 12px 0 5px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #10b981;
+            width: 0%;
+            transition: width 0.4s ease;
         }
         .badge-beta {
             background: #f59e0b;
@@ -75,7 +105,36 @@
             font-weight: 700;
             vertical-align: middle;
             margin-left: 8px;
-            letter-spacing: 0.5px;
+        }
+        /* Estilos del Formulario Oculto para proponer juego */
+        .form-proponer {
+            background: #1a1e29;
+            border: 1px solid #2a2f3f;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        .form-proponer.activo {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: #a0a0b0;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #111520;
+            border: 1px solid #2a2f3f;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
         }
     </style>
 </head>
@@ -100,16 +159,38 @@
     <main class="main-content" style="padding-top: 100px; padding-bottom: 60px;">
         <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
             
-            <div style="text-align: center; margin-bottom: 40px;">
+            <div style="text-align: center; margin-bottom: 30px;">
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
                     ¿Qué traduciremos después? 🗳️ <span class="badge-beta">FASE BETA</span>
                 </h1>
-                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    ¡Tu opinión cuenta! Vota por tu juego favorito de la lista. Los <strong style="color: white;">5 juegos más votados</strong> tendrán prioridad absoluta en el desarrollo. Las demás propuestas no se quedan atrás: si el tiempo lo permite, ¡iré traduciéndolas uno por uno!
+                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 20px;">
+                    Vota con pulgar arriba o abajo por tus juegos favoritos. ¿No encuentras el tuyo? ¡Propón un nuevo juego para que la comunidad pueda votarlo!
                 </p>
-                <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <strong>Aviso:</strong> Esta sección se encuentra en fase de pruebas (Beta). Las reglas y la lista pueden ajustarse próximamente.
-                </div>
+                <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    <i class="fa-solid fa-plus"></i> Proponer un nuevo juego
+                </button>
+            </div>
+
+            <!-- Formulario para agregar juego -->
+            <div id="form-proponer-container" class="form-proponer">
+                <h3 style="color: white; font-family: 'Cinzel', serif; margin-bottom: 15px;">Añadir juego a la lista de votación</h3>
+                <form id="form-juego" onsubmit="agregarJuego(event)">
+                    <div class="form-group">
+                        <label>Título del Juego</label>
+                        <input type="text" id="nuevo-titulo" required placeholder="Ej. Xenogears">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción corta</label>
+                        <textarea id="nuevo-descripcion" rows="2" required placeholder="Breve sinopsis de por qué vale la pena traducirlo..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL de la Imagen (Opcional)</label>
+                        <input type="url" id="nuevo-imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                    </div>
+                    <button type="submit" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                        Enviar Propuesta
+                    </button>
+                </form>
             </div>
 
             <!-- Contenedor de Juegos a Votar -->
@@ -131,10 +212,14 @@
     </footer>
 
     <script>
-        // CREDENCIALES DE SUPABASE
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function toggleFormulario() {
+            const form = document.getElementById('form-proponer-container');
+            form.classList.toggle('activo');
+        }
 
         async function cargarVotaciones() {
             const grid = document.getElementById('grid-votaciones');
@@ -143,22 +228,23 @@
                 const { data: juegos, error } = await supabaseClient
                     .from('votaciones')
                     .select('*')
-                    .order('votos', { ascending: false });
+                    .order('likes', { ascending: false });
 
                 if (error) throw error;
 
                 if (!juegos || juegos.length === 0) {
-                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación por el momento. ¡Vuelve pronto!</p>`;
+                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación por el momento. ¡Sé el primero en proponer uno!</p>`;
                     return;
                 }
 
                 grid.innerHTML = '';
                 
-                const juegoVotadoLocal = localStorage.getItem('tradu_juego_votado');
-
                 juegos.forEach((juego, index) => {
-                    const yaVotoEste = juegoVotadoLocal == juego.id;
-                    
+                    const likes = juego.likes || 0;
+                    const dislikes = juego.dislikes || 0;
+                    const totalVotos = likes + dislikes;
+                    const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
+
                     const card = document.createElement('div');
                     card.className = 'votacion-card';
                     card.innerHTML = `
@@ -167,15 +253,33 @@
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
-                                    <span style="font-size: 0.85rem; color: #a0a0b0;"><i class="fa-solid fa-fire" style="color: #f59e0b;"></i> <span id="votos-${juego.id}">${juego.votos || 0}</span> votos</span>
+                                    <span style="font-size: 0.8rem; color: #a0a0b0;">${totalVotos} votos totales</span>
                                 </div>
                                 <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
-                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4;">${juego.descripcion || 'Sin descripción detallada.'}</p>
+                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción detallada.'}</p>
+                                
+                                <!-- Barra de Progreso de Aceptación -->
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0a0b0;">
+                                    <span>👍 Aprobación</span>
+                                    <span id="porcentaje-${juego.id}">${porcentajeLikes}%</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div id="barra-${juego.id}" class="progress-bar" style="width: ${porcentajeLikes}%;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #808090; margin-top: 2px;">
+                                    <span><strong id="likes-${juego.id}" style="color: #10b981;">${likes}</strong> Sí</span>
+                                    <span><strong id="dislikes-${juego.id}" style="color: #ef4444;">${dislikes}</strong> No</span>
+                                </div>
                             </div>
                             
-                            <button onclick="votarJuego(${juego.id}, ${juego.votos || 0})" id="btn-votar-${juego.id}" class="btn-votar ${yaVotoEste ? 'votado' : ''}">
-                                <i class="fa-solid ${yaVotoEste ? 'fa-check' : 'fa-thumbs-up'}"></i> ${yaVotoEste ? '¡Voto registrado!' : 'Votar por este'}
-                            </button>
+                            <div class="acciones-votos">
+                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like">
+                                    <i class="fa-solid fa-thumbs-up"></i> Sí (${likes})
+                                </button>
+                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike">
+                                    <i class="fa-solid fa-thumbs-down"></i> No (${dislikes})
+                                </button>
+                            </div>
                         </div>
                     `;
                     grid.appendChild(card);
@@ -183,39 +287,74 @@
 
             } catch (err) {
                 console.error("Error al cargar votaciones:", err);
-                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar las votaciones. Comprueba tu conexión o la tabla en Supabase.</p>`;
+                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar las votaciones de Supabase.</p>`;
             }
         }
 
-        async function votarJuego(idJuego, votosActuales) {
-            const juegoVotadoLocal = localStorage.getItem('tradu_juego_votado');
+        async function votar(idJuego, tipo) {
+            // Consultamos los valores actuales de la base de datos para asegurarnos de tener el número exacto
+            const { data: juegoActual, error: errorFetch } = await supabaseClient
+                .from('votaciones')
+                .select('likes, dislikes')
+                .eq('id', idJuego)
+                .single();
 
-            if (juegoVotadoLocal) {
-                alert('¡Ya has emitido tu voto en esta encuesta desde este navegador! Gracias por participar.');
+            if (errorFetch) {
+                alert('No se pudo procesar el voto.');
                 return;
             }
 
-            const nuevosVotos = votosActuales + 1;
+            let nuevosLikes = juegoActual.likes || 0;
+            let nuevosDislikes = juegoActual.dislikes || 0;
 
-            const { error } = await supabaseClient
+            if (tipo === 'like') {
+                nuevosLikes += 1;
+            } else {
+                nuevosDislikes += 1;
+            }
+
+            const { error: errorUpdate } = await supabaseClient
                 .from('votaciones')
-                .update({ votos: nuevosVotos })
+                .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
                 .eq('id', idJuego);
 
-            if (error) {
-                console.error("Error al registrar voto:", error);
+            if (errorUpdate) {
                 alert('Hubo un error al registrar tu voto.');
                 return;
             }
 
-            localStorage.setItem('tradu_juego_votado', idJuego);
+            // Actualizar visualmente en tiempo real sin recargar toda la página
+            document.getElementById(`likes-${idJuego}`).innerText = nuevosLikes;
+            document.getElementById(`dislikes-${idJuego}`).innerText = nuevosDislikes;
 
-            document.getElementById(`votos-${idJuego}`).innerText = nuevosVotos;
-            const btn = document.getElementById(`btn-votar-${idJuego}`);
-            btn.className = 'btn-votar votado';
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Voto registrado!';
+            const total = nuevosLikes + nuevosDislikes;
+            const porcentaje = total > 0 ? Math.round((nuevosLikes / total) * 100) : 50;
             
-            alert('¡Voto registrado con éxito! Gracias por apoyar este proyecto.');
+            document.getElementById(`porcentaje-${idJuego}`).innerText = `${porcentaje}%`;
+            document.getElementById(`barra-${idJuego}`).style.width = `${porcentaje}%`;
+        }
+
+        async function agregarJuego(event) {
+            event.preventDefault();
+            
+            const titulo = document.getElementById('nuevo-titulo').value;
+            const descripcion = document.getElementById('nuevo-descripcion').value;
+            const imagen = document.getElementById('nuevo-imagen').value || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop';
+
+            const { error } = await supabaseClient
+                .from('votaciones')
+                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]); // Empieza con 1 like por defecto de quien lo propone
+
+            if (error) {
+                console.error(error);
+                alert('Error al enviar la propuesta.');
+                return;
+            }
+
+            alert('¡Propuesta agregada con éxito! Ya aparece en la lista para que todos voten.');
+            document.getElementById('form-juego').reset();
+            toggleFormulario();
+            cargarVotaciones();
         }
 
         document.addEventListener('DOMContentLoaded', cargarVotaciones);
