@@ -265,7 +265,7 @@
             try {
                 // Asegúrate de cambiar 'nombre_de_tu_tabla' por el nombre real de tu tabla en Supabase
                 const { data: juegos, error } = await supabaseClient
-                    .from('nombre_de_tu_tabla') 
+                    .from('estado_juegos') 
                     .select('*')
                     .order('fecha_actualizacion', { ascending: false });
 
