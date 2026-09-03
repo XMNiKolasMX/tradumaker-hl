@@ -400,7 +400,7 @@
                     const badgeClase = enDesarrollo ? 'badge-true' : 'badge-false';
                     const badgeTexto = enDesarrollo ? '✨ Se va a traducir (True)' : '❌ No se va a traducir (False)';
 
-                    // Determinar si este juego específico fue votado por este cliente, o si ya votó por cualquier otro juego (bloqueo global por IP/dispositivo)
+                    // Determinar si este juego específico fue votado por este cliente, o si ya votó por cualquier otro juego
                     const votadoEste = juegosYaVotadosPorCliente.has(juego.id);
                     const deshabilitarBotones = yaVotoEnAlgunLado;
 
@@ -452,7 +452,7 @@
         async function votar(idJuego, tipo) {
             const clientId = obtenerClientId();
 
-            // Verificar doblemente en servidor si ya emitió un voto desde este dispositivo/IP
+            // Verificar doblemente en servidor si ya emitió un voto desde este dispositivo/red
             const { data: yaVotoCheck, error: errCheck } = await supabaseClient
                 .from('registro_votos')
                 .select('*')
@@ -465,11 +465,11 @@
 
             if (yaVotoCheck && yaVotoCheck.length > 0) {
                 alert('Ya has emitido tu voto en este dispositivo o red. Solo se permite un voto por usuario.');
-                cargarVotaciones(); // Recargar para sincronizar estado de botones
+                cargarVotaciones();
                 return;
             }
 
-            // Registrar el voto en la tabla de control para bloquear futuras votaciones desde esta IP/equipo
+            // Registrar el voto en la tabla de control
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
                 .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo }]);
@@ -479,7 +479,7 @@
                 return;
             }
 
-            // Obtener datos actuales del juego para actualizar los contadores
+            // Obtener datos actuales del juego para actualizar contadores
             const { data: juegoActual, error: errorFetch } = await supabaseClient
                 .from('votaciones')
                 .select('likes, dislikes')
@@ -502,7 +502,7 @@
             if (errorUpdate) return alert('Hubo un error al actualizar los puntos del juego.');
 
             alert('¡Gracias por votar! Tu voto ha sido registrado con éxito.');
-            cargarVotaciones(); // Recargar interfaz para bloquear el resto de botones de voto
+            cargarVotaciones();
         }
 
         async function agregarJuego(event) {
