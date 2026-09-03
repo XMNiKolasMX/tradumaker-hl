@@ -1,1 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado y Avances de Traducciones - TraduMaker HL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    
+    <style>
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: #6366f1;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #161b22;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border: 1px solid #2a2f3f;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-content a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #6366f1;
+        }
+        .dropdown-content a.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .show {
+            display: block;
+        }
 
+        /* Contenedor específico para la sección de estado de juegos */
+        .avances-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #1a1e29;
+            border: 1px solid #2a2f3f;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navegación con Menú Desplegable -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+            </div>
+            
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="avances.html" class="active"><i class="fa-solid fa-bars-progress"></i> Estado de Avances</a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="container" style="padding: 0 20px;">
+            
+            <div style="text-align: center; margin-bottom: 35px;">
+                <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.3rem; margin-bottom: 10px;">
+                    Estado y Avances de Traducciones 📊
+                </h1>
+                <p style="color: #a0a0b0; font-family: 'Poppins', sans-serif; font-size: 0.95rem;">
+                    Revisa en tiempo real el porcentaje de progreso de cada proyecto activo.
+                </p>
+            </div>
+
+            <!-- Panel de Estado de Juegos (Ampliado y centrado) -->
+            <div class="avances-container">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <i class="fa-solid fa-list-check" style="color: #f59e0b; font-size: 1.3rem;"></i>
+                    <h2 style="font-family: 'Cinzel', serif; color: white; font-size: 1.4rem;">ESTADO DE JUEGOS</h2>
+                </div>
+                <p style="color: #a0a0b0; font-size: 0.85rem; margin-bottom: 20px;">Avance de las traducciones</p>
+                
+                <!-- Aquí puedes incluir tu contenedor o lista de juegos actual con su barra de desplazamiento -->
+                <div style="max-height: 450px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Inserta aquí los elementos de tu lista de juegos -->
+                    <div style="background: #111520; border: 1px solid #2a2f3f; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: white; font-size: 0.9rem; font-weight: 500;">Cuckolding is ine...</span>
+                        <a href="#" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-eye"></i> Ver más</a>
+                    </div>
+                    <div style="background: #111520; border: 1px solid #2a2f3f; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: white; font-size: 0.9rem; font-weight: 500;">Ghost Path</span>
+                        <a href="#" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-eye"></i> Ver más</a>
+                    </div>
+                    <div style="background: #111520; border: 1px solid #2a2f3f; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: white; font-size: 0.9rem; font-weight: 500;">ROBFS4U v1.2</span>
+                        <a href="#" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-eye"></i> Ver más</a>
+                    </div>
+                    <div style="background: #111520; border: 1px solid #2a2f3f; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: white; font-size: 0.9rem; font-weight: 500;">雪音の仇討ち物語...</span>
+                        <a href="#" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-eye"></i> Ver más</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
