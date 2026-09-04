@@ -273,7 +273,7 @@
         .project-title {
             font-size: 1.05rem;
             color: white; font-weight: 600;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -282,7 +282,17 @@
             line-height: 1.3;
         }
 
-        /* Barra de Porcentaje y Progreso con cambio de color dinámico */
+        .project-meta-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .project-meta-date i { color: #a78bfa; }
+
+        /* Barra de Porcentaje y Progreso */
         .progress-container {
             margin-top: auto;
             margin-bottom: 0.5rem;
@@ -459,7 +469,7 @@
                 <div class="guild-header-flex">
                     <div>
                         <h2><i class="fa-solid fa-list-check"></i> Estado de Proyectos</h2>
-                        <p class="guild-subtitle">Monitor integral de rendimiento, filtros avanzados y favoritos personalizados.</p>
+                        <p class="guild-subtitle">Monitor integral de rendimiento, filtros avanzados, favoritos y fechas estimadas.</p>
                     </div>
                 </div>
 
@@ -522,7 +532,6 @@
                     <div class="engines-bar" id="enginesContainer">
                         <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;"><i class="fa-solid fa-filter"></i> Motor:</span>
                         <button class="engine-chip active" onclick="setFiltroMotor('todos', this)">Todos</button>
-                        <!-- Inyectado dinámicamente por JS -->
                     </div>
                 </div>
 
@@ -553,6 +562,10 @@
                 <div class="modal-info-item">
                     <span>Porcentaje Actual</span>
                     <strong id="modal-percentage" style="color: #34d399;">0%</strong>
+                </div>
+                <div class="modal-info-item" style="grid-column: span 2;">
+                    <span>Fecha Estimada de Término</span>
+                    <strong id="modal-date" style="color: var(--gold);"><i class="fa-regular fa-calendar-days"></i> -</strong>
                 </div>
             </div>
 
@@ -752,6 +765,7 @@
                 const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
                 const imagenSrc = (juego.imagen && juego.imagen.trim() !== '') ? juego.imagen : 'https://via.placeholder.com/400x250?text=TraduMaker+HL';
                 const motor = juego.motor || 'RPG Maker';
+                const fechaEstimada = (juego.fecha_estimada && juego.fecha_estimada.trim() !== '') ? juego.fecha_estimada : 'Por definir';
                 const esFav = favs.includes(juego.id);
 
                 return `
@@ -765,6 +779,9 @@
                         </div>
                         <div class="project-body">
                             <h3 class="project-title" title="${juego.titulo}">${juego.titulo}</h3>
+                            <div class="project-meta-date">
+                                <i class="fa-regular fa-calendar-days"></i> Est. Término: <strong>${fechaEstimada}</strong>
+                            </div>
                             
                             <div class="progress-container">
                                 <div class="progress-info">
@@ -801,6 +818,7 @@
             document.getElementById('modal-title').innerText = juego.titulo;
             document.getElementById('modal-engine').innerText = juego.motor || 'RPG Maker';
             document.getElementById('modal-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null ? juego.porcentaje : 0) + '%';
+            document.getElementById('modal-date').innerHTML = `<i class="fa-regular fa-calendar-days"></i> ${(juego.fecha_estimada && juego.fecha_estimada.trim() !== '') ? juego.fecha_estimada : 'Por definir'}`;
             
             const linkEl = document.getElementById('modal-link');
             if (juego.enlace_original) {
