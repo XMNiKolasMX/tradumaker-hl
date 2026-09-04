@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TraduMaker HL - Panel Avanzado de Avances</title>
+    <title>TraduMaker HL - Panel Definitivo de Avances</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
@@ -55,7 +55,7 @@
         /* Panel de Estadísticas / KPIs Superiores */
         .stats-kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -69,17 +69,14 @@
             gap: 1rem;
             transition: border-color 0.2s;
         }
-        .kpi-card:hover {
-            border-color: var(--accent);
-        }
+        .kpi-card:hover { border-color: var(--accent); }
         .kpi-icon {
             width: 48px; height: 48px;
             border-radius: 10px;
             background: rgba(124, 58, 237, 0.15);
             color: #a78bfa;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
+            font-size: 1.25rem; flex-shrink: 0;
             border: 1px solid rgba(124, 58, 237, 0.3);
         }
         .kpi-info span {
@@ -90,23 +87,29 @@
             letter-spacing: 0.5px;
         }
         .kpi-info strong {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-family: 'Cinzel', serif;
             color: white;
         }
 
-        /* Barra de Herramientas: Buscador + Filtros + Vistas */
+        /* Toolbar Completo: Buscador, Filtros, Motores y Orden */
         .toolbar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--bg-main);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .toolbar-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 2rem;
-            background: var(--bg-main);
-            padding: 1rem 1.25rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
         }
 
         .search-box {
@@ -116,9 +119,7 @@
         }
         .search-box i {
             position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 14px; top: 50%; transform: translateY(-50%);
             color: var(--text-muted);
         }
         .search-input {
@@ -127,14 +128,10 @@
             border: 1px solid var(--border);
             padding: 10px 14px 10px 40px;
             border-radius: 8px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
+            color: white; font-size: 0.9rem; outline: none;
             transition: border-color 0.2s;
         }
-        .search-input:focus {
-            border-color: var(--accent);
-        }
+        .search-input:focus { border-color: var(--accent); }
 
         .filter-buttons {
             display: flex;
@@ -147,35 +144,54 @@
             color: var(--text-muted);
             padding: 8px 14px;
             border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease;
         }
         .filter-btn:hover, .filter-btn.active {
             background: rgba(124, 58, 237, 0.2);
             border-color: var(--accent);
             color: white;
         }
-
-        .view-switchers {
-            display: flex;
-            gap: 4px;
+        .filter-btn.fav-btn.active {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--gold);
+            color: var(--gold);
         }
-        .view-btn {
+
+        .sort-select {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text-muted);
-            width: 36px; height: 36px;
+            color: white;
+            padding: 8px 12px;
             border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Contenedor de Motores Dinámicos */
+        .engines-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .engine-chip {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .view-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
+        .engine-chip:hover, .engine-chip.active {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: var(--gold);
+            color: var(--gold);
         }
 
         /* Grid de Proyectos Estilo Tarjeta Pro */
@@ -208,28 +224,43 @@
             background: #111;
         }
         .project-img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
             transition: transform 0.4s ease;
         }
-        .project-card:hover .project-img {
-            transform: scale(1.05);
-        }
+        .project-card:hover .project-img { transform: scale(1.05); }
+
         .project-engine-badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 10px; left: 10px;
             background: rgba(17, 21, 32, 0.85);
             backdrop-filter: blur(4px);
             color: var(--gold);
             border: 1px solid rgba(245, 158, 11, 0.3);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 4px 10px; border-radius: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+        }
+
+        /* Botón de Favorito en Tarjeta */
+        .btn-fav-card {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(17, 21, 32, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        .btn-fav-card:hover, .btn-fav-card.is-fav {
+            color: var(--gold);
+            border-color: var(--gold);
+            background: rgba(245, 158, 11, 0.2);
         }
 
         .project-body {
@@ -241,8 +272,7 @@
 
         .project-title {
             font-size: 1.05rem;
-            color: white;
-            font-weight: 600;
+            color: white; font-weight: 600;
             margin-bottom: 0.75rem;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -252,7 +282,7 @@
             line-height: 1.3;
         }
 
-        /* Barra de Porcentaje y Progreso */
+        /* Barra de Porcentaje y Progreso con cambio de color dinámico */
         .progress-container {
             margin-top: auto;
             margin-bottom: 0.5rem;
@@ -268,11 +298,9 @@
         .progress-value { color: #34d399; }
 
         .progress-bar-bg {
-            width: 100%;
-            height: 8px;
+            width: 100%; height: 8px;
             background: rgba(255,255,255,0.05);
-            border-radius: 4px;
-            overflow: hidden;
+            border-radius: 4px; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.05);
         }
         .progress-bar-fill {
@@ -283,8 +311,7 @@
         }
 
         .project-footer {
-            display: flex;
-            gap: 8px;
+            display: flex; gap: 8px;
             border-top: 1px solid var(--border);
             padding: 1rem 1.25rem;
             background: rgba(0,0,0,0.1);
@@ -295,77 +322,33 @@
             background: rgba(124, 58, 237, 0.15);
             color: #a78bfa;
             border: 1px solid rgba(124, 58, 237, 0.3);
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            padding: 8px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 6px;
             transition: all 0.2s;
         }
         .btn-details:hover {
             background: rgba(124, 58, 237, 0.3);
-            border-color: var(--accent);
-            color: white;
+            border-color: var(--accent); color: white;
         }
 
-        /* Vista de Tabla Alternativa */
-        .projects-table-container {
-            display: none;
-            width: 100%;
-            overflow-x: auto;
-        }
-        .projects-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        .projects-table th {
-            background: var(--bg-main);
-            color: var(--text-muted);
-            padding: 12px 16px;
-            border-bottom: 2px solid var(--border);
-            font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-        }
-        .projects-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-            vertical-align: middle;
-        }
-        .projects-table tr:hover td {
-            background: rgba(124, 58, 237, 0.05);
-        }
-
-        /* Modal Detalle Flotante */
+        /* Modal Detalle Flotante Avanzado */
         .modal-overlay {
-            display: none;
-            position: fixed;
+            display: none; position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 13, 20, 0.85);
             backdrop-filter: blur(8px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-            animation: fadeInModal 0.2s ease;
+            z-index: 2000; justify-content: center; align-items: center;
+            padding: 1.5rem; animation: fadeInModal 0.2s ease;
         }
         @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
 
         .modal-card {
             background: var(--bg-card);
             border: 1px solid var(--accent);
-            border-radius: 16px;
-            max-width: 600px;
-            width: 100%;
-            padding: 2rem;
-            position: relative;
+            border-radius: 16px; max-width: 600px; width: 100%;
+            padding: 2rem; position: relative;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             animation: slideUpModal 0.3s ease;
         }
@@ -375,66 +358,41 @@
         }
 
         .modal-close {
-            position: absolute;
-            top: 20px; right: 20px;
+            position: absolute; top: 20px; right: 20px;
             background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            color: white;
-            width: 36px; height: 36px;
-            border-radius: 50%;
+            border: 1px solid var(--border); color: white;
+            width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
+            cursor: pointer; transition: background 0.2s;
         }
         .modal-close:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
 
         .modal-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
+            width: 100%; height: 220px; object-fit: cover;
+            border-radius: 10px; margin-bottom: 1.5rem;
             border: 1px solid var(--border);
         }
         .modal-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            color: white;
-            margin-bottom: 0.75rem;
+            font-size: 1.5rem; color: white; margin-bottom: 0.75rem;
         }
         .modal-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin: 1rem 0;
-            background: var(--bg-main);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1rem; margin: 1rem 0;
+            background: var(--bg-main); padding: 1rem;
+            border-radius: 8px; border: 1px solid var(--border);
         }
         .modal-info-item span {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            display: block; font-size: 0.75rem;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 2px;
         }
-        .modal-info-item strong {
-            font-size: 0.95rem;
-            color: white;
-        }
+        .modal-info-item strong { font-size: 0.95rem; color: white; }
         .modal-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-top: 1rem;
-            background: var(--bg-main);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            max-height: 150px;
-            overflow-y: auto;
+            color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;
+            margin-top: 1rem; background: var(--bg-main); padding: 1rem;
+            border-radius: 8px; border: 1px solid var(--border);
+            max-height: 150px; overflow-y: auto;
         }
 
         /* Menú Desplegable estándar */
@@ -501,16 +459,16 @@
                 <div class="guild-header-flex">
                     <div>
                         <h2><i class="fa-solid fa-list-check"></i> Estado de Proyectos</h2>
-                        <p class="guild-subtitle">Monitor de rendimiento y porcentajes en vivo de la base de datos de traducciones.</p>
+                        <p class="guild-subtitle">Monitor integral de rendimiento, filtros avanzados y favoritos personalizados.</p>
                     </div>
                 </div>
 
-                <!-- KPIs Dinámicos de Resumen -->
+                <!-- KPIs Dinámicos -->
                 <div class="stats-kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-gamepad"></i></div>
                         <div class="kpi-info">
-                            <span>Total en Curso</span>
+                            <span>Total Registrados</span>
                             <strong id="kpi-total">0</strong>
                         </div>
                     </div>
@@ -524,32 +482,51 @@
                     <div class="kpi-card">
                         <div class="kpi-icon"><i class="fa-solid fa-fire"></i></div>
                         <div class="kpi-info">
-                            <span>Más del 80%</span>
+                            <span>+80% Recta Final</span>
                             <strong id="kpi-cercanos">0</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="color: #34d399; background: rgba(52, 211, 153, 0.15); border-color: rgba(52, 211, 153, 0.3);"><i class="fa-solid fa-check-double"></i></div>
+                        <div class="kpi-info">
+                            <span>Completados</span>
+                            <strong id="kpi-completados">0</strong>
                         </div>
                     </div>
                 </div>
 
-                <!-- Barra de Filtros, Búsqueda y Vistas -->
+                <!-- Toolbar de Búsqueda, Filtros, Orden y Motores -->
                 <div class="toolbar-section">
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar juego por nombre..." oninput="aplicarFiltrosYBusqueda()">
+                    <div class="toolbar-row">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" class="search-input" placeholder="Buscar juego por nombre..." oninput="aplicarFiltrosYBusqueda()">
+                        </div>
+
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="setFiltroEstado('todos', this)">Todos</button>
+                            <button class="filter-btn" onclick="setFiltroEstado('activo', this)">En Curso</button>
+                            <button class="filter-btn" onclick="setFiltroEstado('avanzado', this)">+80%</button>
+                            <button class="filter-btn fav-btn" onclick="setFiltroEstado('favoritos', this)"><i class="fa-solid fa-star"></i> Mis Favoritos</button>
+                        </div>
+
+                        <select id="sortSelect" class="sort-select" onchange="aplicarFiltrosYBusqueda()">
+                            <option value="recientes">Más recientes</option>
+                            <option value="mayor-avance">Mayor avance (%)</option>
+                            <option value="menor-avance">Menor avance (%)</option>
+                            <option value="az">Alfabético (A-Z)</option>
+                        </select>
                     </div>
 
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="setFiltroEstado('todos', this)">Todos</button>
-                        <button class="filter-btn" onclick="setFiltroEstado('activo', this)">En Curso</button>
-                        <button class="filter-btn" onclick="setFiltroEstado('avanzado', this)">+80% Avanzados</button>
-                    </div>
-
-                    <div class="view-switchers">
-                        <button class="view-btn active" id="btnViewGrid" onclick="cambiarVista('grid')" title="Vista Cuadrícula"><i class="fa-solid fa-grip"></i></button>
-                        <button class="view-btn" id="btnViewTable" onclick="cambiarVista('table')" title="Vista Tabla"><i class="fa-solid fa-table-list"></i></button>
+                    <!-- Fila de Motores Dinámicos -->
+                    <div class="engines-bar" id="enginesContainer">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;"><i class="fa-solid fa-filter"></i> Motor:</span>
+                        <button class="engine-chip active" onclick="setFiltroMotor('todos', this)">Todos</button>
+                        <!-- Inyectado dinámicamente por JS -->
                     </div>
                 </div>
 
-                <!-- Contenedor Vista Tarjetas (Grid) -->
+                <!-- Contenedor Grid Principal -->
                 <div id="projects-grid" class="projects-grid">
                     <div class="loading-skeleton" style="grid-column: span 3; text-align: center; padding: 3rem; color: var(--text-muted);">
                         <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent);"></i>
@@ -557,28 +534,11 @@
                     </div>
                 </div>
 
-                <!-- Contenedor Vista Tabla (Alternativo) -->
-                <div id="projects-table-container" class="projects-table-container">
-                    <table class="projects-table">
-                        <thead>
-                            <tr>
-                                <th>Título del Juego</th>
-                                <th>Motor</th>
-                                <th>Progreso</th>
-                                <th style="text-align: right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="projects-table-body">
-                            <!-- Inyectado por JS -->
-                        </tbody>
-                    </table>
-                </div>
-
             </div>
         </div>
     </main>
 
-    <!-- Modal Detalle Flotante Avanzado -->
+    <!-- Modal Detalle Flotante -->
     <div id="projectModal" class="modal-overlay" onclick="cerrarModalFuera(event)">
         <div class="modal-card">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -645,7 +605,7 @@
 
         window.listaProyectosGlobal = [];
         window.filtroActualEstado = 'todos';
-        window.vistaActual = 'grid';
+        window.filtroActualMotor = 'todos';
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -674,6 +634,7 @@
 
                 window.listaProyectosGlobal = juegosEstados || [];
                 actualizarKPIs(window.listaProyectosGlobal);
+                poblarFiltrosMotor(window.listaProyectosGlobal);
                 aplicarFiltrosYBusqueda();
 
             } catch (err) {
@@ -686,18 +647,24 @@
             const total = proyectos.length;
             document.getElementById('kpi-total').innerText = total;
 
-            if (total === 0) {
-                document.getElementById('kpi-promedio').innerText = '0%';
-                document.getElementById('kpi-cercanos').innerText = '0';
-                return;
-            }
+            if (total === 0) return;
 
-            const sumaPorcentajes = proyectos.reduce((acc, curr) => acc + (Number(curr.porcentaje) || 0), 0);
-            const promedio = Math.round(sumaPorcentajes / total);
-            document.getElementById('kpi-promedio').innerText = promedio + '%';
+            const suma = proyectos.reduce((acc, curr) => acc + (Number(curr.porcentaje) || 0), 0);
+            document.getElementById('kpi-promedio').innerText = Math.round(suma / total) + '%';
+            document.getElementById('kpi-cercanos').innerText = proyectos.filter(j => (Number(j.porcentaje) || 0) >= 80).length;
+            document.getElementById('kpi-completados').innerText = proyectos.filter(j => (Number(j.porcentaje) || 0) >= 100).length;
+        }
 
-            const avanzados = proyectos.filter(j => (Number(j.porcentaje) || 0) >= 80).length;
-            document.getElementById('kpi-cercanos').innerText = avanzados;
+        function poblarFiltrosMotor(proyectos) {
+            const motoresSet = new Set();
+            proyectos.forEach(j => {
+                if (j.motor) motoresSet.add(j.motor.trim());
+            });
+
+            const contenedor = document.getElementById('enginesContainer');
+            motoresSet.forEach(motor => {
+                contenedor.innerHTML += `<button class="engine-chip" onclick="setFiltroMotor('${motor}', this)">${motor}</button>`;
+            });
         }
 
         function setFiltroEstado(tipo, btnElement) {
@@ -707,46 +674,77 @@
             aplicarFiltrosYBusqueda();
         }
 
-        function cambiarVista(vista) {
-            window.vistaActual = vista;
-            document.getElementById('btnViewGrid').classList.toggle('active', vista === 'grid');
-            document.getElementById('btnViewTable').classList.toggle('active', vista === 'table');
+        function setFiltroMotor(motor, btnElement) {
+            document.querySelectorAll('.engines-bar .engine-chip').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            window.filtroActualMotor = motor;
+            aplicarFiltrosYBusqueda();
+        }
 
-            document.getElementById('projects-grid').style.display = vista === 'grid' ? 'grid' : 'none';
-            document.getElementById('projects-table-container').style.display = vista === 'table' ? 'block' : 'none';
+        function obtenerFavoritos() {
+            try {
+                return JSON.parse(localStorage.getItem('tradumaker_favs') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function toggleFavorito(id, event) {
+            event.stopPropagation();
+            let favs = obtenerFavoritos();
+            const index = favs.indexOf(id);
+            if (index > -1) {
+                favs.splice(index, 1);
+            } else {
+                favs.push(id);
+            }
+            localStorage.setItem('tradumaker_favs', JSON.stringify(favs));
             aplicarFiltrosYBusqueda();
         }
 
         function aplicarFiltrosYBusqueda() {
             const textoBusqueda = document.getElementById('searchInput').value.toLowerCase().trim();
-            
+            const criterioOrden = document.getElementById('sortSelect').value;
+            const favs = obtenerFavoritos();
+
             let resultado = window.listaProyectosGlobal.filter(juego => {
                 const coincideTexto = juego.titulo && juego.titulo.toLowerCase().includes(textoBusqueda);
                 return coincideTexto;
             });
 
+            // Filtro por Estado
             if (window.filtroActualEstado === 'activo') {
                 resultado = resultado.filter(j => (Number(j.porcentaje) || 0) < 100);
             } else if (window.filtroActualEstado === 'avanzado') {
                 resultado = resultado.filter(j => (Number(j.porcentaje) || 0) >= 80);
+            } else if (window.filtroActualEstado === 'favoritos') {
+                resultado = resultado.filter(j => favs.includes(j.id));
             }
 
-            renderizarVistaActual(resultado);
-        }
-
-        function renderizarVistaActual(proyectos) {
-            if (window.vistaActual === 'grid') {
-                renderizarGrid(proyectos);
-            } else {
-                renderizarTabla(proyectos);
+            // Filtro por Motor
+            if (window.filtroActualMotor !== 'todos') {
+                resultado = resultado.filter(j => j.motor && j.motor.trim() === window.filtroActualMotor);
             }
+
+            // Ordenamiento
+            resultado.sort((a, b) => {
+                const pctA = Number(a.porcentaje) || 0;
+                const pctB = Number(b.porcentaje) || 0;
+                if (criterioOrden === 'mayor-avance') return pctB - pctA;
+                if (criterioOrden === 'menor-avance') return pctA - pctB;
+                if (criterioOrden === 'az') return (a.titulo || '').localeCompare(b.titulo || '');
+                return b.id - a.id; // Recientes (por ID descendente)
+            });
+
+            renderizarGrid(resultado);
         }
 
         function renderizarGrid(proyectos) {
             const contenedorGrid = document.getElementById('projects-grid');
+            const favs = obtenerFavoritos();
 
             if (!proyectos || proyectos.length === 0) {
-                contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron proyectos con estos criterios.</p>';
+                contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 3rem;">No se encontraron proyectos con estos criterios de búsqueda.</p>';
                 return;
             }
 
@@ -754,11 +752,15 @@
                 const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
                 const imagenSrc = (juego.imagen && juego.imagen.trim() !== '') ? juego.imagen : 'https://via.placeholder.com/400x250?text=TraduMaker+HL';
                 const motor = juego.motor || 'RPG Maker';
+                const esFav = favs.includes(juego.id);
 
                 return `
                     <div class="project-card">
                         <div class="project-img-wrapper">
                             <span class="project-engine-badge"><i class="fa-solid fa-gear"></i> ${motor}</span>
+                            <button class="btn-fav-card ${esFav ? 'is-fav' : ''}" onclick="toggleFavorito(${juego.id}, event)" title="Marcar como favorito">
+                                <i class="fa-solid fa-star"></i>
+                            </button>
                             <img src="${imagenSrc}" alt="${juego.titulo}" class="project-img" onerror="this.src='https://via.placeholder.com/400x250?text=TraduMaker+HL'">
                         </div>
                         <div class="project-body">
@@ -780,40 +782,6 @@
                             </button>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
-
-        function renderizarTabla(proyectos) {
-            const tbody = document.getElementById('projects-table-body');
-
-            if (!proyectos || proyectos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron proyectos.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = proyectos.map((juego) => {
-                const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
-                const motor = juego.motor || 'RPG Maker';
-
-                return `
-                    <tr>
-                        <td><strong>${juego.titulo}</strong></td>
-                        <td><span style="color: var(--gold); font-size: 0.85rem;"><i class="fa-solid fa-gear"></i> ${motor}</span></td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 10px; max-width: 200px;">
-                                <div class="progress-bar-bg" style="flex: 1;">
-                                    <div class="progress-bar-fill" style="width: ${porcentaje}%;"></div>
-                                </div>
-                                <span style="font-size: 0.85krem; color: #34d399; font-weight: 600; min-width: 35px;">${porcentaje}%</span>
-                            </div>
-                        </td>
-                        <td style="text-align: right;">
-                            <button class="btn-details" style="display: inline-flex; width: auto; padding: 6px 12px;" onclick="abrirModalProyecto(${juego.id})">
-                                <i class="fa-solid fa-circle-info"></i> Ver
-                            </button>
-                        </td>
-                    </tr>
                 `;
             }).join('');
         }
