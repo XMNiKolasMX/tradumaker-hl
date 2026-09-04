@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TraduMaker HL - Avances de Traducción</title>
+    <title>TraduMaker HL - Avances de Proyectos</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
@@ -11,22 +11,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .avances-container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 3rem auto;
             padding: 0 1.5rem;
         }
+        
         .guild-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 2.5rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
+
+        .guild-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
         .guild-card h2 {
             font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.4rem;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -36,164 +50,276 @@
         .guild-subtitle {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-bottom: 2rem;
         }
 
-        /* Lista de estados adaptada para pantalla completa */
-        .sidebar-list {
-            list-style: none;
+        /* Filtros interactivos */
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Grid de Proyectos Estilo Tarjeta Pro */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-height: none;
-            overflow-y: visible;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .sidebar-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-main);
-            padding: 14px 18px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
-        }
-        .sidebar-item.active-detail {
+        .project-card:hover {
             border-color: var(--accent);
-            background: rgba(124, 58, 237, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
         }
-        .sidebar-game-title {
-            font-size: 1rem;
-            color: var(--text-main);
-            font-weight: 600;
+
+        .project-img-wrapper {
+            position: relative;
+            height: 160px;
+            overflow: hidden;
+            background: #111;
         }
-        
-        /* Botón interactivo */
-        .status-btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-            letter-spacing: 0.3px;
-            flex-shrink: 0;
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--gold);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
         }
-        .status-btn-action:hover {
-            background: rgba(245, 158, 11, 0.3);
+        .project-card:hover .project-img {
             transform: scale(1.05);
         }
-
-        /* Panel desplegable amplio */
-        .game-details-panel {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--bg-main);
-            border: 1px solid var(--accent);
-            border-radius: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .game-details-panel h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
-            color: var(--gold);
-            margin-bottom: 12px;
-        }
-        .game-details-panel p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .game-details-panel a {
-            color: #a78bfa;
-            word-break: break-all;
-        }
-        .detail-game-img {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-        }
-
-        /* Estilos del Menú Desplegable */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background: rgba(124, 58, 237, 0.15);
-            color: white;
-            padding: 8px 16px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: 1px solid rgba(124, 58, 237, 0.4);
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        .dropbtn:hover {
-            background: rgba(124, 58, 237, 0.3);
-            border-color: var(--accent);
-        }
-        .dropdown-content {
-            display: none;
+        .project-engine-badge {
             position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: #161b22;
-            min-width: 220px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-            z-index: 1000;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 8px;
-            animation: fadeIn 0.2s ease;
+            top: 10px;
+            left: 10px;
+            background: rgba(17, 21, 32, 0.85);
+            backdrop-filter: blur(4px);
+            color: var(--gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .dropdown-content a {
-            color: var(--text-main);
-            padding: 12px 16px;
-            text-decoration: none;
+
+        .project-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .project-title {
+            font-size: 1.05rem;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.6rem;
+            line-height: 1.3;
+        }
+
+        /* Barra de Porcentaje y Progreso */
+        .progress-container {
+            margin-top: auto;
+            margin-bottom: 1rem;
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .progress-label { color: var(--text-muted); }
+        .progress-value { color: #34d399; }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .project-footer {
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .btn-details {
+            flex: 1;
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-details:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Modal o Panel Detalle Flotante Estilo RPG */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 13, 20, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            animation: fadeInModal 0.2s ease;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            animation: slideUpModal 0.3s ease;
+        }
+        @keyframes slideUpModal {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
             transition: background 0.2s;
-            white-space: nowrap;
         }
-        .dropdown-content a:last-child {
-            border-bottom: none;
+        .modal-close:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
+        .modal-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
         }
-        .dropdown-content a:hover {
-            background-color: rgba(124, 58, 237, 0.15);
-            color: var(--accent);
+        .modal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.75rem;
         }
-        .dropdown-content a.active {
-            background-color: rgba(124, 58, 237, 0.2);
-            color: #a78bfa;
-            font-weight: 600;
+        .modal-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
-        .dropdown-content.show {
+        .modal-info-item span {
             display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
+        .modal-info-item strong {
+            font-size: 0.95rem;
+            color: white;
+        }
+        .modal-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        /* Menú Desplegable estándar */
+        .dropdown { position: relative; display: inline-block; }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15); color: white; padding: 8px 16px;
+            font-size: 0.95rem; font-weight: 600; border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover { background: rgba(124, 58, 237, 0.3); border-color: var(--accent); }
+        .dropdown-content {
+            display: none; position: absolute; right: 0; top: 100%; background-color: #161b22;
+            min-width: 220px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); z-index: 1000;
+            border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 8px;
+        }
+        .dropdown-content a {
+            color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex;
+            align-items: center; gap: 10px; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .dropdown-content a:hover { background-color: rgba(124, 58, 237, 0.15); color: var(--accent); }
+        .dropdown-content a.active { background-color: rgba(124, 58, 237, 0.2); color: #a78bfa; font-weight: 600; }
+        .dropdown-content.show { display: block; }
     </style>
 </head>
 <body>
@@ -229,31 +355,64 @@
         </div>
     </header>
 
-    <!-- Contenido Principal: Avances -->
+    <!-- Contenido Principal -->
     <main class="main-content">
         <div class="avances-container">
             <div class="guild-card">
-                <h2><i class="fa-solid fa-list-check"></i> Estado de Proyectos</h2>
-                <p class="guild-subtitle">Sigue en tiempo real el porcentaje y estado actual de nuestras traducciones en curso.</p>
                 
-                <ul class="sidebar-list" id="sidebar-translations-list">
-                    <li class="sidebar-item">
-                        <span class="sidebar-game-title">Cargando estados desde Supabase...</span>
-                    </li>
-                </ul>
-
-                <!-- Cuadro desplegable de información -->
-                <div id="game-details-panel" class="game-details-panel">
-                    <img id="detail-img" src="" alt="Imagen del juego" class="detail-game-img" style="display: none;" onerror="this.style.display='none'">
-                    <h3 id="detail-title"></h3>
-                    <p><strong>Enlace Original:</strong> <a id="detail-link" href="#" target="_blank">Ver fuente</a></p>
-                    <p><strong>Porcentaje:</strong> <span id="detail-percentage" style="color: #34d399; font-weight: bold;">0%</span></p>
-                    <p><strong>Motor / Plataforma:</strong> <span id="detail-engine">-</span></p>
-                    <p><strong>Notas:</strong> <span id="detail-desc">Ninguna</span></p>
+                <div class="guild-header-flex">
+                    <div>
+                        <h2><i class="fa-solid fa-list-check"></i> Estado de Proyectos</h2>
+                        <p class="guild-subtitle">Sigue en tiempo real el porcentaje y estado actual de nuestras traducciones en curso.</p>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filtrarProyectos('todos', this)">Todos</button>
+                        <button class="filter-btn" onclick="filtrarProyectos('activo', this)">En Curso</button>
+                        <button class="filter-btn" onclick="filtrarProyectos('avanzado', this)">+80% Avanzados</button>
+                    </div>
                 </div>
+
+                <!-- Grid dinámico de proyectos -->
+                <div id="projects-grid" class="projects-grid">
+                    <div class="loading-skeleton" style="grid-column: span 3; text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent);"></i>
+                        <p>Cargando panel de proyectos desde Supabase...</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
+
+    <!-- Modal Detalle Flotante -->
+    <div id="projectModal" class="modal-overlay" onclick="cerrarModalFuera(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+            <img id="modal-img" src="" alt="Juego" class="modal-img" onerror="this.style.display='none'">
+            <h3 id="modal-title" class="modal-title">Título del Juego</h3>
+            
+            <div class="modal-info-grid">
+                <div class="modal-info-item">
+                    <span>Motor / Plataforma</span>
+                    <strong id="modal-engine">-</strong>
+                </div>
+                <div class="modal-info-item">
+                    <span>Porcentaje</span>
+                    <strong id="modal-percentage" style="color: #34d399;">0%</strong>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Enlace Original</span>
+                <a id="modal-link" href="#" target="_blank" style="color: #a78bfa; word-break: break-all; font-size: 0.9rem;"><i class="fa-solid fa-link"></i> Ver fuente oficial</a>
+            </div>
+
+            <div>
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Notas de Traducción</span>
+                <p id="modal-desc" class="modal-desc">Sin notas adicionales.</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -284,14 +443,13 @@
         </div>
     </footer>
 
-    <!-- Script de Supabase para Avances -->
+    <!-- Script Conexión Supabase y Lógica Interactiva -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let juegoSeleccionadoActual = null;
-        window.proyectosEnProceso = [];
+        window.listaProyectosGlobal = [];
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -310,7 +468,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const listaSidebar = document.getElementById('sidebar-translations-list');
+            const contenedorGrid = document.getElementById('projects-grid');
 
             try {
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
@@ -321,78 +479,110 @@
                 if (errorEstados) throw errorEstados;
 
                 if (!juegosEstados || juegosEstados.length === 0) {
-                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso actualmente.</span></li>';
-                } else {
-                    window.proyectosEnProceso = juegosEstados;
-                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
-                        return `
-                            <li class="sidebar-item" id="sidebar-item-${index}">
-                                <span class="sidebar-game-title">${juego.titulo}</span>
-                                <button class="status-btn-action" id="btn-action-${index}" onclick="toggleDetallesJuego(${index})">
-                                    <i class="fa-solid fa-eye"></i> Ver más
-                                </button>
-                            </li>
-                        `;
-                    }).join('');
+                    contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 2rem;">No hay proyectos en curso actualmente.</p>';
+                    return;
                 }
+
+                window.listaProyectosGlobal = juegosEstados;
+                renderizarProyectos(juegosEstados);
 
             } catch (err) {
                 console.error(err);
-                if (listaSidebar) listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error al conectar con la base de datos.</span></li>';
+                if (contenedorGrid) {
+                    contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: #ef4444; padding: 2rem;">Error al conectar con la base de datos de Supabase.</p>';
+                }
             }
         });
 
-        function toggleDetallesJuego(index) {
-            const panel = document.getElementById('game-details-panel');
-            const botonActual = document.getElementById(`btn-action-${index}`);
-            const itemActual = document.getElementById(`sidebar-item-${index}`);
-
-            if (juegoSeleccionadoActual === index && panel.style.display === 'block') {
-                panel.style.display = 'none';
-                itemActual.classList.remove('active-detail');
-                botonActual.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
-                juegoSeleccionadoActual = null;
-                return;
-            }
-
-            if (juegoSeleccionadoActual !== null) {
-                const botonAnterior = document.getElementById(`btn-action-${juegoSeleccionadoActual}`);
-                const itemAnterior = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
-                if (botonAnterior) botonAnterior.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
-                if (itemAnterior) itemAnterior.classList.remove('active-detail');
-            }
-
-            const juego = window.proyectosEnProceso[index];
-            juegoSeleccionadoActual = index;
-
-            itemActual.classList.add('active-detail');
-            botonActual.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ver menos';
-
-            const imgEl = document.getElementById('detail-img');
-            if (juego.imagen && juego.imagen.trim() !== '') {
-                imgEl.src = juego.imagen;
-                imgEl.style.display = 'block';
-            } else {
-                imgEl.style.display = 'none';
-            }
-
-            document.getElementById('detail-title').innerText = juego.titulo;
+        function renderizarProyectos(proyectos) {
+            const contenedorGrid = document.getElementById('projects-grid');
             
-            const linkEl = document.getElementById('detail-link');
+            contenedorGrid.innerHTML = proyectos.map((juego, index) => {
+                const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
+                const imagenSrc = (juego.imagen && juego.imagen.trim() !== '') ? juego.imagen : 'https://via.placeholder.com/400x250?text=TraduMaker+HL';
+                const motor = juego.motor || 'RPG Maker';
+
+                return `
+                    <div class="project-card">
+                        <div class="project-img-wrapper">
+                            <span class="project-engine-badge"><i class="fa-solid fa-gear"></i> ${motor}</span>
+                            <img src="${imagenSrc}" alt="${juego.titulo}" class="project-img" onerror="this.src='https://via.placeholder.com/400x250?text=TraduMaker+HL'">
+                        </div>
+                        <div class="project-body">
+                            <h3 class="project-title" title="${juego.titulo}">${juego.titulo}</h3>
+                            
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-label">Progreso</span>
+                                    <span class="progress-value">${porcentaje}%</span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: ${porcentaje}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-footer">
+                            <button class="btn-details" onclick="abrirModalProyecto(${juego.id})">
+                                <i class="fa-solid fa-circle-info"></i> Ver Detalles
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filtrarProyectos(tipo, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            if (tipo === 'todos') {
+                renderizarProyectos(window.listaProyectosGlobal);
+            } else if (tipo === 'activo') {
+                const filtrados = window.listaProyectosGlobal.filter(j => (j.porcentaje || 0) < 100);
+                renderizarProyectos(filtrados);
+            } else if (tipo === 'avanzado') {
+                const filtrados = window.listaProyectosGlobal.filter(j => (j.porcentaje || 0) >= 80);
+                renderizarProyectos(filtrados);
+            }
+        }
+
+        function abrirModalProyecto(id) {
+            const juego = window.listaProyectosGlobal.find(j => j.id === id);
+            if (!juego) return;
+
+            const modalImg = document.getElementById('modal-img');
+            if (juego.imagen && juego.imagen.trim() !== '') {
+                modalImg.src = juego.imagen;
+                modalImg.style.display = 'block';
+            } else {
+                modalImg.style.display = 'none';
+            }
+
+            document.getElementById('modal-title').innerText = juego.titulo;
+            document.getElementById('modal-engine').innerText = juego.motor || 'RPG Maker';
+            document.getElementById('modal-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null ? juego.porcentaje : 0) + '%';
+            
+            const linkEl = document.getElementById('modal-link');
             if (juego.enlace_original) {
                 linkEl.href = juego.enlace_original;
                 linkEl.innerText = juego.enlace_original;
-                linkEl.style.display = 'inline';
+                linkEl.parentElement.style.display = 'block';
             } else {
-                linkEl.href = '#';
-                linkEl.innerText = 'No disponible';
+                linkEl.parentElement.style.display = 'none';
             }
 
-            document.getElementById('detail-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null) ? juego.porcentaje + '%' : 'En proceso';
-            document.getElementById('detail-engine').innerText = juego.motor || 'RPG Maker';
-            document.getElementById('detail-desc').innerText = juego.descripcion || 'Sin notas adicionales por el momento.';
+            document.getElementById('modal-desc').innerText = juego.descripcion || 'Sin notas adicionales por el momento.';
+            document.getElementById('projectModal').style.display = 'flex';
+        }
 
-            panel.style.display = 'block';
+        function cerrarModal() {
+            document.getElementById('projectModal').style.display = 'none';
+        }
+
+        function cerrarModalFuera(event) {
+            if (event.target.id === 'projectModal') {
+                cerrarModal();
+            }
         }
     </script>
 </body>
