@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TraduMaker HL - Avances de Proyectos</title>
+    <title>TraduMaker HL - Panel Avanzado de Avances</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
@@ -11,8 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .avances-container {
-            max-width: 1100px;
-            margin: 3rem auto;
+            max-width: 1200px;
+            margin: 2.5rem auto;
             padding: 0 1.5rem;
         }
         
@@ -23,7 +23,7 @@
             padding: 2.5rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
         .guild-header-flex {
@@ -39,7 +39,7 @@
 
         .guild-card h2 {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 0.4rem;
             display: flex;
             align-items: center;
@@ -52,17 +52,100 @@
             font-size: 0.95rem;
         }
 
-        /* Filtros interactivos */
+        /* Panel de Estadísticas / KPIs Superiores */
+        .stats-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .kpi-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.2s;
+        }
+        .kpi-card:hover {
+            border-color: var(--accent);
+        }
+        .kpi-icon {
+            width: 48px; height: 48px;
+            border-radius: 10px;
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        .kpi-info span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .kpi-info strong {
+            font-size: 1.4rem;
+            font-family: 'Cinzel', serif;
+            color: white;
+        }
+
+        /* Barra de Herramientas: Buscador + Filtros + Vistas */
+        .toolbar-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--bg-main);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .search-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 10px 14px 10px 40px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
         .filter-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .filter-btn {
-            background: var(--bg-main);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 6px 14px;
+            padding: 8px 14px;
             border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -75,10 +158,30 @@
             color: white;
         }
 
+        .view-switchers {
+            display: flex;
+            gap: 4px;
+        }
+        .view-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .view-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
         /* Grid de Proyectos Estilo Tarjeta Pro */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
         }
 
@@ -94,13 +197,13 @@
         }
         .project-card:hover {
             border-color: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2);
         }
 
         .project-img-wrapper {
             position: relative;
-            height: 160px;
+            height: 170px;
             overflow: hidden;
             background: #111;
         }
@@ -152,7 +255,7 @@
         /* Barra de Porcentaje y Progreso */
         .progress-container {
             margin-top: auto;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
         .progress-info {
             display: flex;
@@ -209,7 +312,38 @@
             color: white;
         }
 
-        /* Modal o Panel Detalle Flotante Estilo RPG */
+        /* Vista de Tabla Alternativa */
+        .projects-table-container {
+            display: none;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .projects-table th {
+            background: var(--bg-main);
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border);
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .projects-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+        .projects-table tr:hover td {
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        /* Modal Detalle Flotante */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -222,9 +356,7 @@
             padding: 1.5rem;
             animation: fadeInModal 0.2s ease;
         }
-        @keyframes fadeInModal {
-            from { opacity: 0; } to { opacity: 1; }
-        }
+        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
 
         .modal-card {
             background: var(--bg-card);
@@ -297,6 +429,12 @@
             font-size: 0.95rem;
             line-height: 1.6;
             margin-top: 1rem;
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            max-height: 150px;
+            overflow-y: auto;
         }
 
         /* Menú Desplegable estándar */
@@ -363,28 +501,84 @@
                 <div class="guild-header-flex">
                     <div>
                         <h2><i class="fa-solid fa-list-check"></i> Estado de Proyectos</h2>
-                        <p class="guild-subtitle">Sigue en tiempo real el porcentaje y estado actual de nuestras traducciones en curso.</p>
-                    </div>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="filtrarProyectos('todos', this)">Todos</button>
-                        <button class="filter-btn" onclick="filtrarProyectos('activo', this)">En Curso</button>
-                        <button class="filter-btn" onclick="filtrarProyectos('avanzado', this)">+80% Avanzados</button>
+                        <p class="guild-subtitle">Monitor de rendimiento y porcentajes en vivo de la base de datos de traducciones.</p>
                     </div>
                 </div>
 
-                <!-- Grid dinámico de proyectos -->
+                <!-- KPIs Dinámicos de Resumen -->
+                <div class="stats-kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="kpi-info">
+                            <span>Total en Curso</span>
+                            <strong id="kpi-total">0</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="kpi-info">
+                            <span>Avance Promedio</span>
+                            <strong id="kpi-promedio">0%</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-fire"></i></div>
+                        <div class="kpi-info">
+                            <span>Más del 80%</span>
+                            <strong id="kpi-cercanos">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtros, Búsqueda y Vistas -->
+                <div class="toolbar-section">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar juego por nombre..." oninput="aplicarFiltrosYBusqueda()">
+                    </div>
+
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setFiltroEstado('todos', this)">Todos</button>
+                        <button class="filter-btn" onclick="setFiltroEstado('activo', this)">En Curso</button>
+                        <button class="filter-btn" onclick="setFiltroEstado('avanzado', this)">+80% Avanzados</button>
+                    </div>
+
+                    <div class="view-switchers">
+                        <button class="view-btn active" id="btnViewGrid" onclick="cambiarVista('grid')" title="Vista Cuadrícula"><i class="fa-solid fa-grip"></i></button>
+                        <button class="view-btn" id="btnViewTable" onclick="cambiarVista('table')" title="Vista Tabla"><i class="fa-solid fa-table-list"></i></button>
+                    </div>
+                </div>
+
+                <!-- Contenedor Vista Tarjetas (Grid) -->
                 <div id="projects-grid" class="projects-grid">
                     <div class="loading-skeleton" style="grid-column: span 3; text-align: center; padding: 3rem; color: var(--text-muted);">
                         <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent);"></i>
-                        <p>Cargando panel de proyectos desde Supabase...</p>
+                        <p>Cargando datos de Supabase...</p>
                     </div>
+                </div>
+
+                <!-- Contenedor Vista Tabla (Alternativo) -->
+                <div id="projects-table-container" class="projects-table-container">
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Título del Juego</th>
+                                <th>Motor</th>
+                                <th>Progreso</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-table-body">
+                            <!-- Inyectado por JS -->
+                        </tbody>
+                    </table>
                 </div>
 
             </div>
         </div>
     </main>
 
-    <!-- Modal Detalle Flotante -->
+    <!-- Modal Detalle Flotante Avanzado -->
     <div id="projectModal" class="modal-overlay" onclick="cerrarModalFuera(event)">
         <div class="modal-card">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -397,7 +591,7 @@
                     <strong id="modal-engine">-</strong>
                 </div>
                 <div class="modal-info-item">
-                    <span>Porcentaje</span>
+                    <span>Porcentaje Actual</span>
                     <strong id="modal-percentage" style="color: #34d399;">0%</strong>
                 </div>
             </div>
@@ -408,8 +602,8 @@
             </div>
 
             <div>
-                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Notas de Traducción</span>
-                <p id="modal-desc" class="modal-desc">Sin notas adicionales.</p>
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Notas y Descripción del Proyecto</span>
+                <div id="modal-desc" class="modal-desc">Sin notas adicionales.</div>
             </div>
         </div>
     </div>
@@ -443,13 +637,15 @@
         </div>
     </footer>
 
-    <!-- Script Conexión Supabase y Lógica Interactiva -->
+    <!-- Script Conexión Supabase y Lógica Avanzada -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.listaProyectosGlobal = [];
+        window.filtroActualEstado = 'todos';
+        window.vistaActual = 'grid';
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -468,8 +664,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const contenedorGrid = document.getElementById('projects-grid');
-
             try {
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
                     .from('estado_juegos')
@@ -478,26 +672,85 @@
 
                 if (errorEstados) throw errorEstados;
 
-                if (!juegosEstados || juegosEstados.length === 0) {
-                    contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 2rem;">No hay proyectos en curso actualmente.</p>';
-                    return;
-                }
-
-                window.listaProyectosGlobal = juegosEstados;
-                renderizarProyectos(juegosEstados);
+                window.listaProyectosGlobal = juegosEstados || [];
+                actualizarKPIs(window.listaProyectosGlobal);
+                aplicarFiltrosYBusqueda();
 
             } catch (err) {
                 console.error(err);
-                if (contenedorGrid) {
-                    contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: #ef4444; padding: 2rem;">Error al conectar con la base de datos de Supabase.</p>';
-                }
+                document.getElementById('projects-grid').innerHTML = '<p style="grid-column: span 3; text-align: center; color: #ef4444; padding: 2rem;">Error al conectar con la base de datos de Supabase.</p>';
             }
         });
 
-        function renderizarProyectos(proyectos) {
-            const contenedorGrid = document.getElementById('projects-grid');
+        function actualizarKPIs(proyectos) {
+            const total = proyectos.length;
+            document.getElementById('kpi-total').innerText = total;
+
+            if (total === 0) {
+                document.getElementById('kpi-promedio').innerText = '0%';
+                document.getElementById('kpi-cercanos').innerText = '0';
+                return;
+            }
+
+            const sumaPorcentajes = proyectos.reduce((acc, curr) => acc + (Number(curr.porcentaje) || 0), 0);
+            const promedio = Math.round(sumaPorcentajes / total);
+            document.getElementById('kpi-promedio').innerText = promedio + '%';
+
+            const avanzados = proyectos.filter(j => (Number(j.porcentaje) || 0) >= 80).length;
+            document.getElementById('kpi-cercanos').innerText = avanzados;
+        }
+
+        function setFiltroEstado(tipo, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            window.filtroActualEstado = tipo;
+            aplicarFiltrosYBusqueda();
+        }
+
+        function cambiarVista(vista) {
+            window.vistaActual = vista;
+            document.getElementById('btnViewGrid').classList.toggle('active', vista === 'grid');
+            document.getElementById('btnViewTable').classList.toggle('active', vista === 'table');
+
+            document.getElementById('projects-grid').style.display = vista === 'grid' ? 'grid' : 'none';
+            document.getElementById('projects-table-container').style.display = vista === 'table' ? 'block' : 'none';
+            aplicarFiltrosYBusqueda();
+        }
+
+        function aplicarFiltrosYBusqueda() {
+            const textoBusqueda = document.getElementById('searchInput').value.toLowerCase().trim();
             
-            contenedorGrid.innerHTML = proyectos.map((juego, index) => {
+            let resultado = window.listaProyectosGlobal.filter(juego => {
+                const coincideTexto = juego.titulo && juego.titulo.toLowerCase().includes(textoBusqueda);
+                return coincideTexto;
+            });
+
+            if (window.filtroActualEstado === 'activo') {
+                resultado = resultado.filter(j => (Number(j.porcentaje) || 0) < 100);
+            } else if (window.filtroActualEstado === 'avanzado') {
+                resultado = resultado.filter(j => (Number(j.porcentaje) || 0) >= 80);
+            }
+
+            renderizarVistaActual(resultado);
+        }
+
+        function renderizarVistaActual(proyectos) {
+            if (window.vistaActual === 'grid') {
+                renderizarGrid(proyectos);
+            } else {
+                renderizarTabla(proyectos);
+            }
+        }
+
+        function renderizarGrid(proyectos) {
+            const contenedorGrid = document.getElementById('projects-grid');
+
+            if (!proyectos || proyectos.length === 0) {
+                contenedorGrid.innerHTML = '<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron proyectos con estos criterios.</p>';
+                return;
+            }
+
+            contenedorGrid.innerHTML = proyectos.map((juego) => {
                 const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
                 const imagenSrc = (juego.imagen && juego.imagen.trim() !== '') ? juego.imagen : 'https://via.placeholder.com/400x250?text=TraduMaker+HL';
                 const motor = juego.motor || 'RPG Maker';
@@ -531,19 +784,38 @@
             }).join('');
         }
 
-        function filtrarProyectos(tipo, btnElement) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
+        function renderizarTabla(proyectos) {
+            const tbody = document.getElementById('projects-table-body');
 
-            if (tipo === 'todos') {
-                renderizarProyectos(window.listaProyectosGlobal);
-            } else if (tipo === 'activo') {
-                const filtrados = window.listaProyectosGlobal.filter(j => (j.porcentaje || 0) < 100);
-                renderizarProyectos(filtrados);
-            } else if (tipo === 'avanzado') {
-                const filtrados = window.listaProyectosGlobal.filter(j => (j.porcentaje || 0) >= 80);
-                renderizarProyectos(filtrados);
+            if (!proyectos || proyectos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron proyectos.</td></tr>';
+                return;
             }
+
+            tbody.innerHTML = proyectos.map((juego) => {
+                const porcentaje = juego.porcentaje !== undefined && juego.porcentaje !== null ? Number(juego.porcentaje) : 0;
+                const motor = juego.motor || 'RPG Maker';
+
+                return `
+                    <tr>
+                        <td><strong>${juego.titulo}</strong></td>
+                        <td><span style="color: var(--gold); font-size: 0.85rem;"><i class="fa-solid fa-gear"></i> ${motor}</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px; max-width: 200px;">
+                                <div class="progress-bar-bg" style="flex: 1;">
+                                    <div class="progress-bar-fill" style="width: ${porcentaje}%;"></div>
+                                </div>
+                                <span style="font-size: 0.85krem; color: #34d399; font-weight: 600; min-width: 35px;">${porcentaje}%</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <button class="btn-details" style="display: inline-flex; width: auto; padding: 6px 12px;" onclick="abrirModalProyecto(${juego.id})">
+                                <i class="fa-solid fa-circle-info"></i> Ver
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function abrirModalProyecto(id) {
