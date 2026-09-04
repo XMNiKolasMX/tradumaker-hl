@@ -176,19 +176,58 @@
             </div>
         </section>
 
-        <!-- Estado de Juegos (Tu sección original de avances integrada en el index) -->
-        <section class="container recent-section" style="margin-top: 4rem;">
-            <div class="section-header">
-                <div>
-                    <h2><i class="fa-solid fa-bars-progress"></i> Estado de Juegos (En Proceso)</h2>
-                    <p>Seguimiento en tiempo real de las traducciones actuales</p>
+        <!-- Sección de Horario y Proceso Original -->
+        <section class="container info-section" style="margin-top: 4rem; margin-bottom: 4rem;">
+            <div class="guild-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                
+                <div class="guild-card">
+                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
+                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
+                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
+                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
                 </div>
-                <a href="avances.html" class="view-all-link">Ver detalle completo <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
 
-            <div id="grid-estado-juegos" class="games-grid">
-                <!-- Se llenará mediante JS con Supabase -->
-                <div class="loading-skeleton">Cargando estado de proyectos...</div>
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
+                    <div class="process-list">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Caza de la Obra</h4>
+                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Extracción de Textos</h4>
+                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Traducción Base</h4>
+                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Adaptación y Pulido</h4>
+                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>¡Listo para la Aventura!</h4>
+                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>
@@ -246,10 +285,8 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             const contenedorRecientes = document.getElementById('grid-recientes');
-            const contenedorEstado = document.getElementById('grid-estado-juegos');
 
             try {
-                // 1. Cargar juegos recientes traducidos
                 const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
                     .from('juegos')
                     .select('*')
@@ -275,38 +312,9 @@
                         </div>
                     `).join('');
                 }
-
-                // 2. Cargar estado de juegos (en proceso)
-                const { data: estadoJuegos, error: errorEstado } = await supabaseClient
-                    .from('estado_juegos')
-                    .select('*')
-                    .order('id', { ascending: false })
-                    .limit(4);
-
-                if (errorEstado) throw errorEstado;
-
-                if (!estadoJuegos || estadoJuegos.length === 0) {
-                    contenedorEstado.innerHTML = '<p class="no-games">No hay proyectos en proceso actualmente.</p>';
-                } else {
-                    contenedorEstado.innerHTML = estadoJuegos.map(juego => `
-                        <div class="game-card">
-                            <div class="game-img-container">
-                                <img src="${juego.imagen || 'https://via.placeholder.com/300x200?text=TraduMakerHL'}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                                <span class="game-tag">${juego.porcentaje}% Traducido</span>
-                            </div>
-                            <div class="game-info">
-                                <h3 class="game-title">${juego.titulo}</h3>
-                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">${juego.descripcion || 'En desarrollo...'}</p>
-                                ${juego.enlace_original ? `<a href="${juego.enlace_original}" target="_blank" class="btn-enter" style="background: rgba(124,58,237,0.2); border-color: var(--accent);">Ver original <i class="fa-solid fa-link"></i></a>` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
             } catch (err) {
-                console.error("Error al cargar datos de Supabase:", err);
+                console.error(err);
                 if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
-                if (contenedorEstado) contenedorEstado.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
             }
         });
     </script>
