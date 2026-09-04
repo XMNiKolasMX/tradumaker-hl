@@ -1,1239 +1,620 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>TraduMaker HL - Inicio | RPG Maker en Español</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="stylesheet" href="inicio.css">
-
-    <!-- SDK de Supabase -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-
-        /* Estilos adicionales para las nuevas secciones (Horario y Proceso) */
-
-        .guild-section {
-
-            margin: 4rem auto;
-
-            display: grid;
-
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-
-            gap: 2rem;
-
-        }
-
-        .guild-card {
-
-            background: var(--bg-card);
-
-            border: 1px solid var(--border);
-
-            border-radius: 14px;
-
-            padding: 2.5rem;
-
-            position: relative;
-
-            overflow: hidden;
-
-            transition: border-color 0.3s;
-
-        }
-
-        .guild-card:hover {
-
-            border-color: var(--accent);
-
-        }
-
-        .guild-card h2 {
-
-            font-family: 'Cinzel', serif;
-
-            font-size: 1.5rem;
-
-            margin-bottom: 0.5rem;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-        .guild-card h2 i { color: var(--gold); }
-
-        
-
-        /* Subtítulo / Texto de avance de traducciones */
-
-        .guild-subtitle {
-
-            color: var(--text-muted);
-
-            font-size: 0.9rem;
-
-            margin-bottom: 1.5rem;
-
-        }
-
-
-
-        /* Horario Estilo RPG */
-
-        .schedule-status {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            background: rgba(16, 185, 129, 0.15);
-
-            color: #34d399;
-
-            padding: 5px 12px;
-
-            border-radius: 20px;
-
-            font-size: 0.8rem;
-
-            font-weight: 600;
-
-            margin-bottom: 1rem;
-
-            border: 1px solid rgba(16, 185, 129, 0.3);
-
-        }
-
-        .schedule-time {
-
-            font-size: 1.3rem;
-
-            font-family: 'Cinzel', serif;
-
-            color: white;
-
-            margin-bottom: 10px;
-
-        }
-
-        .schedule-desc {
-
-            color: var(--text-muted);
-
-            font-size: 0.95rem;
-
-            line-height: 1.6;
-
-        }
-
-
-
-        /* Pasos del proceso */
-
-        .process-list {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 1rem;
-
-        }
-
-        .process-step {
-
-            display: flex;
-
-            gap: 15px;
-
-            align-items: flex-start;
-
-        }
-
-        .step-number {
-
-            background: rgba(124, 58, 237, 0.15);
-
-            color: #a78bfa;
-
-            border: 1px solid rgba(124, 58, 237, 0.3);
-
-            width: 30px;
-
-            height: 30px;
-
-            border-radius: 50%;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-weight: 700;
-
-            font-size: 0.9rem;
-
-            flex-shrink: 0;
-
-            font-family: 'Cinzel', serif;
-
-        }
-
-        .step-content h4 {
-
-            font-size: 1rem;
-
-            color: white;
-
-            margin-bottom: 2px;
-
-        }
-
-        .step-content p {
-
-            font-size: 0.85rem;
-
-            color: var(--text-muted);
-
-            line-height: 1.4;
-
-        }
-
-
-
-        /* Estilos del Widget de Estado de Traducciones (Supabase) */
-
-        .sidebar-list {
-
-            list-style: none;
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 10px;
-
-            max-height: 250px;
-
-            overflow-y: auto;
-
-            padding-right: 5px;
-
-        }
-
-        .sidebar-item {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            background: var(--bg-main);
-
-            padding: 10px 14px;
-
-            border-radius: 8px;
-
-            border: 1px solid var(--border);
-
-            transition: all 0.2s ease;
-
-        }
-
-        .sidebar-item.active-detail {
-
-            border-color: var(--accent);
-
-            background: rgba(124, 58, 237, 0.1);
-
-        }
-
-        .sidebar-game-title {
-
-            font-size: 0.9rem;
-
-            color: var(--text-main);
-
-            font-weight: 500;
-
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-
-            max-width: 170px;
-
-        }
-
-        
-
-        /* Botón interactivo de Ver más / Ver menos */
-
-        .status-btn-action {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            font-size: 0.75rem;
-
-            font-weight: 700;
-
-            padding: 5px 10px;
-
-            border-radius: 20px;
-
-            letter-spacing: 0.3px;
-
-            flex-shrink: 0;
-
-            background: rgba(245, 158, 11, 0.15);
-
-            color: var(--gold);
-
-            border: 1px solid rgba(245, 158, 11, 0.3);
-
-            cursor: pointer;
-
-            transition: all 0.2s ease;
-
-        }
-
-        .status-btn-action:hover {
-
-            background: rgba(245, 158, 11, 0.3);
-
-            transform: scale(1.05);
-
-        }
-
-
-
-        /* Panel desplegable de detalles */
-
-        .game-details-panel {
-
-            display: none;
-
-            margin-top: 15px;
-
-            padding: 15px;
-
-            background: var(--bg-main);
-
-            border: 1px solid var(--accent);
-
-            border-radius: 8px;
-
-            animation: fadeIn 0.3s ease;
-
-        }
-
-        @keyframes fadeIn {
-
-            from { opacity: 0; transform: translateY(-5px); }
-
-            to { opacity: 1; transform: translateY(0); }
-
-        }
-
-        .game-details-panel h3 {
-
-            font-family: 'Cinzel', serif;
-
-            font-size: 1.1rem;
-
-            color: var(--gold);
-
-            margin-bottom: 10px;
-
-        }
-
-        .game-details-panel p {
-
-            font-size: 0.85rem;
-
-            color: var(--text-muted);
-
-            margin-bottom: 6px;
-
-        }
-
-        .game-details-panel a {
-
-            color: #a78bfa;
-
-            word-break: break-all;
-
-        }
-
-        /* Estilo para la imagen del panel de detalles */
-
-        .detail-game-img {
-
-            width: 100%;
-
-            max-height: 160px;
-
-            object-fit: cover;
-
-            border-radius: 6px;
-
-            margin-bottom: 12px;
-
-            border: 1px solid var(--border);
-
-        }
-
-
-
-        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
-
-        .dropdown {
-
-            position: relative;
-
-            display: inline-block;
-
-        }
-
-        .dropbtn {
-
-            background: rgba(124, 58, 237, 0.15);
-
-            color: white;
-
-            padding: 8px 16px;
-
-            font-size: 0.95rem;
-
-            font-weight: 600;
-
-            border: 1px solid rgba(124, 58, 237, 0.4);
-
-            border-radius: 8px;
-
-            cursor: pointer;
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            transition: all 0.2s ease;
-
-            font-family: 'Inter', sans-serif;
-
-        }
-
-        .dropbtn:hover {
-
-            background: rgba(124, 58, 237, 0.3);
-
-            border-color: var(--accent);
-
-        }
-
-        .dropdown-content {
-
-            display: none;
-
-            position: absolute;
-
-            right: 0;
-
-            background-color: #161b22;
-
-            min-width: 220px;
-
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-
-            z-index: 1000;
-
-            border: 1px solid var(--border);
-
-            border-radius: 10px;
-
-            overflow: hidden;
-
-            margin-top: 8px;
-
-            animation: fadeIn 0.2s ease;
-
-        }
-
-        .dropdown-content a {
-
-            color: var(--text-main);
-
-            padding: 12px 16px;
-
-            text-decoration: none;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            font-size: 0.9rem;
-
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
-            transition: background 0.2s;
-
-        }
-
-        .dropdown-content a:last-child {
-
-            border-bottom: none;
-
-        }
-
-        .dropdown-content a:hover {
-
-            background-color: rgba(124, 58, 237, 0.15);
-
-            color: var(--accent);
-
-        }
-
-        .dropdown-content a.active {
-
-            background-color: rgba(124, 58, 237, 0.2);
-
-            color: #a78bfa;
-
-            font-weight: 600;
-
-        }
-
-        .show {
-
-            display: block;
-
-        }
-
-    </style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraduMaker HL - Inicio | RPG Maker en Español</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="inicio.css">
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos adicionales para las nuevas secciones (Horario y Proceso) */
+        .guild-section {
+            margin: 4rem auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .guild-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .guild-card:hover {
+            border-color: var(--accent);
+        }
+        .guild-card h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .guild-card h2 i { color: var(--gold); }
+        
+        /* Subtítulo / Texto de avance de traducciones */
+        .guild-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Horario Estilo RPG */
+        .schedule-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .schedule-time {
+            font-size: 1.3rem;
+            font-family: 'Cinzel', serif;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .schedule-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Pasos del proceso */
+        .process-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .process-step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            font-family: 'Cinzel', serif;
+        }
+        .step-content h4 {
+            font-size: 1rem;
+            color: white;
+            margin-bottom: 2px;
+        }
+        .step-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Estilos del Widget de Estado de Traducciones (Supabase) */
+        .sidebar-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .sidebar-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .sidebar-item.active-detail {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.1);
+        }
+        .sidebar-game-title {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+        }
+        
+        /* Botón interactivo de Ver más / Ver menos */
+        .status-btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .status-btn-action:hover {
+            background: rgba(245, 158, 11, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Panel desplegable de detalles */
+        .game-details-panel {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-main);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .game-details-panel h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .game-details-panel p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .game-details-panel a {
+            color: #a78bfa;
+            word-break: break-all;
+        }
+        /* Estilo para la imagen del panel de detalles */
+        .detail-game-img {
+            width: 100%;
+            max-height: 160px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: var(--accent);
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #161b22;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        .dropdown-content a {
+            color: var(--text-main);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: var(--accent);
+        }
+        .dropdown-content a.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .show {
+            display: block;
+        }
+    </style>
 </head>
-
 <body>
 
-
-
-    <!-- Navegación Profesional Multi-página -->
-
-    <header class="navbar">
-
-        <div class="nav-container">
-
-            <div class="logo">
-
-                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
-
-            </div>
-
-            
-
-            <!-- Menú Desplegable (Dropdown) -->
-
-            <div class="dropdown">
-
-                <button onclick="toggleMenuDesplegable()" class="dropbtn">
-
-                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
-
-                </button>
-
-                <div id="navDropdown" class="dropdown-content">
-
-                    <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
-
-                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-
-                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
-
-                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
-
-                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-
-                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
-
-                        <i class="fa-solid fa-user"></i> Cuenta 
-
-                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="nav-version">
-
-                <span>Versión 2.0</span>
-
-            </div>
-
-        </div>
-
-    </header>
-
-
-
-    <!-- Contenido Principal: Inicio -->
-
-    <main class="main-content">
-
-        <!-- Hero Section de Alta Gama -->
-
-        <section class="hero-section">
-
-            <div class="hero-overlay"></div>
-
-            <div class="hero-content">
-
-                <div class="hero-badge"><i class="fa-solid fa-star"></i> Traducciones Oficiales al Español</div>
-
-                <h1>El Universo de <span>RPG Maker</span> a tu Alcance</h1>
-
-                <p>Descubre historias inolvidables, joyas ocultas y mundos independientes traducidos con calidad profesional por apasionados para apasionados.</p>
-
-                <div class="hero-buttons">
-
-                    <a href="catalogo.html" class="btn-primary"><i class="fa-solid fa-compass"></i> Explorar Catálogo <i class="fa-solid fa-arrow-right"></i></a>
-
-                    <a href="apoyanos.html" class="btn-secondary"><i class="fa-solid fa-heart"></i> Apoyar Proyecto</a>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- Estadísticas Rápidas / Características Pro -->
-
-        <section class="features-bar">
-
-            <div class="container features-grid">
-
-                <div class="feature-item">
-
-                    <i class="fa-solid fa-language"></i>
-
-                    <div>
-
-                        <h3>100% en Español</h3>
-
-                        <p>Traducciones cuidadas y testeadas</p>
-
-                    </div>
-
-                </div>
-
-                <div class="feature-item">
-
-                    <i class="fa-solid fa-cloud-arrow-down"></i>
-
-                    <div>
-
-                        <h3>Cloud Database</h3>
-
-                        <p>Sincronización instantánea con nuestra base de datos</p>
-
-                    </div>
-
-                </div>
-
-                <div class="feature-item">
-
-                    <i class="fa-solid fa-bolt-lightning"></i>
-
-                    <div>
-
-                        <h3>Acceso Directo</h3>
-
-                        <p>Sin esperas ni acortadores molestos</p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
-
-        <section class="container recent-section">
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
-
-                    <p>Los juegos más recientes añadidos a nuestra base de datos</p>
-
-                </div>
-
-                <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
-
-            </div>
-
-
-
-            <div id="grid-recientes" class="games-grid">
-
-                <!-- Se inyecta dinámicamente desde Supabase -->
-
-                <div class="loading-skeleton">Cargando catálogo, espere por favor.</div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- SECCIÓN: Horario, Estado de Juegos y Proceso -->
-
-        <section class="container">
-
-            <div class="guild-section">
-
-                
-
-                <!-- 1. Horario de Traducción -->
-
-                <div class="guild-card">
-
-                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
-
-                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
-
-                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
-
-                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
-
-                </div>
-
-
-
-                <!-- 2. Estado de Proyectos (Dinámico desde la tabla estado_juegos) -->
-
-                <div class="guild-card">
-
-                    <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
-
-                    <p class="guild-subtitle">Avance de las traducciones</p>
-
-                    <ul class="sidebar-list" id="sidebar-translations-list">
-
-                        <li class="sidebar-item">
-
-                            <span class="sidebar-game-title">Cargando estados...</span>
-
-                        </li>
-
-                    </ul>
-
-                    <!-- Cuadro desplegable de información -->
-
-                    <div id="game-details-panel" class="game-details-panel">
-
-                        <img id="detail-img" src="" alt="Imagen del juego" class="detail-game-img" style="display: none;" onerror="this.style.display='none'">
-
-                        <h3 id="detail-title"></h3>
-
-                        <p><strong>Enlace Original:</strong> <a id="detail-link" href="#" target="_blank">Ver fuente</a></p>
-
-                        <p><strong>Porcentaje:</strong> <span id="detail-percentage" style="color: #34d399; font-weight: bold;">0%</span></p>
-
-                        <p><strong>Motor / Plataforma:</strong> <span id="detail-engine">-</span></p>
-
-                        <p><strong>Notas:</strong> <span id="detail-desc">Ninguna</span></p>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- 3. Proceso de Traducción -->
-
-                <div class="guild-card">
-
-                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
-
-                    <div class="process-list">
-
-                        <div class="process-step">
-
-                            <div class="step-number">1</div>
-
-                            <div class="step-content">
-
-                                <h4>Caza de la Obra</h4>
-
-                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="process-step">
-
-                            <div class="step-number">2</div>
-
-                            <div class="step-content">
-
-                                <h4>Extracción de Textos</h4>
-
-                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="process-step">
-
-                            <div class="step-number">3</div>
-
-                            <div class="step-content">
-
-                                <h4>Traducción Base</h4>
-
-                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="process-step">
-
-                            <div class="step-number">4</div>
-
-                            <div class="step-content">
-
-                                <h4>Adaptación y Pulido</h4>
-
-                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="process-step">
-
-                            <div class="step-number">5</div>
-
-                            <div class="step-content">
-
-                                <h4>¡Listo para la Aventura!</h4>
-
-                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-
-    <!-- Footer Profesional -->
-
-    <footer class="footer">
-
-        <div class="footer-content">
-
-            <div class="footer-info">
-
-                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
-
-                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
-
-            </div>
-
-            <div class="footer-links">
-
-                <h4>Enlaces</h4>
-
-                <a href="index.html">Inicio</a>
-
-                <a href="catalogo.html">Catálogo</a>
-
-                <a href="nosotros.html">Sobre Nosotros</a>
-
-                <a href="apoyanos.html">Apóyanos</a>
-
-            </div>
-
-            <div class="footer-socials">
-
-                <h4>Síguenos</h4>
-
-                <div class="social-icons">
-
-                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-
-                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
-
-                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="footer-bottom">
-
-            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
-
-        </div>
-
-    </footer>
-
-
-
-    <!-- Script de Conexión a Supabase y Menú Desplegable -->
-
-    <script>
-
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-
-
-        let juegoSeleccionadoActual = null; // Variable para rastrear el índice abierto
-
-
-
-        // Función para abrir/cerrar el menú desplegable de navegación
-
-        function toggleMenuDesplegable() {
-
-            document.getElementById("navDropdown").classList.toggle("show");
-
-        }
-
-
-
-        // Cerrar el menú si el usuario hace clic fuera de él
-
-        window.onclick = function(event) {
-
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-
-                for (var i = 0; i < dropdowns.length; i++) {
-
-                    var openDropdown = dropdowns[i];
-
-                    if (openDropdown.classList.contains('show')) {
-
-                        openDropdown.classList.remove('show');
-
-                    }
-
-                }
-
-            }
-
-        }
-
-
-
-        document.addEventListener('DOMContentLoaded', async () => {
-
-            const contenedorRecientes = document.getElementById('grid-recientes');
-
-            const listaSidebar = document.getElementById('sidebar-translations-list');
-
-
-
-            try {
-
-                // 1. Cargar Últimos Lanzamientos (4 juegos ya traducidos de la tabla 'juegos')
-
-                const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
-
-                    .from('juegos')
-
-                    .select('*')
-
-                    .eq('traducido', true)
-
-                    .order('id', { ascending: false })
-
-                    .limit(4);
-
-
-
-                if (errorRecientes) throw errorRecientes;
-
-
-
-                if (!juegosRecientes || juegosRecientes.length === 0) {
-
-                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
-
-                } else {
-
-                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
-
-                        <div class="game-card">
-
-                            <div class="game-img-container">
-
-                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-
-                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
-
-                            </div>
-
-                            <div class="game-info">
-
-                                <h3 class="game-title">${juego.titulo}</h3>
-
-                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
-                            </div>
-
-                        </div>
-
-                    `).join('');
-
-                }
-
-
-
-                // 2. Cargar Estado de Proyectos (Desde la tabla 'estado_juegos')
-
-                const { data: juegosEstados, error: errorEstados } = await supabaseClient
-
-                    .from('estado_juegos')
-
-                    .select('*')
-
-                    .order('id', { ascending: false });
-
-
-
-                if (errorEstados) throw errorEstados;
-
-
-
-                if (!juegosEstados || juegosEstados.length === 0) {
-
-                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
-
-                } else {
-
-                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
-
-                        return `
-
-                            <li class="sidebar-item" id="sidebar-item-${index}">
-
-                                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
-
-                                <button class="status-btn-action" id="btn-action-${index}" onclick="toggleDetallesJuego(${index})">
-
-                                    <i class="fa-solid fa-eye"></i> Ver más
-
-                                </button>
-
-                            </li>
-
-                        `;
-
-                    }).join('');
-
-
-
-                    window.proyectosEnProceso = juegosEstados;
-
-                }
-
-
-
-            } catch (err) {
-
-                console.error(err);
-
-                if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
-
-                if (listaSidebar) listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
-
-            }
-
-        });
-
-
-
-        // Función para alternar el panel de detalles y cambiar dinámicamente entre "Ver más" y "Ver menos"
-
-        function toggleDetallesJuego(index) {
-
-            const panel = document.getElementById('game-details-panel');
-
-            const botonActual = document.getElementById(`btn-action-${index}`);
-
-            const itemActual = document.getElementById(`sidebar-item-${index}`);
-
-
-
-            // Si el usuario hace clic en el mismo que ya está abierto, lo cerramos ("Ver menos" -> "Ver más")
-
-            if (juegoSeleccionadoActual === index && panel.style.display === 'block') {
-
-                panel.style.display = 'none';
-
-                itemActual.classList.remove('active-detail');
-
-                botonActual.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
-
-                juegoSeleccionadoActual = null;
-
-                return;
-
-            }
-
-
-
-            // Si había otro abierto previamente, restablecemos su botón y su estilo
-
-            if (juegoSeleccionadoActual !== null) {
-
-                const botonAnterior = document.getElementById(`btn-action-${juegoSeleccionadoActual}`);
-
-                const itemAnterior = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
-
-                if (botonAnterior) botonAnterior.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
-
-                if (itemAnterior) itemAnterior.classList.remove('active-detail');
-
-            }
-
-
-
-            // Cargamos la información del nuevo juego seleccionado
-
-            const juego = window.proyectosEnProceso[index];
-
-            juegoSeleccionadoActual = index;
-
-
-
-            itemActual.classList.add('active-detail');
-
-            botonActual.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ver menos';
-
-
-
-            // Mostrar la imagen del juego en el panel si existe el campo
-
-            const imgEl = document.getElementById('detail-img');
-
-            if (juego.imagen && juego.imagen.trim() !== '') {
-
-                imgEl.src = juego.imagen;
-
-                imgEl.style.display = 'block';
-
-            } else {
-
-                imgEl.style.display = 'none';
-
-            }
-
-
-
-            document.getElementById('detail-title').innerText = juego.titulo;
-
-            
-
-            const linkEl = document.getElementById('detail-link');
-
-            if (juego.enlace_original) {
-
-                linkEl.href = juego.enlace_original;
-
-                linkEl.innerText = juego.enlace_original;
-
-                linkEl.style.display = 'inline';
-
-            } else {
-
-                linkEl.href = '#';
-
-                linkEl.innerText = 'No disponible';
-
-            }
-
-
-
-            document.getElementById('detail-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null) ? juego.porcentaje + '%' : 'En proceso';
-
-            document.getElementById('detail-engine').innerText = juego.motor || 'RPG Maker';
-
-            document.getElementById('detail-desc').innerText = juego.descripcion || 'Sin notas adicionales por el momento.';
-
-
-
-            panel.style.display = 'block';
-
-        }
-
-    </script>
-
+    <!-- Navegación Profesional Multi-página -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+            </div>
+            
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal: Inicio -->
+    <main class="main-content">
+        <!-- Hero Section de Alta Gama -->
+        <section class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fa-solid fa-star"></i> Traducciones Oficiales al Español</div>
+                <h1>El Universo de <span>RPG Maker</span> a tu Alcance</h1>
+                <p>Descubre historias inolvidables, joyas ocultas y mundos independientes traducidos con calidad profesional por apasionados para apasionados.</p>
+                <div class="hero-buttons">
+                    <a href="catalogo.html" class="btn-primary"><i class="fa-solid fa-compass"></i> Explorar Catálogo <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="apoyanos.html" class="btn-secondary"><i class="fa-solid fa-heart"></i> Apoyar Proyecto</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas Rápidas / Características Pro -->
+        <section class="features-bar">
+            <div class="container features-grid">
+                <div class="feature-item">
+                    <i class="fa-solid fa-language"></i>
+                    <div>
+                        <h3>100% en Español</h3>
+                        <p>Traducciones cuidadas y testeadas</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <div>
+                        <h3>Cloud Database</h3>
+                        <p>Sincronización instantánea con nuestra base de datos</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <div>
+                        <h3>Acceso Directo</h3>
+                        <p>Sin esperas ni acortadores molestos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
+        <section class="container recent-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
+                    <p>Los juegos más recientes añadidos a nuestra base de datos</p>
+                </div>
+                <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div id="grid-recientes" class="games-grid">
+                <!-- Se inyecta dinámicamente desde Supabase -->
+                <div class="loading-skeleton">Cargando catálogo, espere por favor.</div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: Horario, Estado de Juegos y Proceso -->
+        <section class="container">
+            <div class="guild-section">
+                
+                <!-- 1. Horario de Traducción -->
+                <div class="guild-card">
+                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
+                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
+                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
+                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
+                </div>
+
+                <!-- 2. Estado de Proyectos (Dinámico desde la tabla estado_juegos) -->
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-list-check"></i> Estado de Juegos</h2>
+                    <p class="guild-subtitle">Avance de las traducciones</p>
+                    <ul class="sidebar-list" id="sidebar-translations-list">
+                        <li class="sidebar-item">
+                            <span class="sidebar-game-title">Cargando estados...</span>
+                        </li>
+                    </ul>
+                    <!-- Cuadro desplegable de información -->
+                    <div id="game-details-panel" class="game-details-panel">
+                        <img id="detail-img" src="" alt="Imagen del juego" class="detail-game-img" style="display: none;" onerror="this.style.display='none'">
+                        <h3 id="detail-title"></h3>
+                        <p><strong>Enlace Original:</strong> <a id="detail-link" href="#" target="_blank">Ver fuente</a></p>
+                        <p><strong>Porcentaje:</strong> <span id="detail-percentage" style="color: #34d399; font-weight: bold;">0%</span></p>
+                        <p><strong>Motor / Plataforma:</strong> <span id="detail-engine">-</span></p>
+                        <p><strong>Notas:</strong> <span id="detail-desc">Ninguna</span></p>
+                    </div>
+                </div>
+
+                <!-- 3. Proceso de Traducción -->
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
+                    <div class="process-list">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Caza de la Obra</h4>
+                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Extracción de Textos</h4>
+                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Traducción Base</h4>
+                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Adaptación y Pulido</h4>
+                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>¡Listo para la Aventura!</h4>
+                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Profesional -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
+                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="nosotros.html">Sobre Nosotros</a>
+                <a href="apoyanos.html">Apóyanos</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Síguenos</h4>
+                <div class="social-icons">
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script de Conexión a Supabase y Menú Desplegable -->
+    <script>
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let juegoSeleccionadoActual = null; // Variable para rastrear el índice abierto
+
+        // Función para abrir/cerrar el menú desplegable de navegación
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
+
+        // Cerrar el menú si el usuario hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const contenedorRecientes = document.getElementById('grid-recientes');
+            const listaSidebar = document.getElementById('sidebar-translations-list');
+
+            try {
+                // 1. Cargar Últimos Lanzamientos (4 juegos ya traducidos de la tabla 'juegos')
+                const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
+                    .from('juegos')
+                    .select('*')
+                    .eq('traducido', true)
+                    .order('id', { ascending: false })
+                    .limit(4);
+
+                if (errorRecientes) throw errorRecientes;
+
+                if (!juegosRecientes || juegosRecientes.length === 0) {
+                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
+                } else {
+                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
+                        <div class="game-card">
+                            <div class="game-img-container">
+                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">${juego.titulo}</h3>
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 2. Cargar Estado de Proyectos (Desde la tabla 'estado_juegos')
+                const { data: juegosEstados, error: errorEstados } = await supabaseClient
+                    .from('estado_juegos')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (errorEstados) throw errorEstados;
+
+                if (!juegosEstados || juegosEstados.length === 0) {
+                    listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">No hay proyectos en curso</span></li>';
+                } else {
+                    listaSidebar.innerHTML = juegosEstados.map((juego, index) => {
+                        return `
+                            <li class="sidebar-item" id="sidebar-item-${index}">
+                                <span class="sidebar-game-title" title="${juego.titulo}">${juego.titulo}</span>
+                                <button class="status-btn-action" id="btn-action-${index}" onclick="toggleDetallesJuego(${index})">
+                                    <i class="fa-solid fa-eye"></i> Ver más
+                                </button>
+                            </li>
+                        `;
+                    }).join('');
+
+                    window.proyectosEnProceso = juegosEstados;
+                }
+
+            } catch (err) {
+                console.error(err);
+                if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
+                if (listaSidebar) listaSidebar.innerHTML = '<li class="sidebar-item"><span class="sidebar-game-title">Error de conexión</span></li>';
+            }
+        });
+
+        // Función para alternar el panel de detalles y cambiar dinámicamente entre "Ver más" y "Ver menos"
+        function toggleDetallesJuego(index) {
+            const panel = document.getElementById('game-details-panel');
+            const botonActual = document.getElementById(`btn-action-${index}`);
+            const itemActual = document.getElementById(`sidebar-item-${index}`);
+
+            // Si el usuario hace clic en el mismo que ya está abierto, lo cerramos ("Ver menos" -> "Ver más")
+            if (juegoSeleccionadoActual === index && panel.style.display === 'block') {
+                panel.style.display = 'none';
+                itemActual.classList.remove('active-detail');
+                botonActual.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
+                juegoSeleccionadoActual = null;
+                return;
+            }
+
+            // Si había otro abierto previamente, restablecemos su botón y su estilo
+            if (juegoSeleccionadoActual !== null) {
+                const botonAnterior = document.getElementById(`btn-action-${juegoSeleccionadoActual}`);
+                const itemAnterior = document.getElementById(`sidebar-item-${juegoSeleccionadoActual}`);
+                if (botonAnterior) botonAnterior.innerHTML = '<i class="fa-solid fa-eye"></i> Ver más';
+                if (itemAnterior) itemAnterior.classList.remove('active-detail');
+            }
+
+            // Cargamos la información del nuevo juego seleccionado
+            const juego = window.proyectosEnProceso[index];
+            juegoSeleccionadoActual = index;
+
+            itemActual.classList.add('active-detail');
+            botonActual.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ver menos';
+
+            // Mostrar la imagen del juego en el panel si existe el campo
+            const imgEl = document.getElementById('detail-img');
+            if (juego.imagen && juego.imagen.trim() !== '') {
+                imgEl.src = juego.imagen;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            document.getElementById('detail-title').innerText = juego.titulo;
+            
+            const linkEl = document.getElementById('detail-link');
+            if (juego.enlace_original) {
+                linkEl.href = juego.enlace_original;
+                linkEl.innerText = juego.enlace_original;
+                linkEl.style.display = 'inline';
+            } else {
+                linkEl.href = '#';
+                linkEl.innerText = 'No disponible';
+            }
+
+            document.getElementById('detail-percentage').innerText = (juego.porcentaje !== undefined && juego.porcentaje !== null) ? juego.porcentaje + '%' : 'En proceso';
+            document.getElementById('detail-engine').innerText = juego.motor || 'RPG Maker';
+            document.getElementById('detail-desc').innerText = juego.descripcion || 'Sin notas adicionales por el momento.';
+
+            panel.style.display = 'block';
+        }
+    </script>
 </body>
-
 </html>
