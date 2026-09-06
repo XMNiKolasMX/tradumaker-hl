@@ -10,7 +10,7 @@
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos adicionales para las secciones de Horario y Proceso */
+        /* Estilos adicionales para las secciones de Horario, Proceso y Bots */
         .guild-section {
             margin: 4rem auto;
             display: grid;
@@ -100,6 +100,87 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             line-height: 1.4;
+        }
+
+        /* Estilos de Bots de la Comunidad */
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .bot-card {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        .bot-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            background: rgba(17, 24, 39, 0.9);
+        }
+        .bot-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        .bot-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+        }
+        .bot-title h3 {
+            font-size: 1.1rem;
+            color: white;
+            margin-bottom: 2px;
+            font-family: 'Cinzel', serif;
+        }
+        .bot-tag {
+            font-size: 0.7rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .bot-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        .bot-link {
+            text-decoration: none;
+            color: white;
+            background: rgba(124, 58, 237, 0.3);
+            border: 1px solid var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .bot-link:hover {
+            background: var(--accent);
         }
 
         /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
@@ -251,6 +332,25 @@
             </div>
         </section>
 
+        <!-- Banner Interactivo: Votaciones Activas -->
+        <section class="container" style="margin: 3rem auto;">
+            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(15, 23, 42, 0.8)); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; position: relative; overflow: hidden;">
+                <div style="position: absolute; right: -20px; bottom: -20px; font-size: 8rem; color: rgba(124, 58, 237, 0.05); pointer-events: none;">
+                    <i class="fa-solid fa-square-poll-vertical"></i>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <span style="background: #f59e0b; color: #111520; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">VOTACIONES ABIERTAS</span>
+                    <h2 style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: white; margin-bottom: 0.5rem;">¿Qué juego se traducirá después?</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Elige tu RPG Maker favorito y decide cuáles serán los próximos proyectos en recibir el parche oficial al español antes del 30 de septiembre.</p>
+                </div>
+                <div>
+                    <a href="votaciones.html" style="background: var(--accent); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); transition: transform 0.2s;">
+                        <i class="fa-solid fa-check-to-slot"></i> Ir a Votar Ahora <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
         <section class="container recent-section">
             <div class="section-header">
@@ -266,7 +366,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN: Horario y Proceso (Estado de Juegos se movió a avances.html) -->
+        <!-- SECCIÓN: Horario y Proceso -->
         <section class="container">
             <div class="guild-section" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
                 
@@ -322,6 +422,78 @@
 
             </div>
         </section>
+
+        <!-- SECCIÓN: Bots Oficiales de la Comunidad -->
+        <section class="container" style="margin-bottom: 4rem;">
+            <div class="guild-card">
+                <h2><i class="fa-solid fa-robot"></i> Bots Oficiales del Gremio</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem;">Nuestras herramientas automatizadas dentro del ecosistema para mantener todo en orden.</p>
+                
+                <div class="bots-grid">
+                    <!-- VotaBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
+                                <div class="bot-title">
+                                    <h3>VotaBot</h3>
+                                    <span class="bot-tag">Activo</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc">Gestiona y actualiza en tiempo real los contadores de votos para los próximos proyectos de traducción de la comunidad.</p>
+                        </div>
+                        <a href="votaciones.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Votaciones</a>
+                    </div>
+
+                    <!-- FinBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+                                <div class="bot-title">
+                                    <h3>FinBot</h3>
+                                    <span class="bot-tag">Activo</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc">Monitorea y reporta el estado de las metas de apoyo financiero, donaciones y los costos de mantenimiento del servidor.</p>
+                        </div>
+                        <a href="apoyanos.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Apoyo</a>
+                    </div>
+
+                    <!-- TraduBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-language"></i></div>
+                                <div class="bot-title">
+                                    <h3>TraduBot</h3>
+                                    <span class="bot-tag">Activo</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc">Asistente automatizado encargado de rastrear y notificar los nuevos avances de traducción y parches liberados.</p>
+                        </div>
+                        <a href="avances.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Avances</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Comunidad y Alianzas -->
+        <section class="container" style="margin-bottom: 4rem;">
+            <div class="guild-card" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(to bottom, var(--bg-card), #111827);">
+                <i class="fa-solid fa-users-viewfinder" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: white; justify-content: center; margin-bottom: 1rem;">Únete a la Comunidad HL</h2>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto; font-size: 0.95rem;">Forma parte de nuestro servidor de Discord para reportar bugs, proponer ideas de traducción, enterarte de los estrenos en primicia y convivir con más amantes del rol.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank" style="background: #5865F2; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-brands fa-discord"></i> Servidor de Discord
+                    </a>
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank" style="background: #FF0000; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-brands fa-youtube"></i> Canal de YouTube
+                    </a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer Profesional -->
@@ -336,7 +508,7 @@
                 <a href="index.html">Inicio</a>
                 <a href="catalogo.html">Catálogo</a>
                 <a href="nosotros.html">Sobre Nosotros</a>
-                <a href="avances.html"> Avances de Traducción</a>
+                <a href="avances.html">Avances de Traducción</a>
                 <a href="apoyanos.html">Apóyanos</a>
             </div>
             <div class="footer-socials">
