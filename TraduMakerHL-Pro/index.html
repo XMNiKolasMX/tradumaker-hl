@@ -10,7 +10,7 @@
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos adicionales para las secciones de Horario, Proceso y Bots */
+        /* Estilos adicionales para las secciones de Horario, Proceso y Bots de Discord */
         .guild-section {
             margin: 4rem auto;
             display: grid;
@@ -102,7 +102,7 @@
             line-height: 1.4;
         }
 
-        /* Estilos de Bots de la Comunidad */
+        /* Estilos de Bots de Discord */
         .bots-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -120,7 +120,7 @@
             transition: all 0.3s ease;
         }
         .bot-card:hover {
-            border-color: var(--accent);
+            border-color: #5865F2;
             transform: translateY(-3px);
             background: rgba(17, 24, 39, 0.9);
         }
@@ -134,13 +134,13 @@
             width: 45px;
             height: 45px;
             border-radius: 10px;
-            background: rgba(124, 58, 237, 0.2);
-            color: #a78bfa;
+            background: rgba(88, 101, 242, 0.2);
+            color: #8ea1ff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
-            border: 1px solid rgba(124, 58, 237, 0.4);
+            border: 1px solid rgba(88, 101, 242, 0.4);
         }
         .bot-title h3 {
             font-size: 1.1rem;
@@ -150,8 +150,8 @@
         }
         .bot-tag {
             font-size: 0.7rem;
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
+            background: rgba(88, 101, 242, 0.2);
+            color: #a5b4fc;
             padding: 2px 8px;
             border-radius: 10px;
             font-weight: 600;
@@ -166,8 +166,8 @@
         .bot-link {
             text-decoration: none;
             color: white;
-            background: rgba(124, 58, 237, 0.3);
-            border: 1px solid var(--accent);
+            background: #5865F2;
+            border: 1px solid #7983f5;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 0.85rem;
@@ -180,7 +180,7 @@
             transition: background 0.2s;
         }
         .bot-link:hover {
-            background: var(--accent);
+            background: #4752c4;
         }
 
         /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
@@ -423,11 +423,14 @@
             </div>
         </section>
 
-        <!-- SECCIÓN: Bots Oficiales de la Comunidad -->
+        <!-- SECCIÓN: Bots Oficiales de Discord -->
         <section class="container" style="margin-bottom: 4rem;">
             <div class="guild-card">
-                <h2><i class="fa-solid fa-robot"></i> Bots Oficiales del Gremio</h2>
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem;">Nuestras herramientas automatizadas dentro del ecosistema para mantener todo en orden.</p>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+                    <h2><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Bots de Discord del Servidor</h2>
+                    <span style="background: rgba(88, 101, 242, 0.15); color: #8ea1ff; border: 1px solid rgba(88, 101, 242, 0.3); font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px;"><i class="fa-solid fa-circle" style="font-size: 0.5rem; color: #34d399; margin-right: 4px;"></i> Operando en el Gremio</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Conoce a nuestros bots integrados en el servidor de Discord para automatizar votaciones, finanzas y avisos de traducción.</p>
                 
                 <div class="bots-grid">
                     <!-- VotaBot -->
@@ -437,12 +440,12 @@
                                 <div class="bot-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
                                 <div class="bot-title">
                                     <h3>VotaBot</h3>
-                                    <span class="bot-tag">Activo</span>
+                                    <span class="bot-tag">Discord Bot</span>
                                 </div>
                             </div>
-                            <p class="bot-desc">Gestiona y actualiza en tiempo real los contadores de votos para los próximos proyectos de traducción de la comunidad.</p>
+                            <p class="bot-desc">Gestiona las encuestas interactivas, registra las elecciones de los usuarios y muestra los juegos con más votos para los próximos proyectos.</p>
                         </div>
-                        <a href="votaciones.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Votaciones</a>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
                     </div>
 
                     <!-- FinBot -->
@@ -452,12 +455,12 @@
                                 <div class="bot-icon"><i class="fa-solid fa-piggy-bank"></i></div>
                                 <div class="bot-title">
                                     <h3>FinBot</h3>
-                                    <span class="bot-tag">Activo</span>
+                                    <span class="bot-tag">Discord Bot</span>
                                 </div>
                             </div>
-                            <p class="bot-desc">Monitorea y reporta el estado de las metas de apoyo financiero, donaciones y los costos de mantenimiento del servidor.</p>
+                            <p class="bot-desc">Monitorea y emite reportes en tiempo real sobre las metas de apoyo financiero, donaciones y el estado del mantenimiento del servidor.</p>
                         </div>
-                        <a href="apoyanos.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Apoyo</a>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
                     </div>
 
                     <!-- TraduBot -->
@@ -467,12 +470,12 @@
                                 <div class="bot-icon"><i class="fa-solid fa-language"></i></div>
                                 <div class="bot-title">
                                     <h3>TraduBot</h3>
-                                    <span class="bot-tag">Activo</span>
+                                    <span class="bot-tag">Discord Bot</span>
                                 </div>
                             </div>
-                            <p class="bot-desc">Asistente automatizado encargado de rastrear y notificar los nuevos avances de traducción y parches liberados.</p>
+                            <p class="bot-desc">Envía notificaciones automáticas y alertas en los canales cuando un nuevo avance de traducción o parche oficial es liberado.</p>
                         </div>
-                        <a href="avances.html" class="bot-link"><i class="fa-solid fa-arrow-right"></i> Ver Avances</a>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
                     </div>
                 </div>
             </div>
