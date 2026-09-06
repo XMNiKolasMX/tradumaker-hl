@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
     
-    <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -228,14 +227,12 @@
 </head>
 <body>
 
-    <!-- Navegación con Menú Desplegable -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
             
-            <!-- Menú Desplegable (Dropdown) -->
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
                     <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
@@ -265,19 +262,18 @@
             
             <div style="text-align: center; margin-bottom: 30px;">
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
-                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 50 JUEGOS</span>
+                    ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 10 JUEGOS</span>
                 </h1>
                 
-                <!-- Aviso de solo RPG Maker -->
                 <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;">
-                    <i class="fa-solid fa-circle-check"></i> Solo juegos desarrollados en RPG Maker
+                    <i class="fa-solid fa-circle-check"></i> Solo juegos desarrollados en RPG Maker &bull; <span style="color: #f59e0b;">¡Solo los 3 primeros puestos serán traducidos!</span>
                 </p>
 
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
                     Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
-                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/50 juegos registrados.
+                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
                 </div>
                 <div>
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
@@ -286,7 +282,6 @@
                 </div>
             </div>
 
-            <!-- Formulario para agregar juego -->
             <div id="form-proponer-container" class="form-proponer">
                 <h3 style="color: white; font-family: 'Cinzel', serif; margin-bottom: 15px;">Añadir juego a la lista de votación</h3>
                 <form id="form-juego" onsubmit="agregarJuego(event)">
@@ -308,7 +303,6 @@
                 </form>
             </div>
 
-            <!-- Contenedor de Juegos a Votar -->
             <div id="grid-votaciones" class="votacion-grid">
                 <div style="text-align: center; grid-column: 1 / -1; padding: 40px; color: white;">
                     <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: #6366f1;"></i>
@@ -319,7 +313,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
             <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
@@ -350,8 +343,8 @@
         }
 
         function toggleFormulario() {
-            if (totalJuegosActuales >= 50) {
-                alert('Se ha alcanzado el límite máximo de 50 juegos en votación.');
+            if (totalJuegosActuales >= 10) {
+                alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
                 return;
             }
             const form = document.getElementById('form-proponer-container');
@@ -401,18 +394,19 @@
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
-                    // Condición para mostrar el badge solo si en_desarrollo es TRUE o FALSE (ignora si es null/undefined)
+                    // Condición para mostrar el badge según si está en el Top 3 o el estado en_desarrollo de la base de datos
                     let badgeHtml = '';
-                    if (juego.en_desarrollo === true) {
-                        badgeHtml = `<span class="badge-estado badge-true">✨ Se va a traducir (True)</span>`;
+                    if (juego.en_desarrollo === true || (juego.en_desarrollo === null && index < 3)) {
+                        badgeHtml = `<span class="badge-estado badge-true">✨ Top ${index + 1} (Se traduce)</span>`;
                     } else if (juego.en_desarrollo === false) {
-                        badgeHtml = `<span class="badge-estado badge-false">❌ No se va a traducir (False)</span>`;
+                        badgeHtml = `<span class="badge-estado badge-false">❌ No se va a traducir</span>`;
+                    } else {
+                        badgeHtml = `<span class="badge-estado" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b;">⏳ En disputa</span>`;
                     }
 
                     const tipoVotoPrevio = votosClienteMap[juego.id];
                     const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
 
-                    // Procesar la URL para permitir enlaces de páginas web mediante un proxy visualizador
                     let imagenUrl = juego.imagen || '';
                     if (imagenUrl && !imagenUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
                         imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
@@ -503,8 +497,8 @@
         async function agregarJuego(event) {
             event.preventDefault();
             
-            if (totalJuegosActuales >= 50) {
-                alert('Se ha alcanzado el límite máximo de 50 juegos. No se pueden agregar más propuestas.');
+            if (totalJuegosActuales >= 10) {
+                alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
                 return;
             }
 
@@ -514,7 +508,7 @@
 
             const { error } = await supabaseClient
                 .from('votaciones')
-                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]); // Sin en_desarrollo para que quede NULL por defecto
+                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]);
 
             if (error) {
                 console.error(error);
