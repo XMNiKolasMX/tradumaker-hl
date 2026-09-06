@@ -394,14 +394,12 @@
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
-                    // Condición para mostrar el badge según si está en el Top 3 o el estado en_desarrollo de la base de datos
+                    // Lógica estricta de Supabase: true = se traduce, false = no se traduce, null = no aparece cuadro
                     let badgeHtml = '';
-                    if (juego.en_desarrollo === true || (juego.en_desarrollo === null && index < 3)) {
-                        badgeHtml = `<span class="badge-estado badge-true">✨ Top ${index + 1} (Se traduce)</span>`;
+                    if (juego.en_desarrollo === true) {
+                        badgeHtml = `<span class="badge-estado badge-true">✨ Se traduce</span>`;
                     } else if (juego.en_desarrollo === false) {
-                        badgeHtml = `<span class="badge-estado badge-false">❌ No se va a traducir</span>`;
-                    } else {
-                        badgeHtml = `<span class="badge-estado" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b;">⏳ En disputa</span>`;
+                        badgeHtml = `<span class="badge-estado badge-false">❌ No se traduce</span>`;
                     }
 
                     const tipoVotoPrevio = votosClienteMap[juego.id];
