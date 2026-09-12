@@ -10,7 +10,139 @@
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos adicionales para las secciones de Horario, Proceso y Bots de Discord */
+        /* Estilos actualizados para el Modal con Términos Completos */
+        .verificacion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+        .verificacion-overlay.oculto {
+            display: none;
+        }
+        .verificacion-card {
+            background: #161b22;
+            border: 1px solid #2a2f3f;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            color: #ffffff;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .verificacion-card i.fa-triangle-exclamation {
+            font-size: 2.5rem;
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+        .verificacion-card h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .verificacion-card > p {
+            color: #a0a0b0;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Caja de Términos Desplazable */
+        .terminos-scroll-box {
+            text-align: left;
+            background: #111520;
+            border: 1px solid #2a2f3f;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            color: #b0b0c0;
+            line-height: 1.5;
+        }
+        .terminos-scroll-box h4 {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-family: 'Cinzel', serif;
+        }
+        .terminos-scroll-box h4:first-child {
+            margin-top: 0;
+        }
+        .terminos-scroll-box p {
+            margin-bottom: 10px;
+        }
+
+        .terminos-check-container {
+            text-align: left;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            cursor: pointer;
+            background: rgba(99, 102, 241, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .terminos-check-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+        .botones-verificacion {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-edad {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .btn-si {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-si:hover:not(:disabled) {
+            background: #4f46e5;
+        }
+        .btn-si:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-no {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .btn-no:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Estilos de las secciones del sitio original */
         .guild-section {
             margin: 4rem auto;
             display: grid;
@@ -38,8 +170,6 @@
             gap: 10px;
         }
         .guild-card h2 i { color: var(--gold); }
-
-        /* Horario Estilo RPG */
         .schedule-status {
             display: inline-flex;
             align-items: center;
@@ -64,8 +194,6 @@
             font-size: 0.95rem;
             line-height: 1.6;
         }
-
-        /* Pasos del proceso */
         .process-list {
             display: flex;
             flex-direction: column;
@@ -101,8 +229,6 @@
             color: var(--text-muted);
             line-height: 1.4;
         }
-
-        /* Estilos de Bots de Discord */
         .bots-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -182,8 +308,6 @@
         .bot-link:hover {
             background: #4752c4;
         }
-
-        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -256,6 +380,45 @@
     </style>
 </head>
 <body>
+
+    <!-- Modal de Verificación +18 y Términos y Condiciones Completos -->
+    <div class="verificacion-overlay" id="modalVerificacion">
+        <div class="verificacion-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h1>Restricción de Edad - Contenido Explícito (+18)</h1>
+            <p>Bienvenido a TraduMaker HL. Por favor, lea detenidamente los siguientes términos antes de continuar.</p>
+            
+            <!-- Caja con los Términos y Condiciones Integrales -->
+            <div class="terminos-scroll-box">
+                <h4>1. Mayoría de Edad</h4>
+                <p>El acceso a este sitio web está estrictamente reservado a personas mayores de 18 años (o la mayoría de edad legal en su jurisdicción). Al ingresar, usted declara bajo juramento cumplir con este requisito.</p>
+                
+                <h4>2. Naturaleza del Contenido</h4>
+                <p>Este sitio web recopila, aloja y comparte modificaciones, traducciones y parches en español para videojuegos independientes desarrollados en motores como RPG Maker, los cuales pueden contener material explícito, lenguaje adulto, violencia o temáticas no aptas para menores.</p>
+                
+                <h4>3. Propiedad Intelectual y Parches</h4>
+                <p>TraduMaker HL no reclama la propiedad de los juegos originales ni de los recursos gráficos/narrativos pertenecientes a sus respectivos creadores o desarrolladores originales. Los parches de traducción se distribuyen con fines lúdicos y de preservación cultural sin ánimo de lucro directo.</p>
+                
+                <h4>4. Exención de Responsabilidad</h4>
+                <p>Los administradores de este sitio no se hacen responsables por el mal uso que los usuarios puedan dar a los enlaces o archivos proporcionados. El uso del sitio y la descarga de los archivos corren por cuenta y riesgo exclusivo del usuario.</p>
+                
+                <h4>5. Conducta del Usuario</h4>
+                <p>Queda prohibido intentar vulnerar la seguridad del sitio, extraer bases de datos por medios automatizados o redistribuir contenido malicioso a través de nuestras comunidades asociadas.</p>
+            </div>
+
+            <!-- Casilla de Aceptación -->
+            <label class="terminos-check-container">
+                <input type="checkbox" id="checkTerminos" onchange="actualizarBoton()">
+                <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
+            </label>
+
+            <!-- Botones de Acción -->
+            <div class="botones-verificacion">
+                <button class="btn-edad btn-no" onclick="rechazarAcceso()">Salir del Sitio</button>
+                <button class="btn-edad btn-si" id="btnIngresar" onclick="aceptarAcceso()" disabled>Acepto los términos y condiciones</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Navegación Profesional Multi-página -->
     <header class="navbar">
@@ -528,8 +691,30 @@
         </div>
     </footer>
 
-    <!-- Script de Supabase para Juegos Recientes -->
+    <!-- Scripts (Verificación de Edad + Supabase) -->
     <script>
+        // Comprobar si ya pasó la verificación de edad en este navegador
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem('tradu_verificado') === 'true') {
+                document.getElementById('modalVerificacion').classList.add('oculto');
+            }
+        });
+
+        function actualizarBoton() {
+            const aceptado = document.getElementById('checkTerminos').checked;
+            document.getElementById('btnIngresar').disabled = !aceptado;
+        }
+
+        function aceptarAcceso() {
+            localStorage.setItem('tradu_verificado', 'true');
+            document.getElementById('modalVerificacion').classList.add('oculto');
+        }
+
+        function rechazarAcceso() {
+            window.location.href = 'https://www.google.com';
+        }
+
+        // Lógica de Supabase para Juegos Recientes
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
