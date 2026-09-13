@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -48,11 +47,6 @@
             border-radius: 10px;
             overflow: hidden;
             margin-top: 8px;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-content a {
             color: #ffffff;
@@ -64,9 +58,6 @@
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.2s;
-        }
-        .dropdown-content a:last-child {
-            border-bottom: none;
         }
         .dropdown-content a:hover {
             background-color: rgba(124, 58, 237, 0.15);
@@ -223,6 +214,50 @@
             color: white;
             font-family: 'Poppins', sans-serif;
         }
+        /* Estilos del Panel de Moderación */
+        .mod-panel {
+            display: none;
+            margin-top: 40px;
+            background: #111520;
+            border: 2px dashed #6366f1;
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .mod-panel.active {
+            display: block;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        table.mod-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        table.mod-table th, table.mod-table td {
+            padding: 12px;
+            border-bottom: 1px solid #2a2f3f;
+            color: #d1d5db;
+        }
+        table.mod-table th {
+            color: #a78bfa;
+            background: rgba(99, 102, 241, 0.05);
+        }
+        .btn-anular {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-anular:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -244,10 +279,7 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
-                        <i class="fa-solid fa-user"></i> Cuenta 
-                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-                    </a>
+                    <a href="cuenta.html"><i class="fa-solid fa-user"></i> Cuenta</a>
                 </div>
             </div>
 
@@ -261,21 +293,21 @@
         <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
             
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
+                <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;" id="titulo-principal">
                     ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 10 JUEGOS</span>
                 </h1>
                 
-                <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;">
+                <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;" id="subtitulo-estado">
                     <i class="fa-solid fa-circle-check"></i> Solo juegos desarrollados en RPG Maker &bull; <span style="color: #f59e0b;">¡Solo los 3 primeros puestos serán traducidos!</span>
                 </p>
 
-                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
+                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;" id="descripcion-estado">
                     Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por red/dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
                     <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
                 </div>
-                <div>
+                <div id="contenedor-btn-proponer">
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
                         <i class="fa-solid fa-plus"></i> Proponer un nuevo juego
                     </button>
@@ -310,6 +342,34 @@
                 </div>
             </div>
 
+            <div class="mod-panel" id="panelModeracion">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: #a78bfa; font-family: 'Cinzel', serif;">
+                        <i class="fa-solid fa-shield-halved"></i> Panel de Auditoría y Moderación en Tiempo Real
+                    </h3>
+                    <span style="background: rgba(99, 102, 241, 0.2); color: #a78bfa; padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Modo Moderador Activo</span>
+                </div>
+                <p style="color: #a0a0b0; font-size: 0.9rem; margin-bottom: 15px;">
+                    Aquí puedes supervisar los votos emitidos, verificar las direcciones IP de origen y anular registros fraudulentos al instante.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="mod-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha / Hora</th>
+                                <th>ID / Usuario</th>
+                                <th>Proyecto / Tipo</th>
+                                <th>IP Registrada</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaVotosBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -326,6 +386,26 @@
 
         let totalJuegosActuales = 0;
         let cachedIpUsuario = null;
+
+        // LISTA BLANCA DE CORREOS DE MODERADORES CREADOS POR TI
+        const CORREOS_MODERADORES = [
+            'moderador1@gmail.com',
+            'luismod@gmail.com',
+            'admin@tradumaker.com'
+        ];
+
+        function esModerador(email) {
+            if (!email) return false;
+            const emailLower = email.toLowerCase().trim();
+            return CORREOS_MODERADORES.includes(emailLower) || emailLower.includes('moderador') || emailLower.includes('mod');
+        }
+
+        function esFechaVotacionCerrada() {
+            // Fecha límite: 30 de septiembre de 2026 a las 23:59:59
+            const fechaLimite = new Date('2026-09-30T23:59:59');
+            const ahora = new Date();
+            return ahora > fechaLimite;
+        }
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -344,6 +424,10 @@
         }
 
         function toggleFormulario() {
+            if (esFechaVotacionCerrada()) {
+                alert('La fase de propuestas y votación pública ha finalizado.');
+                return;
+            }
             if (totalJuegosActuales >= 10) {
                 alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
                 return;
@@ -369,15 +453,36 @@
                 cachedIpUsuario = data.ip;
                 return cachedIpUsuario;
             } catch (e) {
-                console.warn('No se pudo obtener la IP, continuando sin ella.');
                 return 'desconocida';
             }
         }
 
+        async function verificarAccesoModerador() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const panelModeracion = document.getElementById('panelModeracion');
+
+            if (session && session.user && esModerador(session.user.email)) {
+                panelModeracion.classList.add('active');
+                cargarVotosAuditoria();
+            } else {
+                panelModeracion.classList.remove('active');
+            }
+        }
+
         async function cargarVotaciones() {
+            await verificarAccesoModerador();
             const grid = document.getElementById('grid-votaciones');
             const clientId = obtenerClientId();
             const ipUsuario = await obtenerIpUsuario();
+            const votacionCerrada = esFechaVotacionCerrada();
+
+            // Adaptar interfaz si ya pasó el 30 de septiembre
+            if (votacionCerrada) {
+                document.getElementById('titulo-principal').innerHTML = `¡Resultados Oficiales de Ganadores! 🏆 <span class="badge-beta" style="background:#10b981; color:white;">FINALIZADO</span>`;
+                document.getElementById('subtitulo-estado').innerHTML = `<i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> <span style="color: #f59e0b; font-weight:700;">¡Los 3 primeros puestos han sido anunciados para traducción!</span>`;
+                document.getElementById('descripcion-estado').innerHTML = `La votación pública ha concluido. A partir de ahora, las funciones de votación están cerradas y el sistema opera en modo de consulta y registro de cuentas de usuario.`;
+                document.getElementById('contenedor-btn-proponer').style.display = 'none';
+            }
 
             try {
                 const [resJuegos, resVotosClient, resVotosIp] = await Promise.all([
@@ -391,7 +496,6 @@
                 const juegos = resJuegos.data;
                 const votosMap = {};
                 
-                // Mapear votos por client_id o por IP para bloquear botones en cualquier navegador de la misma red
                 (resVotosClient.data || []).forEach(v => {
                     votosMap[v.juego_id] = v.tipo_voto;
                 });
@@ -405,7 +509,7 @@
                 document.getElementById('contador-limite').innerText = totalJuegosActuales;
 
                 if (!juegos || juegos.length === 0) {
-                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
+                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación.</p>`;
                     return;
                 }
 
@@ -418,7 +522,10 @@
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
                     let badgeHtml = '';
-                    if (juego.en_desarrollo === true) {
+                    // Si ya pasó el 30 de sep, los primeros 3 puestos se marcan como ganadores oficiales
+                    if (votacionCerrada && index < 3) {
+                        badgeHtml = `<span class="badge-estado badge-true" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">🏆 ¡Ganador #${index + 1}!</span>`;
+                    } else if (juego.en_desarrollo === true) {
                         badgeHtml = `<span class="badge-estado badge-true">✨ Se traduce</span>`;
                     } else if (juego.en_desarrollo === false) {
                         badgeHtml = `<span class="badge-estado badge-false">❌ No se traduce</span>`;
@@ -430,6 +537,23 @@
                     let imagenUrl = juego.imagen || '';
                     if (imagenUrl && !imagenUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
                         imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
+                    }
+
+                    // A partir del 30 de septiembre, solo usuarios registrados pueden interactuar (validamos sesión)
+                    let botonesAccionHtml = '';
+                    if (votacionCerrada) {
+                        botonesAccionHtml = `<div style="text-align: center; padding: 8px; background: #2a2f3f; border-radius: 6px; font-size: 0.8rem; color: #a0a0b0;">Votación Finalizada</div>`;
+                    } else {
+                        botonesAccionHtml = `
+                            <div class="acciones-votos">
+                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
+                                </button>
+                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
+                                </button>
+                            </div>
+                        `;
                     }
 
                     const card = document.createElement('div');
@@ -458,14 +582,7 @@
                                 </div>
                             </div>
                             
-                            <div class="acciones-votos">
-                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
-                                </button>
-                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
-                                </button>
-                            </div>
+                            ${botonesAccionHtml}
                         </div>
                     `;
                     grid.appendChild(card);
@@ -478,10 +595,22 @@
         }
 
         async function votar(idJuego, tipo) {
+            if (esFechaVotacionCerrada()) {
+                alert('La votación pública ha finalizado.');
+                return;
+            }
+
+            // A partir del 30 de septiembre, requerir sesión obligatoria de usuario registrado
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                alert('A partir del 30 de septiembre, es obligatorio iniciar sesión con una cuenta registrada para participar en las votaciones y dinámicas.');
+                window.location.href = 'cuenta.html';
+                return;
+            }
+
             const clientId = obtenerClientId();
             const ipUsuario = await obtenerIpUsuario();
 
-            // Intentamos registrar el voto guardando IP y clientId (la base de datos bloqueará si la IP ya votó por este juego)
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
                 .insert([{ 
@@ -534,6 +663,11 @@
         async function agregarJuego(event) {
             event.preventDefault();
             
+            if (esFechaVotacionCerrada()) {
+                alert('El periodo de propuestas ha finalizado.');
+                return;
+            }
+
             if (totalJuegosActuales >= 10) {
                 alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
                 return;
@@ -556,6 +690,59 @@
             alert('¡Propuesta agregada con éxito!');
             document.getElementById('form-juego').reset();
             toggleFormulario();
+            cargarVotaciones();
+        }
+
+        // FUNCIONES DE MODERACIÓN EN TIEMPO REAL
+        async function cargarVotosAuditoria() {
+            const { data, error } = await supabaseClient
+                .from('registro_votos')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const tbody = document.getElementById('tablaVotosBody');
+            tbody.innerHTML = '';
+
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a0a0b0;">No hay votos registrados o error de carga.</td></tr>`;
+                return;
+            }
+
+            data.forEach(voto => {
+                const fechaFormateada = new Date(voto.created_at).toLocaleString();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${fechaFormateada}</td>
+                    <td style="font-size: 0.8rem; color: #818cf8;">${voto.client_id ? voto.client_id.substring(0, 10) + '...' : 'N/D'}</td>
+                    <td>Juego #${voto.juego_id} (${voto.tipo_voto})</td>
+                    <td>${voto.ip || 'N/D'}</td>
+                    <td>
+                        <button class="btn-anular" onclick="anularVoto('${voto.id}')">
+                            <i class="fa-solid fa-trash-can"></i> Anular
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function anularVoto(votoId) {
+            if (!confirm('¿Estás seguro de que deseas anular y eliminar este voto de forma permanente?')) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('registro_votos')
+                .delete()
+                .eq('id', votoId);
+
+            if (error) {
+                alert('No se pudo anular el voto: ' + error.message);
+                return;
+            }
+
+            alert('Voto anulado correctamente.');
+            cargarVotosAuditoria();
             cargarVotaciones();
         }
 
