@@ -662,7 +662,7 @@
         </section>
     </main>
 
-    <!-- Footer Profesional -->
+<!-- Footer Profesional -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-info">
@@ -691,7 +691,7 @@
         </div>
     </footer>
 
-   <!-- Script Único Corregido para Menú, Términos, Supabase y Roles Globales -->
+    <!-- Script Único Corregido para Menú, Términos, Supabase y Roles Globales -->
     <script>
         // --- 1. LÓGICA DEL MENÚ DESPLEGABLE (GLOBAL) ---
         function toggleMenuDesplegable() {
@@ -724,23 +724,23 @@
             }
         });
 
-        window.actualizarBoton = function() {
+        function actualizarBoton() {
             const check = document.getElementById('checkTerminos');
             const btnIngresar = document.getElementById('btnIngresar');
             if (check && btnIngresar) {
                 btnIngresar.disabled = !check.checked;
             }
-        };
+        }
 
-        window.aceptarAcceso = function() {
+        function aceptarAcceso() {
             localStorage.setItem('tradu_verificado', 'true');
             const modal = document.getElementById('modalVerificacion');
             if (modal) modal.classList.add('oculto');
-        };
+        }
 
-        window.rechazarAcceso = function() {
+        function rechazarAcceso() {
             window.location.href = 'https://www.google.com';
-        };
+        }
 
         // --- 4. CARGA DE JUEGOS RECIENTES + VERIFICACIÓN DE SESIÓN (ROLES) ---
         document.addEventListener('DOMContentLoaded', async () => {
