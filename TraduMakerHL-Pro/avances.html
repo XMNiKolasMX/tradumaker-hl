@@ -843,5 +843,64 @@
             }
         }
     </script>
+
+    <!-- Script para el Menú Desplegable y Control de Sesión Global -->
+    <script>
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
+
+        // Cerrar el menú si el usuario hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseGlobal = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function verificarSesionYRolesGlobal() {
+            const { data: { session } } = await supabaseGlobal.auth.getSession();
+            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
+
+            if (session && session.user) {
+                const userId = session.user.id;
+
+                // Consultar rol en la base de datos
+                const { data: perfil } = await supabaseGlobal
+                    .from('usuarios_registrados')
+                    .select('rol')
+                    .eq('id', userId)
+                    .single();
+
+                const rol = perfil ? perfil.rol : 'usuario';
+
+                enlacesCuenta.forEach(enlace => {
+                    if (rol === 'admin') {
+                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                    } else if (rol === 'moderador') {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
+                    } else {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
+                    }
+                });
+            } else {
+                enlacesCuenta.forEach(enlace => {
+                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', verificarSesionYRolesGlobal);
+    </script>
 </body>
 </html>
