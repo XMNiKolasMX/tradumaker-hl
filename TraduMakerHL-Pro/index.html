@@ -407,16 +407,16 @@
             </div>
 
             <!-- Casilla de Aceptación -->
-            <label class="terminos-check-container">
-                <input type="checkbox" id="checkTerminos" onchange="actualizarBoton()">
-                <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
-            </label>
+<label class="terminos-check-container" style="cursor: pointer; position: relative; z-index: 10000;">
+    <input type="checkbox" id="checkTerminos">
+    <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
+</label>
 
-            <!-- Botones de Acción -->
-            <div class="botones-verificacion">
-                <button class="btn-edad btn-no" onclick="rechazarAcceso()">Salir del Sitio</button>
-                <button class="btn-edad btn-si" id="btnIngresar" onclick="aceptarAcceso()" disabled>Acepto los términos y condiciones</button>
-            </div>
+<!-- Botones de Acción -->
+<div class="botones-verificacion" style="position: relative; z-index: 10000;">
+    <button type="button" class="btn-edad btn-no" id="btnSalir">Salir del Sitio</button>
+    <button type="button" class="btn-edad btn-si" id="btnIngresar" disabled>Acepto los términos y condiciones</button>
+</div>
         </div>
     </div>
 
@@ -691,126 +691,138 @@
         </div>
     </footer>
 
-    <!-- Script Único Corregido para Menú, Términos, Supabase y Roles Globales -->
-    <script>
-        // --- 1. LÓGICA DEL MENÚ DESPLEGABLE (GLOBAL) ---
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
+<script>
+    // --- 1. LÓGICA DEL MENÚ DESPLEGABLE (GLOBAL) ---
+    function toggleMenuDesplegable() {
+        document.getElementById("navDropdown").classList.toggle("show");
+    }
 
-        // Cerrar el menú si el usuario hace clic fuera de él
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
                 }
             }
         }
+    };
 
-        // --- 2. VERIFICACIÓN DE EDAD Y TÉRMINOS (ASEGURADO EN WINDOW) ---
-        document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem('tradu_verificado') === 'true') {
-                const modal = document.getElementById('modalVerificacion');
-                if (modal) modal.classList.add('oculto');
-            }
-        });
-
-        window.actualizarBoton = function() {
-            const check = document.getElementById('checkTerminos');
-            const btnIngresar = document.getElementById('btnIngresar');
-            if (check && btnIngresar) {
-                btnIngresar.disabled = !check.checked;
-            }
-        };
-
-        window.aceptarAcceso = function() {
-            localStorage.setItem('tradu_verificado', 'true');
-            const modal = document.getElementById('modalVerificacion');
+    // --- 2. VERIFICACIÓN DE EDAD Y TÉRMINOS (CORREGIDO Y SEGURO) ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const modal = document.getElementById('modalVerificacion');
+        if (localStorage.getItem('tradu_verificado') === 'true') {
             if (modal) modal.classList.add('oculto');
-        };
-
-        window.rechazarAcceso = function() {
-            window.location.href = 'https://www.google.com';
-        };
-
-        // --- 3. CONFIGURACIÓN Y CARGA DE SUPABASE (AISLADO) ---
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // A. Verificar Sesión y Roles del Navbar
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-                if (session && session.user) {
-                    const userId = session.user.id;
-                    const { data: perfil } = await supabase
-                        .from('usuarios_registrados')
-                        .select('rol')
-                        .eq('id', userId)
-                        .single();
-
-                    const rol = perfil ? perfil.rol : 'usuario';
-
-                    enlacesCuenta.forEach(enlace => {
-                        if (rol === 'admin') {
-                            enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                        } else if (rol === 'moderador') {
-                            enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                        } else {
-                            enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                        }
-                    });
-                } else {
-                    enlacesCuenta.forEach(enlace => {
-                        enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                    });
-                }
-            } catch (errSession) {
-                console.error("Error verificando sesión:", errSession);
+        } else {
+            // Forzar visibilidad y capas altas si el modal está activo
+            if (modal) {
+                modal.style.pointerEvents = "auto";
+                modal.style.zIndex = "999999";
             }
+        }
 
-            // B. Cargar Juegos Recientes en el Index
-            const contenedorRecientes = document.getElementById('grid-recientes');
-            if (contenedorRecientes) {
-                try {
-                    const { data: juegosRecientes, error: errorRecientes } = await supabase
-                        .from('juegos')
-                        .select('*')
-                        .eq('traducido', true)
-                        .order('id', { ascending: false })
-                        .limit(4);
+        const checkTerminos = document.getElementById('checkTerminos');
+        const btnIngresar = document.getElementById('btnIngresar');
+        const btnSalir = document.getElementById('btnSalir');
 
-                    if (errorRecientes) throw errorRecientes;
+        // Habilitar/Deshabilitar botón según el checkbox
+        if (checkTerminos && btnIngresar) {
+            checkTerminos.addEventListener('change', function() {
+                btnIngresar.disabled = !this.checked;
+            });
+        }
 
-                    if (!juegosRecientes || juegosRecientes.length === 0) {
-                        contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
+        // Evento para aceptar y ocultar el modal
+        if (btnIngresar) {
+            btnIngresar.addEventListener('click', function() {
+                if (!this.disabled) {
+                    localStorage.setItem('tradu_verificado', 'true');
+                    if (modal) modal.classList.add('oculto');
+                }
+            });
+        }
+
+        // Evento para salir del sitio
+        if (btnSalir) {
+            btnSalir.addEventListener('click', function() {
+                window.location.href = 'https://www.google.com';
+            });
+        }
+    });
+
+    // --- 3. CONFIGURACIÓN Y CARGA DE SUPABASE ---
+    const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
+
+            if (session && session.user) {
+                const userId = session.user.id;
+                const { data: perfil } = await supabase
+                    .from('usuarios_registrados')
+                    .select('rol')
+                    .eq('id', userId)
+                    .single();
+
+                const rol = perfil ? perfil.rol : 'usuario';
+
+                enlacesCuenta.forEach(enlace => {
+                    if (rol === 'admin') {
+                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                    } else if (rol === 'moderador') {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
                     } else {
-                        contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
-                            <div class="game-card">
-                                <div class="game-img-container">
-                                    <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                                    <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
-                                </div>
-                                <div class="game-info">
-                                    <h3 class="game-title">${juego.titulo}</h3>
-                                    <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                </div>
-                            </div>
-                        `).join('');
+                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
                     }
-                } catch (errJuegos) {
-                    console.error(errJuegos);
-                    contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
-                }
+                });
+            } else {
+                enlacesCuenta.forEach(enlace => {
+                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
+                });
             }
-        });
-    </script>
+        } catch (errSession) {
+            console.error("Error verificando sesión:", errSession);
+        }
+
+        const contenedorRecientes = document.getElementById('grid-recientes');
+        if (contenedorRecientes) {
+            try {
+                const { data: juegosRecientes, error: errorRecientes } = await supabase
+                    .from('juegos')
+                    .select('*')
+                    .eq('traducido', true)
+                    .order('id', { ascending: false })
+                    .limit(4);
+
+                if (errorRecientes) throw errorRecientes;
+
+                if (!juegosRecientes || juegosRecientes.length === 0) {
+                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
+                } else {
+                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
+                        <div class="game-card">
+                            <div class="game-img-container">
+                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">${juego.titulo}</h3>
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (errJuegos) {
+                console.error(errJuegos);
+                contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
+            }
+        }
+    });
+</script>
 </body>
 </html>
