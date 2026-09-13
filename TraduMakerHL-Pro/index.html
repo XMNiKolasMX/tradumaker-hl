@@ -711,12 +711,7 @@
             }
         }
 
-        // --- 2. CONFIGURACIÓN ÚNICA DE SUPABASE ---
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // --- 3. VERIFICACIÓN DE EDAD Y TÉRMINOS (EXPUESTO GLOBALMENTE) ---
+        // --- 2. VERIFICACIÓN DE EDAD Y TÉRMINOS (ASEGURADO EN WINDOW) ---
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem('tradu_verificado') === 'true') {
                 const modal = document.getElementById('modalVerificacion');
@@ -724,25 +719,29 @@
             }
         });
 
-        function actualizarBoton() {
+        window.actualizarBoton = function() {
             const check = document.getElementById('checkTerminos');
             const btnIngresar = document.getElementById('btnIngresar');
             if (check && btnIngresar) {
                 btnIngresar.disabled = !check.checked;
             }
-        }
+        };
 
-        function aceptarAcceso() {
+        window.aceptarAcceso = function() {
             localStorage.setItem('tradu_verificado', 'true');
             const modal = document.getElementById('modalVerificacion');
             if (modal) modal.classList.add('oculto');
-        }
+        };
 
-        function rechazarAcceso() {
+        window.rechazarAcceso = function() {
             window.location.href = 'https://www.google.com';
-        }
+        };
 
-        // --- 4. CARGA DE JUEGOS RECIENTES + VERIFICACIÓN DE SESIÓN (ROLES) ---
+        // --- 3. CONFIGURACIÓN Y CARGA DE SUPABASE (AISLADO) ---
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         document.addEventListener('DOMContentLoaded', async () => {
             // A. Verificar Sesión y Roles del Navbar
             try {
