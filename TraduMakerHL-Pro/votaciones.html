@@ -270,10 +270,10 @@
                 </p>
 
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
+                    Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong> [1].
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
-                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
+                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados [1].
                 </div>
                 <div>
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
@@ -315,7 +315,7 @@
 
     <footer class="footer">
         <div class="footer-bottom">
-            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
+            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span> [1]</p>
         </div>
     </footer>
 
@@ -394,7 +394,6 @@
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
                     
-                    // Lógica estricta de Supabase: true = se traduce, false = no se traduce, null = no aparece cuadro
                     let badgeHtml = '';
                     if (juego.en_desarrollo === true) {
                         badgeHtml = `<span class="badge-estado badge-true">✨ Se traduce</span>`;
@@ -458,12 +457,14 @@
         async function votar(idJuego, tipo) {
             const clientId = obtenerClientId();
 
+            // Intentamos registrar el voto en Supabase (la base de datos bloqueará si ya existe el registro único)
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
                 .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo }]);
 
             if (errRegistro) {
-                alert('Ya has votado por este juego anteriormente.');
+                alert('Ya has registrado un voto para este juego desde este dispositivo.');
+                cargarVotaciones();
                 return;
             }
 
@@ -473,20 +474,29 @@
                 .eq('id', idJuego)
                 .single();
 
-            if (errorFetch) return alert('No se pudo actualizar el contador del juego.');
+            if (errorFetch) {
+                alert('No se pudo actualizar el contador del juego.');
+                return;
+            }
 
             let nuevosLikes = juegoActual.likes || 0;
             let nuevosDislikes = juegoActual.dislikes || 0;
 
-            if (tipo === 'like') nuevosLikes += 1;
-            else nuevosDislikes += 1;
+            if (tipo === 'like') {
+                nuevosLikes += 1;
+            } else {
+                nuevosDislikes += 1;
+            }
 
             const { error: errorUpdate } = await supabaseClient
                 .from('votaciones')
                 .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
                 .eq('id', idJuego);
 
-            if (errorUpdate) return alert('Hubo un error al actualizar los puntos del juego.');
+            if (errorUpdate) {
+                alert('Hubo un error al actualizar los puntos del juego.');
+                return;
+            }
 
             alert('¡Voto registrado con éxito!');
             cargarVotaciones();
