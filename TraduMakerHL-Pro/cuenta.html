@@ -87,6 +87,21 @@
         .btn-submit:hover {
             background: #4f46e5;
         }
+        .forgot-password {
+            display: block;
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 18px;
+            color: #818cf8;
+            font-size: 0.8rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .forgot-password:hover {
+            color: #6366f1;
+            text-decoration: underline;
+        }
         .user-panel {
             display: none;
             text-align: center;
@@ -128,6 +143,7 @@
                         <label>Contraseña</label>
                         <input type="password" id="loginPassword" required placeholder="••••••••">
                     </div>
+                    <a class="forgot-password" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a>
                     <button type="submit" class="btn-submit">Entrar</button>
                 </form>
 
@@ -255,6 +271,27 @@
             }
 
             verificarSesion();
+        }
+
+        async function recuperarPassword() {
+            const email = document.getElementById('loginEmail').value;
+            
+            if (!email) {
+                alert('Por favor, escribe tu correo electrónico en el campo de arriba para poder enviarte las instrucciones de recuperación.');
+                document.getElementById('loginEmail').focus();
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href, // Te redirige de vuelta aquí al cambiarla
+            });
+
+            if (error) {
+                alert('Error al solicitar la recuperación: ' + error.message);
+                return;
+            }
+
+            alert('¡Correo enviado! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.');
         }
 
         async function cerrarSesion() {
