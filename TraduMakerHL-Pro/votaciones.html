@@ -270,10 +270,10 @@
                 </p>
 
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
-                    Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong> [1].
+                    Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por red/dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
-                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados [1].
+                    <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
                 </div>
                 <div>
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
@@ -315,7 +315,7 @@
 
     <footer class="footer">
         <div class="footer-bottom">
-            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span> [1]</p>
+            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
         </div>
     </footer>
 
@@ -325,6 +325,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let totalJuegosActuales = 0;
+        let cachedIpUsuario = null;
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -360,23 +361,45 @@
             return clientId;
         }
 
+        async function obtenerIpUsuario() {
+            if (cachedIpUsuario) return cachedIpUsuario;
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                cachedIpUsuario = data.ip;
+                return cachedIpUsuario;
+            } catch (e) {
+                console.warn('No se pudo obtener la IP, continuando sin ella.');
+                return 'desconocida';
+            }
+        }
+
         async function cargarVotaciones() {
             const grid = document.getElementById('grid-votaciones');
             const clientId = obtenerClientId();
+            const ipUsuario = await obtenerIpUsuario();
 
             try {
-                const [resJuegos, resVotos] = await Promise.all([
+                const [resJuegos, resVotosClient, resVotosIp] = await Promise.all([
                     supabaseClient.from('votaciones').select('*').order('likes', { ascending: false }),
-                    supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('client_id', clientId)
+                    supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('client_id', clientId),
+                    ipUsuario !== 'desconocida' ? supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('ip', ipUsuario) : Promise.resolve({ data: [] })
                 ]);
 
                 if (resJuegos.error) throw resJuegos.error;
 
                 const juegos = resJuegos.data;
-                const votosClienteMap = {};
-                (resVotos.data || []).forEach(v => {
-                    votosClienteMap[v.juego_id] = v.tipo_voto;
+                const votosMap = {};
+                
+                // Mapear votos por client_id o por IP para bloquear botones en cualquier navegador de la misma red
+                (resVotosClient.data || []).forEach(v => {
+                    votosMap[v.juego_id] = v.tipo_voto;
                 });
+                if (resVotosIp && resVotosIp.data) {
+                    resVotosIp.data.forEach(v => {
+                        votosMap[v.juego_id] = v.tipo_voto;
+                    });
+                }
 
                 totalJuegosActuales = juegos ? juegos.length : 0;
                 document.getElementById('contador-limite').innerText = totalJuegosActuales;
@@ -401,7 +424,7 @@
                         badgeHtml = `<span class="badge-estado badge-false">❌ No se traduce</span>`;
                     }
 
-                    const tipoVotoPrevio = votosClienteMap[juego.id];
+                    const tipoVotoPrevio = votosMap[juego.id];
                     const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
 
                     let imagenUrl = juego.imagen || '';
@@ -456,14 +479,20 @@
 
         async function votar(idJuego, tipo) {
             const clientId = obtenerClientId();
+            const ipUsuario = await obtenerIpUsuario();
 
-            // Intentamos registrar el voto en Supabase (la base de datos bloqueará si ya existe el registro único)
+            // Intentamos registrar el voto guardando IP y clientId (la base de datos bloqueará si la IP ya votó por este juego)
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
-                .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo }]);
+                .insert([{ 
+                    client_id: clientId, 
+                    juego_id: idJuego, 
+                    tipo_voto: tipo,
+                    ip: ipUsuario 
+                }]);
 
             if (errRegistro) {
-                alert('Ya has registrado un voto para este juego desde este dispositivo.');
+                alert('Ya has registrado un voto para este juego desde esta red o dispositivo.');
                 cargarVotaciones();
                 return;
             }
