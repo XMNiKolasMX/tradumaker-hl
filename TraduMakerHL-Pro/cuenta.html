@@ -145,13 +145,13 @@
                 </form>
             </div>
 
-            <!-- Panel de Usuario Logeado (Preparado para futuras votaciones seguras por cuenta) -->
+            <!-- Panel de Usuario Logeado -->
             <div class="auth-container user-panel" id="userPanel">
                 <h3 style="color: white; font-family: 'Cinzel', serif; margin-bottom: 10px;">¡Bienvenido!</h3>
                 <p id="userEmailDisplay" style="color: #a0a0b0; font-size: 0.9rem; margin-bottom: 20px;"></p>
                 <div style="background: rgba(99, 102, 241, 0.1); border: 1px dashed #6366f1; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
                     <p style="color: #a78bfa; font-size: 0.85rem; line-height: 1.5;">
-                        <i class="fa-solid fa-shield-halved"></i> Tu cuenta está vinculada de forma segura. En futuras actualizaciones, este sistema se conectará directamente a las votaciones para garantizar un voto único eインalterable por usuario registrado.
+                        <i class="fa-solid fa-shield-halved"></i> Tu cuenta está vinculada de forma segura. Este sistema resguardará tu acceso para futuras dinámicas y votaciones exclusivas de la comunidad.
                     </p>
                 </div>
                 <button onclick="cerrarSesion()" class="btn-submit" style="background: #ef4444;">Cerrar Sesión</button>
@@ -192,18 +192,51 @@
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
 
-            const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-            });
+            try {
+                // 1. Obtener la IP y verificar si es una VPN/Proxy
+                const responseGeo = await fetch('https://ipapi.co/json/');
+                const dataGeo = await responseGeo.json();
+                const userIp = dataGeo.ip;
 
-            if (error) {
-                alert('Error al registrarse: ' + error.message);
-                return;
+                if (dataGeo.asn && (dataGeo.org && (dataGeo.org.toLowerCase().includes('vpn') || dataGeo.org.toLowerCase().includes('proxy') || dataGeo.org.toLowerCase().includes('hosting')))) {
+                    alert('Hemos detectado el uso de una red privada virtual (VPN) o proxy. Para proteger la seguridad de la comunidad y evitar registros automatizados, por favor desactiva tu VPN para registrarte.');
+                    return;
+                }
+
+                // 2. Verificar cuántas cuentas se han registrado desde esta misma IP real
+                const { count, error: countError } = await supabaseClient
+                    .from('usuarios_registrados')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('ip', userIp);
+
+                if (!countError && count >= 3) {
+                    alert('Hemos detectado que ya se han registrado varias cuentas desde esta misma red. Si un amigo o familiar que vive contigo necesita crear su propia cuenta, por favor contáctanos para autorizarla y mantener segura la comunidad.');
+                    return;
+                }
+
+                // 3. Registrar al usuario pasando la IP en los metadatos para que el Trigger la guarde
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            ip: userIp
+                        }
+                    }
+                });
+
+                if (error) {
+                    alert('Error al registrarse: ' + error.message);
+                    return;
+                }
+
+                alert('¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.');
+                cambiarTab('login');
+
+            } catch (err) {
+                console.error('Error en el proceso de registro:', err);
+                alert('Ocurrió un error al verificar la red. Por favor, intenta de nuevo.');
             }
-
-            alert('¡Registro exitoso! Revisa tu correo si requiere confirmación, o ya puedes iniciar sesión.');
-            cambiarTab('login');
         }
 
         async function iniciarSesion(event) {
