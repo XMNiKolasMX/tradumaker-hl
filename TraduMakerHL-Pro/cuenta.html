@@ -3,111 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuenta de Usuario - TraduMaker HL</title>
+    <title>Mi Cuenta - TraduMaker HL</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
     
+    <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         .auth-container {
-            max-width: 420px;
-            margin: 0 auto;
-            background: #1a1e29;
-            border: 1px solid #2a2f3f;
-            border-radius: 12px;
+            max-width: 450px;
+            margin: 40px auto;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 14px;
             padding: 30px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7);
         }
-        .auth-tabs {
-            display: flex;
+        .auth-header {
+            text-align: center;
             margin-bottom: 25px;
-            border-bottom: 1px solid #2a2f3f;
         }
-        .auth-tab {
-            flex: 1;
-            background: none;
-            border: none;
-            color: #a0a0b0;
-            padding: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: color 0.2s, border-color 0.2s;
-            border-bottom: 2px solid transparent;
+        .auth-header h2 {
+            font-family: 'Cinzel', serif;
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
         }
-        .auth-tab.active {
-            color: #6366f1;
-            border-bottom-color: #6366f1;
-        }
-        .auth-form {
-            display: none;
-        }
-        .auth-form.active {
-            display: block;
+        .auth-header p {
+            color: #8b949e;
+            font-size: 0.9rem;
         }
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         .form-group label {
             display: block;
-            color: #a0a0b0;
+            color: #c9d1d9;
             font-size: 0.85rem;
             margin-bottom: 6px;
+            font-weight: 500;
         }
         .form-group input {
             width: 100%;
             padding: 12px;
-            background: #111520;
-            border: 1px solid #2a2f3f;
+            background: #0d1117;
+            border: 1px solid #30363d;
             border-radius: 8px;
             color: white;
             font-family: 'Poppins', sans-serif;
             font-size: 0.95rem;
+            transition: border-color 0.2s;
         }
         .form-group input:focus {
-            border-color: #6366f1;
             outline: none;
+            border-color: #6366f1;
         }
         .btn-submit {
             width: 100%;
-            padding: 12px;
-            background: #6366f1;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             border: none;
+            padding: 12px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
         }
         .btn-submit:hover {
-            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
         }
-        .forgot-password {
-            display: block;
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 18px;
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+        .auth-toggle a {
             color: #818cf8;
-            font-size: 0.8rem;
             text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
+            font-weight: 600;
         }
-        .forgot-password:hover {
-            color: #6366f1;
+        .auth-toggle a:hover {
             text-decoration: underline;
         }
         .user-panel {
+            text-align: center;
+        }
+        .user-panel h3 {
+            color: white;
+            font-family: 'Cinzel', serif;
+            margin-bottom: 15px;
+        }
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+        .mensaje-alerta {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
             display: none;
             text-align: center;
         }
-        .user-panel.active {
-            display: block;
+        .mensaje-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+        .mensaje-exito {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid #10b981;
         }
     </style>
 </head>
@@ -119,58 +142,55 @@
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
             <div class="nav-version">
-                <span>Versión 2.0</span>
+                <a href="index.html" style="color: #a78bfa; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-house"></i> Volver al Inicio</a>
             </div>
         </div>
     </header>
 
     <main class="main-content" style="padding-top: 120px; padding-bottom: 60px;">
-        <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
+        <div class="container">
             
-            <div class="auth-container" id="authBox">
-                <div class="auth-tabs">
-                    <button class="auth-tab active" onclick="cambiarTab('login')">Iniciar Sesión</button>
-                    <button class="auth-tab" onclick="cambiarTab('register')">Registrarse</button>
+            <!-- CONTENEDOR PRINCIPAL DE AUTENTICACIÓN -->
+            <div class="auth-container" id="contenedorAuth">
+                
+                <!-- SECCIÓN DE LOGIN / REGISTRO (Se muestra si NO hay sesión) -->
+                <div id="seccionFormulario">
+                    <div class="auth-header">
+                        <h2 id="tituloFormulario">Iniciar Sesión</h2>
+                        <p id="subtituloFormulario">Accede a tu cuenta en TraduMaker HL</p>
+                    </div>
+
+                    <div id="alertaBox" class="mensaje-alerta"></div>
+
+                    <form id="formAcceso" onsubmit="manejarAcceso(event)">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+                            <input type="email5" id="inputEmail" required placeholder="tucorreo@dominio.com">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                            <input type="password" id="inputPassword" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btnSubmitTexto">Entrar</button>
+                    </form>
+
+                    <div class="auth-toggle">
+                        <p id="textoToggle">¿No tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Regístrate aquí</a></p>
+                    </div>
                 </div>
 
-                <!-- Formulario de Login -->
-                <form id="formLogin" class="auth-form active" onsubmit="iniciarSesion(event)">
-                    <div class="form-group">
-                        <label>Correo Electrónico</label>
-                        <input type="email" id="loginEmail" required placeholder="tucorreo@email.com">
+                <!-- SECCIÓN DE PERFIL (Se muestra SI hay sesión iniciada) -->
+                <div id="seccionPerfil" class="user-panel" style="display: none;">
+                    <div style="font-size: 3rem; color: #a78bfa; margin-bottom: 15px;">
+                        <i class="fa-solid fa-circle-user"></i>
                     </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••">
-                    </div>
-                    <a class="forgot-password" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a>
-                    <button type="submit" class="btn-submit">Entrar</button>
-                </form>
-
-                <!-- Formulario de Registro -->
-                <form id="formRegister" class="auth-form" onsubmit="registrarUsuario(event)">
-                    <div class="form-group">
-                        <label>Correo Electrónico</label>
-                        <input type="email" id="regEmail" required placeholder="tucorreo@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="regPassword" required placeholder="Mínimo 6 caracteres">
-                    </div>
-                    <button type="submit" class="btn-submit">Crear Cuenta</button>
-                </form>
-            </div>
-
-            <!-- Panel de Usuario Logeado -->
-            <div class="auth-container user-panel" id="userPanel">
-                <h3 style="color: white; font-family: 'Cinzel', serif; margin-bottom: 10px;">¡Bienvenido!</h3>
-                <p id="userEmailDisplay" style="color: #a0a0b0; font-size: 0.9rem; margin-bottom: 20px;"></p>
-                <div style="background: rgba(99, 102, 241, 0.1); border: 1px dashed #6366f1; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
-                    <p style="color: #a78bfa; font-size: 0.85rem; line-height: 1.5;">
-                        <i class="fa-solid fa-shield-halved"></i> Tu cuenta está vinculada de forma segura. Este sistema resguardará tu acceso para futuras dinámicas y votaciones exclusivas de la comunidad.
-                    </p>
+                    <h3 id="texto-bienvenida">¡Hola, Usuario!</h3>
+                    <p id="texto-email-usuario" style="color: #8b949e; font-size: 0.9rem; margin-bottom: 20px;"></p>
+                    <button onclick="cerrarSesion()" class="btn-logout">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                    </button>
                 </div>
-                <button onclick="cerrarSesion()" class="btn-submit" style="background: #ef4444;">Cerrar Sesión</button>
+
             </div>
 
         </div>
@@ -187,184 +207,118 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function cambiarTab(tipo) {
-            const tabs = document.querySelectorAll('.auth-tab');
-            const forms = document.querySelectorAll('.auth-form');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            forms.forEach(f => f.classList.remove('active'));
+        let esModoRegistro = false;
 
-            if (tipo === 'login') {
-                tabs[0].classList.add('active');
-                document.getElementById('formLogin').classList.add('active');
+        function cambiarModoFormulario(e) {
+            e.preventDefault();
+            esModoRegistro = !esModoRegistro;
+            
+            const titulo = document.getElementById('tituloFormulario');
+            const subtitulo = document.getElementById('subtituloFormulario');
+            const btn = document.getElementById('btnSubmitTexto');
+            const toggle = document.getElementById('textoToggle');
+
+            if (esModoRegistro) {
+                titulo.innerText = 'Crear Cuenta';
+                subtitulo.innerText = 'Regístrate para participar en votaciones';
+                btn.innerText = 'Registrarse';
+                toggle.innerHTML = '¿Ya tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Inicia sesión</a>';
             } else {
-                tabs[1].classList.add('active');
-                document.getElementById('formRegister').classList.add('active');
+                titulo.innerText = 'Iniciar Sesión';
+                subtitulo.innerText = 'Accede a tu cuenta en TraduMaker HL';
+                btn.innerText = 'Entrar';
+                toggle.innerHTML = '¿No tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Regístrate aquí</a>';
             }
+            ocultarAlerta();
         }
 
-        function validarCorreoPermitido(email) {
-            const emailLower = email.toLowerCase().trim();
-            const partes = emailLower.split('@');
-            
-            if (partes.length !== 2) return false;
-            
-            const usuario = partes[0];
-            const dominio = partes[1];
-
-            // 1. Lista de palabras prohibidas que intenten suplantar roles o sean genéricas/falsas
-            const palabrasProhibidas = [
-                'admin', 'administrator', 'administrador', 'moderador', 'moderator', 
-                'soporte', 'support', 'owner', 'staff', 'teamhl', 'tradumaker', 
-                'root', 'system', 'contacto', 'contact', 'help', 'ayuda',
-                'test', 'prueba', 'asdf', 'qwer', 'abc', '123'
-            ];
-
-            // Verificar si el usuario contiene exactamente o empieza con alguna palabra prohibida
-            for (let palabra of palabrasProhibidas) {
-                if (usuario === palabra || usuario.startsWith(palabra + '0') || usuario.startsWith(palabra + '1') || usuario.startsWith(palabra + '2') || usuario.startsWith(palabra + '_') || usuario.startsWith(palabra + '.')) {
-                    return false;
-                }
-            }
-
-            // 2. Lista de dominios de correo temporal / desechable más comunes
-            const dominiosProhibidos = [
-                'mailinator.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com',
-                'trashmail.com', 'yopmail.com', 'dispostable.com', 'fakeinbox.com',
-                'temp-mail.org', 'luxsci.com', 'mohmal.com'
-            ];
-
-            if (dominiosProhibidos.includes(dominio)) {
-                return false;
-            }
-
-            // 3. Validar que el nombre de usuario tenga un tamaño mínimo lógico (ej. al menos 3 caracteres antes del @)
-            if (usuario.length < 3) {
-                return false;
-            }
-
-            return true;
+        function mostrarAlerta(mensaje, esError = true) {
+            const caja = document.getElementById('alertaBox');
+            caja.innerText = mensaje;
+            caja.className = `mensaje-alerta ${esError ? 'mensaje-error' : 'mensaje-exito'}`;
+            caja.style.display = 'block';
         }
 
-        async function registrarUsuario(event) {
+        function ocultarAlerta() {
+            document.getElementById('alertaBox').style.display = 'none';
+        }
+
+        async function manejarAcceso(event) {
             event.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
+            ocultarAlerta();
 
-            // Validar que el correo sea legítimo y no esté prohibido
-            if (!validarCorreoPermitido(email)) {
-                alert('El correo electrónico ingresado no está permitido o no cumple con los estándares de seguridad de la comunidad. Por favor, utiliza una cuenta de correo personal válida.');
+            const email = document.getElementById('inputEmail').value.trim();
+            const password = document.getElementById('inputPassword').value;
+
+            // RESTRICCIÓN DE SEGURIDAD PARA EL CORREO ADMIN DESDE LA WEB
+            if (esModoRegistro && email.toLowerCase() === 'admin@admin.com') {
+                mostrarAlerta('No está permitido registrar este correo desde el formulario público.');
                 return;
             }
 
-            try {
-                // 1. Obtener la IP y verificar si es una VPN/Proxy
-                const responseGeo = await fetch('https://ipapi.co/json/');
-                const dataGeo = await responseGeo.json();
-                const userIp = dataGeo.ip;
-
-                if (dataGeo.asn && (dataGeo.org && (dataGeo.org.toLowerCase().includes('vpn') || dataGeo.org.toLowerCase().includes('proxy') || dataGeo.org.toLowerCase().includes('hosting')))) {
-                    alert('Hemos detectado el uso de una red privada virtual (VPN) o proxy. Para proteger la seguridad de la comunidad y evitar registros automatizados, por favor desactiva tu VPN para registrarte.');
-                    return;
-                }
-
-                // 2. Verificar cuántas cuentas se han registrado desde esta misma IP real
-                const { count, error: countError } = await supabaseClient
-                    .from('usuarios_registrados')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('ip', userIp);
-
-                if (!countError && count >= 3) {
-                    alert('Hemos detectado que ya se han registrado varias cuentas desde esta misma red. Si un amigo o familiar que vive contigo necesita crear su propia cuenta, por favor contáctanos para autorizarla y mantener segura la comunidad.');
-                    return;
-                }
-
-                // 3. Registrar al usuario pasando la IP en los metadatos para que el Trigger la guarde
+            if (esModoRegistro) {
+                // Registro
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            ip: userIp
-                        }
-                    }
+                    password: password
                 });
 
                 if (error) {
-                    alert('Error al registrarse: ' + error.message);
-                    return;
+                    mostrarAlerta(error.message);
+                } else {
+                    mostrarAlerta('¡Cuenta creada con éxito! Ya puedes iniciar sesión.', false);
+                    esModoRegistro = false;
+                    cambiarModoFormulario(new Event('click'));
                 }
+            } else {
+                // Inicio de sesión
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
 
-                alert('¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.');
-                cambiarTab('login');
-
-            } catch (err) {
-                console.error('Error en el proceso de registro:', err);
-                alert('Ocurrió un error al verificar la red. Por favor, intenta de nuevo.');
+                if (error) {
+                    mostrarAlerta('Correo o contraseña incorrectos.');
+                } else {
+                    verificarSesionYSaludar();
+                }
             }
         }
 
-        async function iniciarSesion(event) {
-            event.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+        async function verificarSesionYSaludar() {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
+            const seccionForm = document.getElementById('seccionFormulario');
+            const seccionPerfil = document.getElementById('seccionPerfil');
+            const elementoBienvenida = document.getElementById('texto-bienvenida');
+            const elementoEmail = document.getElementById('texto-email-usuario');
 
-            if (error) {
-                alert('Credenciales incorrectas o error al iniciar sesión: ' + error.message);
-                return;
+            if (session && session.user) {
+                seccionForm.style.display = 'none';
+                seccionPerfil.style.display = 'block';
+
+                const correo = session.user.email;
+                elementoEmail.innerText = correo;
+
+                if (correo.toLowerCase() === 'admin@admin.com') {
+                    elementoBienvenida.innerHTML = `¡Hola, Administrador! 🛡️`;
+                } else {
+                    elementoBienvenida.innerHTML = `¡Hola, ${correo}!`;
+                }
+            } else {
+                seccionForm.style.display = 'block';
+                seccionPerfil.style.display = 'none';
             }
-
-            verificarSesion();
-        }
-
-        async function recuperarPassword() {
-            const email = document.getElementById('loginEmail').value;
-            
-            if (!email) {
-                alert('Por favor, escribe tu correo electrónico en el campo de arriba para poder enviarte las instrucciones de recuperación.');
-                document.getElementById('loginEmail').focus();
-                return;
-            }
-
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href,
-            });
-
-            if (error) {
-                alert('Error al solicitar la recuperación: ' + error.message);
-                return;
-            }
-
-            alert('¡Correo enviado! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.');
         }
 
         async function cerrarSesion() {
             await supabaseClient.auth.signOut();
-            verificarSesion();
+            document.getElementById('formAcceso').reset();
+            verificarSesionYSaludar();
         }
 
-        async function verificarSesion() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const authBox = document.getElementById('authBox');
-            const userPanel = document.getElementById('userPanel');
-            const userEmailDisplay = document.getElementById('userEmailDisplay');
-
-            if (session) {
-                authBox.style.display = 'none';
-                userPanel.classList.add('active');
-                userEmailDisplay.innerText = session.user.email;
-            } else {
-                authBox.style.display = 'block';
-                userPanel.classList.remove('active');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', verificarSesion);
+        // Ejecutar al cargar la página para verificar si ya hay sesión activa
+        document.addEventListener('DOMContentLoaded', verificarSesionYSaludar);
     </script>
 </body>
 </html>
