@@ -203,10 +203,59 @@
             }
         }
 
+        function validarCorreoPermitido(email) {
+            const emailLower = email.toLowerCase().trim();
+            const partes = emailLower.split('@');
+            
+            if (partes.length !== 2) return false;
+            
+            const usuario = partes[0];
+            const dominio = partes[1];
+
+            // 1. Lista de palabras prohibidas que intenten suplantar roles o sean genéricas/falsas
+            const palabrasProhibidas = [
+                'admin', 'administrator', 'administrador', 'moderador', 'moderator', 
+                'soporte', 'support', 'owner', 'staff', 'teamhl', 'tradumaker', 
+                'root', 'system', 'contacto', 'contact', 'help', 'ayuda',
+                'test', 'prueba', 'asdf', 'qwer', 'abc', '123'
+            ];
+
+            // Verificar si el usuario contiene exactamente o empieza con alguna palabra prohibida
+            for (let palabra of palabrasProhibidas) {
+                if (usuario === palabra || usuario.startsWith(palabra + '0') || usuario.startsWith(palabra + '1') || usuario.startsWith(palabra + '2') || usuario.startsWith(palabra + '_') || usuario.startsWith(palabra + '.')) {
+                    return false;
+                }
+            }
+
+            // 2. Lista de dominios de correo temporal / desechable más comunes
+            const dominiosProhibidos = [
+                'mailinator.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com',
+                'trashmail.com', 'yopmail.com', 'dispostable.com', 'fakeinbox.com',
+                'temp-mail.org', 'luxsci.com', 'mohmal.com'
+            ];
+
+            if (dominiosProhibidos.includes(dominio)) {
+                return false;
+            }
+
+            // 3. Validar que el nombre de usuario tenga un tamaño mínimo lógico (ej. al menos 3 caracteres antes del @)
+            if (usuario.length < 3) {
+                return false;
+            }
+
+            return true;
+        }
+
         async function registrarUsuario(event) {
             event.preventDefault();
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
+
+            // Validar que el correo sea legítimo y no esté prohibido
+            if (!validarCorreoPermitido(email)) {
+                alert('El correo electrónico ingresado no está permitido o no cumple con los estándares de seguridad de la comunidad. Por favor, utiliza una cuenta de correo personal válida.');
+                return;
+            }
 
             try {
                 // 1. Obtener la IP y verificar si es una VPN/Proxy
@@ -283,7 +332,7 @@
             }
 
             const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href, // Te redirige de vuelta aquí al cambiarla
+                redirectTo: window.location.href,
             });
 
             if (error) {
