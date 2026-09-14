@@ -23,6 +23,7 @@ body {
     display: flex; 
     flex-direction: column; 
     min-height: 100vh;
+    overflow-x: hidden; /* Evita el scroll horizontal indeseado */
     background-image: 
         radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.04) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
@@ -69,7 +70,7 @@ body {
 }
 .nav-links { 
     display: flex; 
-    gap: 1.1rem; /* Espacio equilibrado para que no choquen */
+    gap: 1.1rem; 
     align-items: center; 
 }
 .nav-links a { 
@@ -77,11 +78,11 @@ body {
     text-decoration: none; 
     font-weight: 500; 
     transition: all 0.25s ease; 
-    font-size: 0.85rem; /* Letra ligeramente más ligera para ganar espacio */
+    font-size: 0.85rem; 
     display: flex; 
     align-items: center; 
     gap: 5px; 
-    white-space: nowrap; /* Evita que los textos se rompan en dos líneas */
+    white-space: nowrap; 
 }
 .nav-links a:hover, .nav-links a.active { 
     color: var(--text-main); 
@@ -109,8 +110,21 @@ body {
     border-radius: 8px;
 }
 
-.main-content { flex: 1; }
-.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+/* Contenedores generales corregidos para centrar y evitar desbordes */
+.main-content { 
+    flex: 1; 
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+.container { 
+    width: 100%;
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 2rem; 
+}
 
 /* Hero Section Épico / Anime */
 .hero-section { 
@@ -121,6 +135,7 @@ body {
     text-align: center; 
     border-bottom: 1px solid var(--border); 
     overflow: hidden; 
+    width: 100%;
 }
 .hero-content { position: relative; z-index: 2; max-width: 750px; margin: 0 auto; }
 .hero-badge { 
@@ -193,8 +208,20 @@ body {
 }
 
 /* Features Bar */
-.features-bar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 2rem 0; }
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; padding: 0 2rem; }
+.features-bar { 
+    background: var(--bg-card); 
+    border-bottom: 1px solid var(--border); 
+    padding: 2rem 0; 
+    width: 100%;
+}
+.features-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 1.5rem; 
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem; 
+}
 .feature-item { display: flex; align-items: center; gap: 1.2rem; }
 .feature-item i { 
     font-size: 1.8rem; 
@@ -208,8 +235,13 @@ body {
 .feature-item p { font-size: 0.85rem; color: var(--text-muted); }
 
 /* Secciones y Tarjetas de Juegos (Estilo RPG Cards) */
-.recent-section { margin: 4rem auto; }
-.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
+.recent-section { 
+    margin: 4rem auto; 
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 2rem;
+}
+.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; width: 100%; }
 .section-header h2 { 
     font-family: 'Cinzel', serif;
     font-size: 1.8rem; 
@@ -222,7 +254,7 @@ body {
 .view-all-link { color: #a78bfa; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s; }
 .view-all-link:hover { color: white; text-decoration: underline; }
 
-.games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.8rem; }
+.games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.8rem; width: 100%; }
 .game-card { 
     background: var(--bg-card); 
     border: 1px solid var(--border); 
@@ -286,7 +318,7 @@ body {
 }
 
 /* Controles de Catálogo y Búsqueda */
-.catalog-page-section { padding: 3rem 2rem; }
+.catalog-page-section { padding: 3rem 2rem; width: 100%; max-width: 1200px; margin: 0 auto; }
 .catalog-header-banner { text-align: center; margin-bottom: 2.5rem; }
 .catalog-header-banner h1 { font-family: 'Cinzel', serif; font-size: 2.6rem; margin-bottom: 0.5rem; }
 .catalog-header-banner p { color: var(--text-muted); font-size: 1.1rem; }
@@ -311,7 +343,7 @@ body {
 }
 
 /* Páginas Sobre Nosotros y Apóyanos */
-.about-page-section, .donate-page-section { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; }
+.about-page-section, .donate-page-section { padding: 3rem 2rem; max-width: 1000px; margin: 0 auto; width: 100%; }
 .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
 .about-card { background: var(--bg-card); border: 1px solid var(--border); padding: 2.2rem; border-radius: 14px; transition: border-color 0.3s; }
 .about-card:hover { border-color: rgba(124, 58, 237, 0.4); }
@@ -390,8 +422,8 @@ body {
 }
 
 /* Footer Profesional RPG */
-.footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 3rem 0 1.5rem 0; margin-top: auto; }
-.footer-content { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2.5rem; margin-bottom: 2.5rem; }
+.footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 3rem 0 1.5rem 0; margin-top: auto; width: 100%; }
+.footer-content { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2.5rem; margin-bottom: 2.5rem; width: 100%; }
 .footer-info p, .footer-links a, .footer-socials a { color: var(--text-muted); font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
 .footer-info p { margin-top: 12px; line-height: 1.6; }
 .footer-links h4, .footer-socials h4 { font-family: 'Cinzel', serif; color: white; font-size: 1.05rem; margin-bottom: 1.2rem; }
@@ -415,10 +447,10 @@ body {
     color: var(--gold);
     transform: translateY(-2px);
 }
-.footer-bottom { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 0 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+.footer-bottom { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 0 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.85rem; width: 100%; }
 
 /* ========================================================================== */
-/* ADAPTABILIDAD RESPONSIVE (MÓVIL Y TABLET)                                  */
+/* ADAPTABILIDAD RESPONSIVE (MÓVIL Y TABLET)                                 */
 /* ========================================================================== */
 @media (max-width: 900px) {
     .menu-toggle {
@@ -432,9 +464,9 @@ body {
     .nav-links {
         position: absolute;
         top: calc(100% + 1rem);
-        left: -2rem;
-        right: -2rem;
-        width: calc(100% + 4rem);
+        left: -1.5rem;
+        right: -1.5rem;
+        width: calc(100% + 3rem);
         background: rgba(13, 18, 29, 0.98);
         backdrop-filter: blur(16px);
         flex-direction: column;
@@ -483,6 +515,7 @@ body {
     border-radius: 14px;
     padding: 1.5rem;
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .sidebar-header {
