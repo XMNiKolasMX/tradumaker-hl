@@ -439,10 +439,9 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
-                    <a href="cuenta.html">
+                   <a href="cuenta.html">
                         <i class="fa-solid fa-user"></i> Cuenta 
-                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                        <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
                     </a>
                 </div>
             </div>
@@ -692,15 +691,8 @@
         </div>
     </footer>
 
-    <!-- Scripts (Verificación de Edad + Supabase) -->
+<!-- Script unificado: Modal, Supabase (Juegos Recientes) y Verificación de Roles -->
     <script>
-        // Comprobar si ya pasó la verificación de edad en este navegador
-        document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem('tradu_verificado') === 'true') {
-                document.getElementById('modalVerificacion').classList.add('oculto');
-            }
-        });
-
         function actualizarBoton() {
             const aceptado = document.getElementById('checkTerminos').checked;
             document.getElementById('btnIngresar').disabled = !aceptado;
@@ -715,15 +707,11 @@
             window.location.href = 'https://www.google.com';
         }
 
-        // Lógica de Supabase para Juegos Recientes
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
         }
 
+        // Cerrar el menú si se hace clic fuera de él
         window.onclick = function(event) {
             if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -736,7 +724,52 @@
             }
         }
 
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Inicializar lógica al cargar el DOM
         document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Validar si el usuario ya aceptó la advertencia previa
+            if (localStorage.getItem('tradu_verificado') === 'true') {
+                const modal = document.getElementById('modalVerificacion');
+                if (modal) {
+                    modal.classList.add('oculto');
+                }
+            }
+
+            // 2. Verificación de sesión y roles globales para el menú
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
+
+            if (session && session.user) {
+                const userId = session.user.id;
+
+                const { data: perfil } = await supabaseClient
+                    .from('usuarios_registrados')
+                    .select('rol')
+                    .eq('id', userId)
+                    .single();
+
+                const rol = perfil ? perfil.rol : 'usuario';
+
+                enlacesCuenta.forEach(enlace => {
+                    if (rol === 'admin') {
+                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                    } else if (rol === 'moderador') {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
+                    } else {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
+                    }
+                });
+            } else {
+                enlacesCuenta.forEach(enlace => {
+                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
+                });
+            }
+
+            // 3. Cargar Juegos Recientes desde Supabase
             const contenedorRecientes = document.getElementById('grid-recientes');
 
             try {
