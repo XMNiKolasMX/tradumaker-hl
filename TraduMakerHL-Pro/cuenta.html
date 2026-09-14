@@ -165,7 +165,7 @@
                     <form id="formAcceso" onsubmit="manejarAcceso(event)">
                         <div class="form-group">
                             <label><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
-                            <input type="email5" id="inputEmail" required placeholder="tucorreo@dominio.com">
+                            <input type="email" id="inputEmail" required placeholder="tucorreo@dominio.com">
                         </div>
                         <div class="form-group">
                             <label><i class="fa-solid fa-lock"></i> Contraseña</label>
@@ -257,7 +257,17 @@
             }
 
             if (esModoRegistro) {
-                // Registro
+                // Obtener la IP antes de registrar
+                let ipUsuario = 'desconocida';
+                try {
+                    const respuestaIp = await fetch('https://api.ipify.org?format=json');
+                    const datosIp = await respuestaIp.json();
+                    ipUsuario = datosIp.ip;
+                } catch (e) {
+                    console.warn("No se pudo obtener la IP:", e);
+                }
+
+                // Registro en Supabase Auth
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password
@@ -266,6 +276,24 @@
                 if (error) {
                     mostrarAlerta(error.message);
                 } else {
+                    // Guardar los datos en la tabla usuarios_registrados con su respectiva IP
+                    if (data && data.user) {
+                        const { error: errorDb } = await supabaseClient
+                            .from('usuarios_registrados')
+                            .insert([
+                                { 
+                                    id: data.user.id, 
+                                    email: email, 
+                                    rol: 'usuario', 
+                                    ip: ipUsuario 
+                                }
+                            ]);
+
+                        if (errorDb) {
+                            console.error("Error al guardar en usuarios_registrados:", errorDb.message);
+                        }
+                    }
+
                     mostrarAlerta('¡Cuenta creada con éxito! Ya puedes iniciar sesión.', false);
                     esModoRegistro = false;
                     cambiarModoFormulario(new Event('click'));
