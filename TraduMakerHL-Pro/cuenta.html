@@ -218,6 +218,16 @@
                         </a>
                     </div>
 
+                    <!-- SECCIÓN DE JUEGOS FAVORITOS -->
+                    <div class="seccion-edicion" style="margin-top: 0px; margin-bottom: 15px;">
+                        <p style="color: white; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;">
+                            <i class="fa-solid fa-heart" style="color: #ef4444;"></i> Mis Juegos Favoritos
+                        </p>
+                        <div id="listaFavoritos" style="max-height: 150px; overflow-y: auto; color: #8b949e; font-size: 0.85rem; text-align: left;">
+                            <p>Cargando favoritos...</p>
+                        </div>
+                    </div>
+
                     <!-- FORMULARIO PARA ACTUALIZAR DATOS -->
                     <div class="seccion-edicion">
                         <p style="color: white; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;"><i class="fa-solid fa-user-gear"></i> Ajustes de Cuenta</p>
@@ -373,7 +383,87 @@
             }
         }
 
-        // FUNCIONES PARA ACTUALIZAR PERFIL (Correo y Contraseña)
+        // FUNCIONES PARA FAVORITOS
+        async function cargarFavoritos(userId) {
+            const contenedorLista = document.getElementById('listaFavoritos');
+            
+            const { data, error } = await supabaseClient
+                .from('juegos_favoritos')
+                .select('*')
+                .eq('user_id', userId);
+
+            if (error) {
+                contenedorLista.innerHTML = '<p style="color: #f87171;">Error al cargar favoritos.</p>';
+                return;
+            }
+
+            if (data.length === 0) {
+                contenedorLista.innerHTML = '<p>Aún no tienes juegos favoritos guardados.</p>';
+                return;
+            }
+
+            contenedorLista.innerHTML = '';
+            data.forEach(fav => {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.marginBottom = '6px';
+                item.style.padding = '4px 8px';
+                item.style.background = '#161b22';
+                item.style.borderRadius = '4px';
+
+                item.innerHTML = `
+                    <span style="color: white;">${fav.juego_id}</span>
+                    <button onclick="eliminarFavorito('${fav.juego_id}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer;">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                contenedorLista.appendChild(item);
+            });
+        }
+
+        async function agregarFavorito(nombreJuego) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                alert('Debes iniciar sesión para guardar favoritos.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('juegos_favoritos')
+                .insert([{ user_id: session.user.id, juego_id: nombreJuego }]);
+
+            if (error) {
+                if (error.code === '23505') {
+                    alert('Este juego ya está en tus favoritos.');
+                } else {
+                    alert('Error al guardar: ' + error.message);
+                }
+            } else {
+                alert('¡Juego añadido a favoritos!');
+                cargarFavoritos(session.user.id);
+            }
+        }
+
+        async function eliminarFavorito(nombreJuego) {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return;
+
+            const { error } = await supabaseClient
+                .from('juegos_favoritos')
+                .delete()
+                .eq('user_id', session.user.id)
+                .eq('juego_id', nombreJuego);
+
+            if (error) {
+                alert('Error al eliminar.');
+            } else {
+                cargarFavoritos(session.user.id);
+            }
+        }
+
+        // FUNCIONES PARA ACTUALIZAR PERFIL
         async function actualizarCorreo() {
             const nuevoEmail = document.getElementById('nuevoEmailInput').value.trim();
             if (!nuevoEmail) {
@@ -422,7 +512,6 @@
                 const correo = session.user.email;
                 elementoEmail.innerText = correo;
 
-                // Validar si es tu correo administrador
                 if (correo.toLowerCase() === 'nicolas123xz@gmail.com') {
                     elementoBienvenida.innerHTML = `¡Hola, Administrador! 🛡️`;
                     panelAdmin.style.display = 'block';
@@ -430,6 +519,9 @@
                     elementoBienvenida.innerHTML = `¡Hola, ${correo}!`;
                     panelAdmin.style.display = 'none';
                 }
+
+                // Cargar favoritos del usuario actual
+                cargarFavoritos(session.user.id);
             } else {
                 seccionForm.style.display = 'block';
                 seccionPerfil.style.display = 'none';
