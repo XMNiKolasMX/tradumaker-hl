@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="inicio.css">
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-   <style>
+  <style>
         /* Estilos actualizados para el Modal con Términos Completos */
         .verificacion-overlay {
             position: fixed;
@@ -24,7 +24,6 @@
             align-items: center;
             z-index: 99999;
             padding: 20px;
-            box-sizing: border-box;
         }
         .verificacion-overlay.oculto {
             display: none;
@@ -42,39 +41,34 @@
             max-height: 90vh;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
-            overflow: hidden; /* Evita que la tarjeta desborde la ventana */
         }
         .verificacion-card i.fa-triangle-exclamation {
             font-size: 2.5rem;
             color: #f59e0b;
             margin-bottom: 10px;
-            flex-shrink: 0;
         }
         .verificacion-card h1 {
             font-family: 'Cinzel', serif;
             font-size: 1.6rem;
             margin-bottom: 10px;
             color: #fff;
-            flex-shrink: 0;
         }
         .verificacion-card > p {
             color: #a0a0b0;
             font-size: 0.85rem;
             margin-bottom: 15px;
-            flex-shrink: 0;
         }
         
-        /* Caja de Términos Desplazable Ajustada */
+        /* Caja de Términos Desplazable */
         .terminos-scroll-box {
             text-align: left;
             background: #111520;
             border: 1px solid #2a2f3f;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            max-height: 220px;
             overflow-y: auto;
-            flex-grow: 1; /* Permite que el texto se adapte al espacio y cree scroll interno de forma fluida */
             font-size: 0.8rem;
             color: #b0b0c0;
             line-height: 1.5;
@@ -95,7 +89,7 @@
 
         .terminos-check-container {
             text-align: left;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -106,19 +100,16 @@
             padding: 10px;
             border-radius: 6px;
             border: 1px solid rgba(99, 102, 241, 0.2);
-            flex-shrink: 0; /* Impide que el checkbox se aplaste */
         }
         .terminos-check-container input[type="checkbox"] {
             width: 18px;
             height: 18px;
             accent-color: #6366f1;
             cursor: pointer;
-            flex-shrink: 0;
         }
         .botones-verificacion {
             display: flex;
             gap: 15px;
-            flex-shrink: 0; /* Impide que los botones sufran deformaciones por espacio */
         }
         .btn-edad {
             flex: 1;
@@ -317,6 +308,8 @@
         .bot-link:hover {
             background: #4752c4;
         }
+
+        /* Corrección del Dropdown para que flote bien alineado */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -344,15 +337,14 @@
             display: none;
             position: absolute;
             right: 0;
-            top: 100%;
+            top: calc(100% + 8px); /* Baja un poquito para que no tape el botón */
             background-color: #161b22;
-            min-width: 220px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            min-width: 240px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.7);
             z-index: 1000;
             border: 1px solid var(--border);
             border-radius: 10px;
             overflow: hidden;
-            margin-top: 8px;
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn {
