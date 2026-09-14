@@ -171,6 +171,12 @@
                             <label><i class="fa-solid fa-lock"></i> Contraseña</label>
                             <input type="password" id="inputPassword" required placeholder="••••••••">
                         </div>
+                        
+                        <!-- ENLACE DE OLVIDÉ MI CONTRASEÑA -->
+                        <div id="contenedorOlvido" style="text-align: right; margin-bottom: 15px;">
+                            <a href="#" onclick="solicitarRecuperacionPassword(event)" style="font-size: 0.8rem; color: #818cf8; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                        </div>
+
                         <button type="submit" class="btn-submit" id="btnSubmitTexto">Entrar</button>
                     </form>
 
@@ -217,17 +223,20 @@
             const subtitulo = document.getElementById('subtituloFormulario');
             const btn = document.getElementById('btnSubmitTexto');
             const toggle = document.getElementById('textoToggle');
+            const contenedorOlvido = document.getElementById('contenedorOlvido');
 
             if (esModoRegistro) {
                 titulo.innerText = 'Crear Cuenta';
                 subtitulo.innerText = 'Regístrate para participar en votaciones';
                 btn.innerText = 'Registrarse';
                 toggle.innerHTML = '¿Ya tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Inicia sesión</a>';
+                if (contenedorOlvido) contenedorOlvido.style.display = 'none'; // Ocultar recupero en registro
             } else {
                 titulo.innerText = 'Iniciar Sesión';
                 subtitulo.innerText = 'Accede a tu cuenta en TraduMaker HL';
                 btn.innerText = 'Entrar';
                 toggle.innerHTML = '¿No tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Regístrate aquí</a>';
+                if (contenedorOlvido) contenedorOlvido.style.display = 'block'; // Mostrar recupero en login
             }
             ocultarAlerta();
         }
@@ -241,6 +250,28 @@
 
         function ocultarAlerta() {
             document.getElementById('alertaBox').style.display = 'none';
+        }
+
+        // FUNCIÓN PARA SOLICITAR RECUPERACIÓN DE CONTRASEÑA
+        async function solicitarRecuperacionPassword(e) {
+            e.preventDefault();
+            ocultarAlerta();
+
+            const emailInput = document.getElementById('inputEmail').value.trim();
+            if (!emailInput) {
+                mostrarAlerta('Por favor, introduce tu correo electrónico arriba para recuperar tu contraseña.');
+                return;
+            }
+
+            const { data, error } = await supabaseClient.auth.resetPasswordForEmail(emailInput, {
+                redirectTo: window.location.href, // Redirige de vuelta a esta misma página o donde desees
+            });
+
+            if (error) {
+                mostrarAlerta('Error al enviar el correo: ' + error.message);
+            } else {
+                mostrarAlerta('¡Correo enviado! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.', false);
+            }
         }
 
         async function manejarAcceso(event) {
