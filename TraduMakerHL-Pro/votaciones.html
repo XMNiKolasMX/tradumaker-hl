@@ -395,65 +395,8 @@
         </div>
     </footer>
 
-    <script>
-        <!-- Script para el Menú Desplegable y Control de Sesión Global -->
-    <script>
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
-
-        // Cerrar el menú si el usuario hace clic fuera de él
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseGlobal = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseGlobal.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-
-                // Consultar rol en la base de datos
-                const { data: perfil } = await supabaseGlobal
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', verificarSesionYRolesGlobal);
-        
+<script>
+        // CREDENCIALES DE SUPABASE
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -461,7 +404,7 @@
         let totalJuegosActuales = 0;
         let cachedIpUsuario = null;
 
-        // LISTA BLANCA DE CORREOS DE MODERADORES CREADOS POR TI
+        // LISTA BLANCA DE CORREOS DE MODERADORES
         const CORREOS_MODERADORES = [
             'moderador1@gmail.com',
             'luismod@gmail.com',
@@ -475,12 +418,12 @@
         }
 
         function esFechaVotacionCerrada() {
-            // Fecha límite: 30 de septiembre de 2026 a las 23:59:59
             const fechaLimite = new Date('2026-09-30T23:59:59');
             const ahora = new Date();
             return ahora > fechaLimite;
         }
 
+        // MENÚ DESPLEGABLE Y CIERRE AL CLICKEAR FUERA
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
         }
@@ -507,7 +450,7 @@
                 return;
             }
             const form = document.getElementById('form-proponer-container');
-            form.classList.toggle('activo');
+            if (form) form.classList.toggle('activo');
         }
 
         function obtenerClientId() {
@@ -532,31 +475,71 @@
             }
         }
 
+        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL (Actualiza el botón de cuenta)
+        async function verificarSesionYRolesGlobal() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
+
+            if (session && session.user) {
+                const userId = session.user.id;
+                const { data: perfil } = await supabaseClient
+                    .from('usuarios_registrados')
+                    .select('rol')
+                    .eq('id', userId)
+                    .single();
+
+                const rol = perfil ? perfil.rol : 'usuario';
+
+                enlacesCuenta.forEach(enlace => {
+                    if (rol === 'admin') {
+                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                    } else if (rol === 'moderador') {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
+                    } else {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
+                    }
+                });
+            } else {
+                enlacesCuenta.forEach(enlace => {
+                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
+                });
+            }
+        }
+
         async function verificarAccesoModerador() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             const panelModeracion = document.getElementById('panelModeracion');
 
-            if (session && session.user && esModerador(session.user.email)) {
-                panelModeracion.classList.add('active');
-                cargarVotosAuditoria();
-            } else {
-                panelModeracion.classList.remove('active');
+            if (panelModeracion) {
+                if (session && session.user && esModerador(session.user.email)) {
+                    panelModeracion.classList.add('active');
+                    cargarVotosAuditoria();
+                } else {
+                    panelModeracion.classList.remove('active');
+                }
             }
         }
 
+        // CARGAR JUEGOS DESDE SUPABASE
         async function cargarVotaciones() {
             await verificarAccesoModerador();
             const grid = document.getElementById('grid-votaciones');
+            if (!grid) return;
+
             const clientId = obtenerClientId();
             const ipUsuario = await obtenerIpUsuario();
             const votacionCerrada = esFechaVotacionCerrada();
 
-            // Adaptar interfaz si ya pasó el 30 de septiembre
             if (votacionCerrada) {
-                document.getElementById('titulo-principal').innerHTML = `¡Resultados Oficiales de Ganadores! 🏆 <span class="badge-beta" style="background:#10b981; color:white;">FINALIZADO</span>`;
-                document.getElementById('subtitulo-estado').innerHTML = `<i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> <span style="color: #f59e0b; font-weight:700;">¡Los 3 primeros puestos han sido anunciados para traducción!</span>`;
-                document.getElementById('descripcion-estado').innerHTML = `La votación pública ha concluido. A partir de ahora, las funciones de votación están cerradas y el sistema opera en modo de consulta y registro de cuentas de usuario.`;
-                document.getElementById('contenedor-btn-proponer').style.display = 'none';
+                const tituloPrin = document.getElementById('titulo-principal');
+                const subEstado = document.getElementById('subtitulo-estado');
+                const descEstado = document.getElementById('descripcion-estado');
+                const btnProponer = document.getElementById('contenedor-btn-proponer');
+
+                if (tituloPrin) tituloPrin.innerHTML = `¡Resultados Oficiales de Ganadores! 🏆 <span class="badge-beta" style="background:#10b981; color:white;">FINALIZADO</span>`;
+                if (subEstado) subEstado.innerHTML = `<i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> <span style="color: #f59e0b; font-weight:700;">¡Los 3 primeros puestos han sido anunciados para traducción!</span>`;
+                if (descEstado) descEstado.innerHTML = `La votación pública ha concluido. A partir de ahora, las funciones de votación están cerradas y el sistema opera en modo de consulta y registro de cuentas de usuario.`;
+                if (btnProponer) btnProponer.style.display = 'none';
             }
 
             try {
@@ -571,22 +554,17 @@
                 const juegos = resJuegos.data;
                 const votosMap = {};
 
-                // Mapear votos por client_id o por IP para bloquear botones en cualquier navegador de la misma red
-                (resVotosClient.data || []).forEach(v => {
-                    votosMap[v.juego_id] = v.tipo_voto;
-                });
+                (resVotosClient.data || []).forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
                 if (resVotosIp && resVotosIp.data) {
-                    resVotosIp.data.forEach(v => {
-                        votosMap[v.juego_id] = v.tipo_voto;
-                    });
+                    resVotosIp.data.forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
                 }
 
                 totalJuegosActuales = juegos ? juegos.length : 0;
-                document.getElementById('contador-limite').innerText = totalJuegosActuales;
+                const contadorLim = document.getElementById('contador-limite');
+                if (contadorLim) contadorLim.innerText = totalJuegosActuales;
 
                 if (!juegos || juegos.length === 0) {
                     grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
-                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación.</p>`;
                     return;
                 }
 
@@ -599,8 +577,6 @@
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
 
                     let badgeHtml = '';
-                    if (juego.en_desarrollo === true) {
-                    // Si ya pasó el 30 de sep, los primeros 3 puestos se marcan como ganadores oficiales
                     if (votacionCerrada && index < 3) {
                         badgeHtml = `<span class="badge-estado badge-true" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">🏆 ¡Ganador #${index + 1}!</span>`;
                     } else if (juego.en_desarrollo === true) {
@@ -617,7 +593,6 @@
                         imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
                     }
 
-                    // A partir del 30 de septiembre, solo usuarios registrados pueden interactuar (validamos sesión)
                     let botonesAccionHtml = '';
                     if (votacionCerrada) {
                         botonesAccionHtml = `<div style="text-align: center; padding: 8px; background: #2a2f3f; border-radius: 6px; font-size: 0.8rem; color: #a0a0b0;">Votación Finalizada</div>`;
@@ -659,15 +634,6 @@
                                     <span><strong style="color: #ef4444;">${dislikes}</strong> No</span>
                                 </div>
                             </div>
-                            
-                            <div class="acciones-votos">
-                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
-                                </button>
-                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
-                                </button>
-                            </div>
                             ${botonesAccionHtml}
                         </div>
                     `;
@@ -686,7 +652,6 @@
                 return;
             }
 
-            // A partir del 30 de septiembre, requerir sesión obligatoria de usuario registrado
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('A partir del 30 de septiembre, es obligatorio iniciar sesión con una cuenta registrada para participar en las votaciones y dinámicas.');
@@ -697,15 +662,9 @@
             const clientId = obtenerClientId();
             const ipUsuario = await obtenerIpUsuario();
 
-            // Intentamos registrar el voto guardando IP y clientId (la base de datos bloqueará si la IP ya votó por este juego)
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
-                .insert([{ 
-                    client_id: clientId, 
-                    juego_id: idJuego, 
-                    tipo_voto: tipo,
-                    ip: ipUsuario 
-                }]);
+                .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo, ip: ipUsuario }]);
 
             if (errRegistro) {
                 alert('Ya has registrado un voto para este juego desde esta red o dispositivo.');
@@ -780,7 +739,6 @@
             cargarVotaciones();
         }
 
-        // FUNCIONES DE MODERACIÓN EN TIEMPO REAL
         async function cargarVotosAuditoria() {
             const { data, error } = await supabaseClient
                 .from('registro_votos')
@@ -788,6 +746,7 @@
                 .order('created_at', { ascending: false });
 
             const tbody = document.getElementById('tablaVotosBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (error || !data || data.length === 0) {
@@ -829,11 +788,14 @@
             }
 
             alert('Voto anulado correctamente.');
-            cargarVotosAuditoria();
             cargarVotaciones();
         }
 
-        document.addEventListener('DOMContentLoaded', cargarVotaciones);
+        // INICIALIZACIÓN AL CARGAR LA PÁGINA
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSesionYRolesGlobal();
+            cargarVotaciones();
+        });
     </script>
 </body>
 </html>
