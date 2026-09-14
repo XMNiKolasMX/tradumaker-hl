@@ -339,7 +339,6 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (!session) {
-                // Si no hay sesión, redirigir al login o index (o mostrar aviso)
                 window.location.href = 'index.html';
                 return;
             }
@@ -365,42 +364,52 @@
                 document.getElementById('user-greeting').textContent = `¡Bienvenido de nuevo!`;
             }
 
-            // Cargar juegos favoritos del usuario con la relación de la tabla juegos
+            // Cargar juegos favoritos de forma segura en dos pasos
             await cargarMisFavoritos(user.id);
         }
 
         async function cargarMisFavoritos(userId) {
             const contenedorFavoritos = document.getElementById('contenedor-favoritos');
 
-            const { data, error } = await supabaseClient
+            // 1. Obtenemos los IDs de los juegos favoritos del usuario
+            const { data: favs, error: errorFavs } = await supabaseClient
                 .from('favoritos')
-                .select(`
-                    id,
-                    juego_id,
-                    juegos (
-                        id,
-                        titulo,
-                        imagen,
-                        categoria
-                    )
-                `)
+                .select('juego_id')
                 .eq('user_id', userId);
 
-            if (error) {
-                console.error('Error al cargar favoritos:', error);
+            if (errorFavs) {
+                console.error('Error al cargar favoritos:', errorFavs);
                 contenedorFavoritos.innerHTML = '<p style="color: #f85149; font-size: 0.9rem;">Error al cargar favoritos.</p>';
                 return;
             }
 
-            if (!data || data.length === 0) {
+            if (!favs || favs.length === 0) {
                 contenedorFavoritos.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No tienes juegos favoritos guardados aún.</p>';
                 return;
             }
 
-            contenedorFavoritos.innerHTML = data.map(fav => {
-                const juego = fav.juegos;
-                if (!juego) return '';
+            // Extraemos los IDs
+            const juegoIds = favs.map(f => f.juego_id);
 
+            // 2. Consultamos los detalles directamente de la tabla 'juegos'
+            const { data: juegos, error: errorJuegos } = await supabaseClient
+                .from('juegos')
+                .select('id, titulo, imagen, categoria')
+                .in('id', juegoIds);
+
+            if (errorJuegos) {
+                console.error('Error al cargar detalles de los juegos:', errorJuegos);
+                contenedorFavoritos.innerHTML = '<p style="color: #f85149; font-size: 0.9rem;">Error al cargar los juegos favoritos.</p>';
+                return;
+            }
+
+            if (!juegos || juegos.length === 0) {
+                contenedorFavoritos.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No se encontraron los juegos favoritos.</p>';
+                return;
+            }
+
+            // 3. Renderizamos las tarjetas en el perfil
+            contenedorFavoritos.innerHTML = juegos.map(juego => {
                 return `
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; background: #161b22; padding: 10px; border-radius: 6px; border: 1px solid #30363d;">
                         <div style="display: flex; align-items: center; gap: 10px;">
