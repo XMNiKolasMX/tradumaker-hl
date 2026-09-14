@@ -92,6 +92,15 @@
         .btn-action:hover {
             background: #2ea043;
         }
+        .btn-secondary-custom {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+        }
+        .btn-secondary-custom:hover {
+            background: #30363d;
+            color: #fff;
+        }
         .btn-danger-custom {
             background: #da3633;
         }
@@ -230,14 +239,34 @@
                     <p id="user-email">Cargando información...</p>
                 </div>
 
-                <!-- Contenedor dinámico si no hay sesión -->
-                <div id="no-session-section" style="display: none; text-align: center; padding: 20px 0;">
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">No has iniciado sesión o tu sesión ha expirado.</p>
-                    <a href="index.html" class="btn-action"><i class="fa-solid fa-right-to-bracket"></i> Ir a Iniciar Sesión</a>
+                <!-- SECCIÓN 1: Formulario de Inicio de Sesión / Registro (Visible si NO hay sesión) -->
+                <div id="no-session-section" style="display: none;">
+                    
+                    <!-- Pestañas para alternar entre Iniciar Sesión y Registrarse -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button id="tab-login-btn" onclick="cambiarModoAuth('login')" class="btn-action" style="background: #238636;">Iniciar Sesión</button>
+                        <button id="tab-register-btn" onclick="cambiarModoAuth('register')" class="btn-action btn-secondary-custom">Registrarse</button>
+                    </div>
+
+                    <!-- Formulario de Login -->
+                    <div id="form-login-container" class="account-section">
+                        <h3 id="auth-title"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</h3>
+                        
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="auth-email" class="form-control" placeholder="tu_correo@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="auth-password" class="form-control" placeholder="Tu contraseña">
+                        </div>
+
+                        <button id="auth-submit-btn" onclick="ejecutarAutenticacion()" class="btn-action">Entrar a mi Cuenta</button>
+                    </div>
                 </div>
 
-                <!-- Secciones protegidas de la cuenta -->
-                <div id="protected-account-content">
+                <!-- SECCIÓN 2: Panel de Cuenta Protegido (Visible si SÍ hay sesión) -->
+                <div id="protected-account-content" style="display: none;">
                     <!-- Sección del Panel de Supabase (Si es Admin) -->
                     <div id="admin-panel-section" style="display: none; margin-bottom: 20px;">
                         <a href="https://supabase.com/dashboard" target="_blank" class="btn-action" style="background: #d97706;">
@@ -308,11 +337,13 @@
         </div>
     </footer>
 
-    <!-- Script de lógica de la cuenta, favoritos y Supabase -->
+    <!-- Script de lógica de la cuenta, favoritos, auth y Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let modoActualAuth = 'login'; // 'login' o 'register'
 
         // Menú desplegable
         function toggleMenuDesplegable() {
@@ -345,24 +376,80 @@
             }, 2500);
         }
 
+        // Alternar pestañas entre Iniciar Sesión y Registrarse
+        function cambiarModoAuth(modo) {
+            modoActualAuth = modo;
+            const titulo = document.getElementById('auth-title');
+            const btnSubmit = document.getElementById('auth-submit-btn');
+            const btnLoginTab = document.getElementById('tab-login-btn');
+            const btnRegisterTab = document.getElementById('tab-register-btn');
+
+            if (modo === 'login') {
+                titulo.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión`;
+                btnSubmit.textContent = 'Entrar a mi Cuenta';
+                btnLoginTab.style.background = '#238636';
+                btnLoginTab.className = 'btn-action';
+                btnRegisterTab.style.background = '';
+                btnRegisterTab.className = 'btn-action btn-secondary-custom';
+            } else {
+                titulo.innerHTML = `<i class="fa-solid fa-user-plus"></i> Crear una Cuenta`;
+                btnSubmit.textContent = 'Registrarse';
+                btnRegisterTab.style.background = '#238636';
+                btnRegisterTab.className = 'btn-action';
+                btnLoginTab.style.background = '';
+                btnLoginTab.className = 'btn-action btn-secondary-custom';
+            }
+        }
+
+        // Manejar Login o Registro directamente en la página
+        async function ejecutarAutenticacion() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if (!email || !password) {
+                mostrarNotificacion('Por favor completa todos los campos.');
+                return;
+            }
+
+            if (modoActualAuth === 'login') {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    mostrarNotificacion('Error al iniciar sesión: ' + error.message);
+                } else {
+                    mostrarNotificacion('¡Inicio de sesión exitoso!');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            } else {
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) {
+                    mostrarNotificacion('Error al registrarse: ' + error.message);
+                } else {
+                    mostrarNotificacion('¡Registro exitoso! Revisa tu correo para confirmar o inicia sesión.');
+                    cambiarModoAuth('login');
+                }
+            }
+        }
+
         // Cargar datos de la sesión de forma segura
         async function inicializarCuenta() {
-            // Damos un pequeño respiro para asegurar que Supabase lea las credenciales locales
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             
             if (error || !session) {
-                // Si no hay sesión, ocultamos el contenido protegido y mostramos el aviso amigable
-                document.getElementById('user-greeting').textContent = 'Acceso Restringido';
-                document.getElementById('user-email').textContent = 'Debes iniciar sesión para ver esta sección';
+                // Mostrar formulario de autenticación
+                document.getElementById('user-greeting').textContent = 'Bienvenido a TraduMaker';
+                document.getElementById('user-email').textContent = 'Inicia sesión o regístrate para continuar';
                 document.getElementById('protected-account-content').style.display = 'none';
                 document.getElementById('no-session-section').style.display = 'block';
                 return;
             }
 
+            // Ocultar autenticación y mostrar panel de cuenta
+            document.getElementById('no-session-section').style.display = 'none';
+            document.getElementById('protected-account-content').style.display = 'block';
+
             const user = session.user;
             document.getElementById('user-email').textContent = user.email;
 
-            // Consultar rol en la tabla usuarios_registrados
             const { data: perfil } = await supabaseClient
                 .from('usuarios_registrados')
                 .select('rol')
@@ -380,7 +467,6 @@
                 document.getElementById('user-greeting').textContent = `¡Bienvenido de nuevo!`;
             }
 
-            // Cargar juegos favoritos de forma segura en dos pasos
             await cargarMisFavoritos(user.id);
         }
 
@@ -471,7 +557,7 @@
 
         async function cerrarSesion() {
             await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
+            location.reload(); // Recarga la página para mostrar el formulario de login de inmediato
         }
 
         document.addEventListener('DOMContentLoaded', inicializarCuenta);
