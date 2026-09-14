@@ -3,538 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Cuenta - TraduMaker HL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>TraduMaker HL - Mi Cuenta | RPG Maker en Español</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
-    
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
-        .auth-container {
-            max-width: 480px;
+        .account-container {
+            max-width: 600px;
             margin: 40px auto;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 14px;
+            background: var(--bg-card, #161b22);
+            border: 1px solid var(--border-color, #30363d);
+            border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
-        .auth-header {
+        .account-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
-        .auth-header h2 {
+        .account-header i.fa-user-circle {
+            font-size: 4rem;
+            color: var(--accent, #73bfff);
+            margin-bottom: 10px;
+        }
+        .account-header h1 {
             font-family: 'Cinzel', serif;
-            color: white;
             font-size: 1.8rem;
-            margin-bottom: 8px;
+            color: #fff;
+            margin-bottom: 5px;
         }
-        .auth-header p {
-            color: #8b949e;
-            font-size: 0.9rem;
+        .account-header p {
+            color: var(--text-muted, #8b949e);
+            font-size: 0.95rem;
+        }
+        .account-section {
+            background: #0d1117;
+            border: 1px solid var(--border-color, #30363d);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .account-section h3 {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .form-group label {
             display: block;
-            color: #c9d1d9;
             font-size: 0.85rem;
-            margin-bottom: 6px;
-            font-weight: 500;
+            color: var(--text-muted, #8b949e);
+            margin-bottom: 5px;
         }
-        .form-group input {
+        .form-control {
             width: 100%;
-            padding: 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus {
+            background: #161b22;
+            border: 1px solid var(--border-color, #30363d);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
             outline: none;
-            border-color: #6366f1;
+            font-size: 0.95rem;
         }
-        .btn-submit {
+        .form-control:focus {
+            border-color: var(--accent, #73bfff);
+        }
+        .btn-action {
             width: 100%;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: #238636;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-        }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-        }
-        .btn-secundario {
-            background: #21262d;
-            border: 1px solid #30363d;
-            margin-top: 10px;
-        }
-        .btn-secundario:hover {
-            background: #30363d;
-            box-shadow: none;
-        }
-        .auth-toggle {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: #8b949e;
-        }
-        .auth-toggle a {
-            color: #818cf8;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .auth-toggle a:hover {
-            text-decoration: underline;
-        }
-        .user-panel {
-            text-align: center;
-        }
-        .user-panel h3 {
-            color: white;
-            font-family: 'Cinzel', serif;
-            margin-bottom: 15px;
-        }
-        .btn-logout {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: background 0.2s;
-            width: 100%;
-        }
-        .btn-logout:hover {
-            background: #dc2626;
-        }
-        .mensaje-alerta {
             padding: 10px;
             border-radius: 6px;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            display: none;
-            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .mensaje-error {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid #ef4444;
+        .btn-action:hover {
+            background: #2ea043;
         }
-        .mensaje-exito {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid #10b981;
+        .btn-danger-custom {
+            background: #da3633;
         }
-        .seccion-edicion {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            padding: 15px;
+        .btn-danger-custom:hover {
+            background: #f85149;
+        }
+        .toast-notificacion {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 20px;
             border-radius: 8px;
-            margin-top: 20px;
-            text-align: left;
+            border: 1px solid #374151;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            animation: fadeInOut 2.5s ease forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: rgba(124, 58, 237, 0.15);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .dropbtn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            border-color: var(--accent);
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #161b22;
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-content a {
+            color: var(--text-main);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: var(--accent);
+        }
+        .dropdown-content a.active {
+            background-color: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        .show {
+            display: block;
         }
     </style>
 </head>
 <body>
 
+    <!-- Navegación Profesional Multi-página -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
+            
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="cuenta.html" class="active"><i class="fa-solid fa-user"></i> Cuenta</a>
+                </div>
+            </div>
+
             <div class="nav-version">
-                <a href="index.html" style="color: #a78bfa; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-house"></i> Volver al Inicio</a>
+                <span>Versión 2.0</span>
             </div>
         </div>
     </header>
 
-    <main class="main-content" style="padding-top: 120px; padding-bottom: 60px;">
+    <!-- Contenido Principal: Cuenta / Perfil -->
+    <main class="main-content">
         <div class="container">
-            
-            <div class="auth-container" id="contenedorAuth">
-                
-                <!-- SECCIÓN LOGIN / REGISTRO -->
-                <div id="seccionFormulario">
-                    <div class="auth-header">
-                        <h2 id="tituloFormulario">Iniciar Sesión</h2>
-                        <p id="subtituloFormulario">Accede a tu cuenta en TraduMaker HL</p>
-                    </div>
+            <div class="account-container">
+                <div class="account-header">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <h1 id="user-greeting">Mi Cuenta</h1>
+                    <p id="user-email">Cargando información...</p>
+                </div>
 
-                    <div id="alertaBox" class="mensaje-alerta"></div>
+                <!-- Sección del Panel de Supabase (Si es Admin) -->
+                <div id="admin-panel-section" style="display: none; margin-bottom: 20px;">
+                    <a href="https://supabase.com/dashboard" target="_blank" class="btn-action" style="display: block; text-align: center; text-decoration: none; background: #d97706;">
+                        <i class="fa-solid fa-shield-halved"></i> Ir al Panel de Supabase
+                    </a>
+                </div>
 
-                    <form id="formAcceso" onsubmit="manejarAcceso(event)">
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
-                            <input type="email" id="inputEmail" required placeholder="tucorreo@dominio.com">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-lock"></i> Contraseña</label>
-                            <input type="password" id="inputPassword" required placeholder="••••••••">
-                        </div>
-                        
-                        <div id="contenedorOlvido" style="text-align: right; margin-bottom: 15px;">
-                            <a href="#" onclick="solicitarRecuperacionPassword(event)" style="font-size: 0.8rem; color: #818cf8; text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                        </div>
-
-                        <button type="submit" class="btn-submit" id="btnSubmitTexto">Entrar</button>
-                    </form>
-
-                    <div class="auth-toggle">
-                        <p id="textoToggle">¿No tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Regístrate aquí</a></p>
+                <!-- Sección de Mis Juegos Favoritos -->
+                <div class="account-section">
+                    <h3><i class="fa-solid fa-heart" style="color: #f85149;"></i> Mis Juegos Favoritos</h3>
+                    <div id="contenedor-favoritos">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando tus juegos favoritos...</p>
                     </div>
                 </div>
 
-                <!-- SECCIÓN DE PERFIL Y AJUSTES (Si hay sesión) -->
-                <div id="seccionPerfil" class="user-panel" style="display: none;">
-                    <div style="font-size: 3rem; color: #a78bfa; margin-bottom: 10px;">
-                        <i class="fa-solid fa-circle-user"></i>
+                <!-- Sección de Ajustes de Cuenta -->
+                <div class="account-section">
+                    <h3><i class="fa-solid fa-gear"></i> Ajustes de Cuenta</h3>
+                    
+                    <div class="form-group">
+                        <label for="nuevo-correo">Nuevo Correo</label>
+                        <input type="email" id="nuevo-correo" class="form-control" placeholder="Actualizar correo">
                     </div>
-                    <h3 id="texto-bienvenida">¡Hola, Usuario!</h3>
-                    <p id="texto-email-usuario" style="color: #8b949e; font-size: 0.9rem; margin-bottom: 15px;"></p>
+                    <button onclick="cambiarCorreo()" class="btn-action" style="margin-bottom: 20px;">Cambiar Correo</button>
 
-                    <div id="alertaPerfil" class="mensaje-alerta"></div>
-
-                    <!-- PANEL DE ADMINISTRADOR (Visible solo para nicolas123xz@gmail.com) -->
-                    <div id="panelAdmin" style="display: none; margin-bottom: 15px;">
-                        <a href="https://supabase.com" target="_blank" class="btn-submit" style="display: block; text-decoration: none; background: linear-gradient(135deg, #f59e0b, #d97706);">
-                            <i class="fa-solid fa-shield-halved"></i> Ir al Panel de Supabase
-                        </a>
+                    <div class="form-group">
+                        <label for="nueva-contrasena">Nueva Contraseña</label>
+                        <input type="password" id="nueva-contrasena" class="form-control" placeholder="Mínimo 6 caracteres">
                     </div>
-
-                    <!-- SECCIÓN DE JUEGOS FAVORITOS -->
-                    <div class="seccion-edicion" style="margin-top: 0px; margin-bottom: 15px;">
-                        <p style="color: white; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;">
-                            <i class="fa-solid fa-heart" style="color: #ef4444;"></i> Mis Juegos Favoritos
-                        </p>
-                        <div id="listaFavoritos" style="max-height: 150px; overflow-y: auto; color: #8b949e; font-size: 0.85rem; text-align: left;">
-                            <p>Cargando favoritos...</p>
-                        </div>
-                    </div>
-
-                    <!-- FORMULARIO PARA ACTUALIZAR DATOS -->
-                    <div class="seccion-edicion">
-                        <p style="color: white; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;"><i class="fa-solid fa-user-gear"></i> Ajustes de Cuenta</p>
-                        
-                        <div class="form-group" style="margin-bottom: 12px;">
-                            <label style="font-size: 0.75rem;">Nuevo Correo</label>
-                            <input type="email" id="nuevoEmailInput" placeholder="Actualizar correo">
-                        </div>
-                        <button onclick="actualizarCorreo()" class="btn-submit btn-secundario" style="padding: 8px; font-size: 0.85rem;">Cambiar Correo</button>
-
-                        <div class="form-group" style="margin-top: 15px; margin-bottom: 12px;">
-                            <label style="font-size: 0.75rem;">Nueva Contraseña</label>
-                            <input type="password" id="nuevaPasswordInput" placeholder="Mínimo 6 caracteres">
-                        </div>
-                        <button onclick="actualizarPassword()" class="btn-submit btn-secundario" style="padding: 8px; font-size: 0.85rem;">Cambiar Contraseña</button>
-                    </div>
-
-                    <button onclick="cerrarSesion()" class="btn-logout">
-                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-                    </button>
+                    <button onclick="cambiarContrasena()" class="btn-action">Cambiar Contraseña</button>
                 </div>
 
+                <!-- Botón de Cerrar Sesión -->
+                <button onclick="cerrarSesion()" class="btn-action btn-danger-custom">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </button>
             </div>
-
         </div>
     </main>
 
+    <!-- Footer Profesional -->
     <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
+                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="nosotros.html">Sobre Nosotros</a>
+                <a href="avances.html">Avances de Traducción</a>
+                <a href="apoyanos.html">Apóyanos</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Síguenos</h4>
+                <div class="social-icons">
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Creado con pasión por el <span>Team HL</span></p>
+            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
         </div>
     </footer>
 
+    <!-- Script de lógica de la cuenta, favoritos y Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let esModoRegistro = false;
-
-        function cambiarModoFormulario(e) {
-            e.preventDefault();
-            esModoRegistro = !esModoRegistro;
-            
-            const titulo = document.getElementById('tituloFormulario');
-            const subtitulo = document.getElementById('subtituloFormulario');
-            const btn = document.getElementById('btnSubmitTexto');
-            const toggle = document.getElementById('textoToggle');
-            const contenedorOlvido = document.getElementById('contenedorOlvido');
-
-            if (esModoRegistro) {
-                titulo.innerText = 'Crear Cuenta';
-                subtitulo.innerText = 'Regístrate para participar en votaciones';
-                btn.innerText = 'Registrarse';
-                toggle.innerHTML = '¿Ya tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Inicia sesión</a>';
-                if (contenedorOlvido) contenedorOlvido.style.display = 'none';
-            } else {
-                titulo.innerText = 'Iniciar Sesión';
-                subtitulo.innerText = 'Accede a tu cuenta en TraduMaker HL';
-                btn.innerText = 'Entrar';
-                toggle.innerHTML = '¿No tienes cuenta? <a href="#" onclick="cambiarModoFormulario(event)">Regístrate aquí</a>';
-                if (contenedorOlvido) contenedorOlvido.style.display = 'block';
-            }
-            ocultarAlerta();
+        // Menú desplegable
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
         }
 
-        function mostrarAlerta(mensaje, esError = true, idCaja = 'alertaBox') {
-            const caja = document.getElementById(idCaja);
-            caja.innerText = mensaje;
-            caja.className = `mensaje-alerta ${esError ? 'mensaje-error' : 'mensaje-exito'}`;
-            caja.style.display = 'block';
-        }
-
-        function ocultarAlerta() {
-            document.getElementById('alertaBox').style.display = 'none';
-            document.getElementById('alertaPerfil').style.display = 'none';
-        }
-
-        async function solicitarRecuperacionPassword(e) {
-            e.preventDefault();
-            ocultarAlerta();
-
-            const emailInput = document.getElementById('inputEmail').value.trim();
-            if (!emailInput) {
-                mostrarAlerta('Por favor, introduce tu correo electrónico arriba para recuperar tu contraseña.');
-                return;
-            }
-
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(emailInput, {
-                redirectTo: window.location.href,
-            });
-
-            if (error) {
-                mostrarAlerta('Error al enviar el correo: ' + error.message);
-            } else {
-                mostrarAlerta('¡Correo enviado! Revisa tu bandeja de entrada (y spam) para restablecer tu contraseña.', false);
-            }
-        }
-
-        async function manejarAcceso(event) {
-            event.preventDefault();
-            ocultarAlerta();
-
-            const email = document.getElementById('inputEmail').value.trim();
-            const password = document.getElementById('inputPassword').value;
-
-            if (esModoRegistro && email.toLowerCase() === 'nicolas123xz@gmail.com') {
-                mostrarAlerta('No está permitido registrar este correo desde el formulario público.');
-                return;
-            }
-
-            if (esModoRegistro) {
-                let ipUsuario = 'desconocida';
-                try {
-                    const respuestaIp = await fetch('https://api.ipify.org?format=json');
-                    const datosIp = await respuestaIp.json();
-                    ipUsuario = datosIp.ip;
-                } catch (e) {
-                    console.warn("No se pudo obtener la IP:", e);
-                }
-
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password
-                });
-
-                if (error) {
-                    mostrarAlerta(error.message);
-                } else {
-                    if (data && data.user) {
-                        await supabaseClient.from('usuarios_registrados').insert([{
-                            id: data.user.id,
-                            email: email,
-                            rol: 'usuario',
-                            ip: ipUsuario
-                        }]);
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
                     }
-                    mostrarAlerta('¡Cuenta creada con éxito! Ya puedes iniciar sesión.', false);
-                    esModoRegistro = false;
-                    cambiarModoFormulario(new Event('click'));
-                }
-            } else {
-                const { error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) {
-                    mostrarAlerta('Correo o contraseña incorrectos.');
-                } else {
-                    verificarSesionYSaludar();
                 }
             }
         }
 
-        // FUNCIONES PARA FAVORITOS
-        async function cargarFavoritos(userId) {
-            const contenedorLista = document.getElementById('listaFavoritos');
+        function mostrarNotificacion(mensaje) {
+            const viejaNoti = document.querySelector('.toast-notificacion');
+            if (viejaNoti) viejaNoti.remove();
+
+            const noti = document.createElement('div');
+            noti.className = 'toast-notificacion';
+            noti.innerHTML = `<i class="fa-solid fa-circle-info" style="color: #73bfff; margin-right: 6px;"></i> ${mensaje}`;
+            document.body.appendChild(noti);
+
+            setTimeout(() => {
+                if (noti) noti.remove();
+            }, 2500);
+        }
+
+        // Cargar datos de la sesión, rol y favoritos
+        async function inicializarCuenta() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
             
+            if (!session) {
+                // Si no hay sesión, redirigir al login o index (o mostrar aviso)
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const user = session.user;
+            document.getElementById('user-email').textContent = user.email;
+
+            // Consultar rol en la tabla usuarios_registrados
+            const { data: perfil } = await supabaseClient
+                .from('usuarios_registrados')
+                .select('rol')
+                .eq('id', user.id)
+                .single();
+
+            const rol = perfil ? perfil.rol : 'usuario';
+
+            if (rol === 'admin') {
+                document.getElementById('user-greeting').innerHTML = `¡Hola, Administrador! <i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i>`;
+                document.getElementById('admin-panel-section').style.display = 'block';
+            } else if (rol === 'moderador') {
+                document.getElementById('user-greeting').innerHTML = `¡Hola, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
+            } else {
+                document.getElementById('user-greeting').textContent = `¡Bienvenido de nuevo!`;
+            }
+
+            // Cargar juegos favoritos del usuario con la relación de la tabla juegos
+            await cargarMisFavoritos(user.id);
+        }
+
+        async function cargarMisFavoritos(userId) {
+            const contenedorFavoritos = document.getElementById('contenedor-favoritos');
+
             const { data, error } = await supabaseClient
-                .from('juegos_favoritos')
-                .select('*')
+                .from('favoritos')
+                .select(`
+                    id,
+                    juego_id,
+                    juegos (
+                        id,
+                        titulo,
+                        imagen,
+                        categoria
+                    )
+                `)
                 .eq('user_id', userId);
 
             if (error) {
-                contenedorLista.innerHTML = '<p style="color: #f87171;">Error al cargar favoritos.</p>';
+                console.error('Error al cargar favoritos:', error);
+                contenedorFavoritos.innerHTML = '<p style="color: #f85149; font-size: 0.9rem;">Error al cargar favoritos.</p>';
                 return;
             }
 
-            if (data.length === 0) {
-                contenedorLista.innerHTML = '<p>Aún no tienes juegos favoritos guardados.</p>';
+            if (!data || data.length === 0) {
+                contenedorFavoritos.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No tienes juegos favoritos guardados aún.</p>';
                 return;
             }
 
-            contenedorLista.innerHTML = '';
-            data.forEach(fav => {
-                const item = document.createElement('div');
-                item.style.display = 'flex';
-                item.style.justifyContent = 'space-between';
-                item.style.alignItems = 'center';
-                item.style.marginBottom = '6px';
-                item.style.padding = '4px 8px';
-                item.style.background = '#161b22';
-                item.style.borderRadius = '4px';
+            contenedorFavoritos.innerHTML = data.map(fav => {
+                const juego = fav.juegos;
+                if (!juego) return '';
 
-                item.innerHTML = `
-                    <span style="color: white;">${fav.juego_id}</span>
-                    <button onclick="eliminarFavorito('${fav.juego_id}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer;">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; background: #161b22; padding: 10px; border-radius: 6px; border: 1px solid #30363d;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://via.placeholder.com/50x35?text=HL'">
+                            <div>
+                                <h6 style="margin: 0; color: #fff; font-size: 0.9rem;">${juego.titulo}</h6>
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">${juego.categoria || 'RPG Maker'}</span>
+                            </div>
+                        </div>
+                        <a href="juego.html?id=${juego.id}" style="background: #238636; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Ver</a>
+                    </div>
                 `;
-                contenedorLista.appendChild(item);
-            });
+            }).join('');
         }
 
-        async function agregarFavorito(nombreJuego) {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                alert('Debes iniciar sesión para guardar favoritos.');
+        async function cambiarCorreo() {
+            const nuevoCorreo = document.getElementById('nuevo-correo').value.trim();
+            if (!nuevoCorreo) {
+                mostrarNotificacion('Por favor ingresa un correo válido.');
                 return;
             }
 
-            const { error } = await supabaseClient
-                .from('juegos_favoritos')
-                .insert([{ user_id: session.user.id, juego_id: nombreJuego }]);
-
+            const { error } = await supabaseClient.auth.updateUser({ email: nuevoCorreo });
             if (error) {
-                if (error.code === '23505') {
-                    alert('Este juego ya está en tus favoritos.');
-                } else {
-                    alert('Error al guardar: ' + error.message);
-                }
+                mostrarNotificacion('Error al actualizar correo: ' + error.message);
             } else {
-                alert('¡Juego añadido a favoritos!');
-                cargarFavoritos(session.user.id);
+                mostrarNotificacion('¡Correo actualizado! Revisa tu bandeja para confirmar.');
+                document.getElementById('nuevo-correo').value = '';
             }
         }
 
-        async function eliminarFavorito(nombreJuego) {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) return;
-
-            const { error } = await supabaseClient
-                .from('juegos_favoritos')
-                .delete()
-                .eq('user_id', session.user.id)
-                .eq('juego_id', nombreJuego);
-
-            if (error) {
-                alert('Error al eliminar.');
-            } else {
-                cargarFavoritos(session.user.id);
-            }
-        }
-
-        // FUNCIONES PARA ACTUALIZAR PERFIL
-        async function actualizarCorreo() {
-            const nuevoEmail = document.getElementById('nuevoEmailInput').value.trim();
-            if (!nuevoEmail) {
-                mostrarAlerta('Escribe un correo válido para actualizar.', true, 'alertaPerfil');
+        async function cambiarContrasena() {
+            const nuevaContrasena = document.getElementById('nueva-contrasena').value.trim();
+            if (nuevaContrasena.length < 6) {
+                mostrarNotificacion('La contraseña debe tener al menos 6 caracteres.');
                 return;
             }
 
-            const { error } = await supabaseClient.auth.updateUser({ email: nuevoEmail });
+            const { error } = await supabaseClient.auth.updateUser({ password: nuevaContrasena });
             if (error) {
-                mostrarAlerta('Error al actualizar correo: ' + error.message, true, 'alertaPerfil');
+                mostrarNotificacion('Error al actualizar contraseña: ' + error.message);
             } else {
-                mostrarAlerta('¡Correo de confirmación enviado a tu nueva dirección!', false, 'alertaPerfil');
-                document.getElementById('nuevoEmailInput').value = '';
-            }
-        }
-
-        async function actualizarPassword() {
-            const nuevaPassword = document.getElementById('nuevaPasswordInput').value;
-            if (!nuevaPassword || nuevaPassword.length < 6) {
-                mostrarAlerta('La contraseña debe tener al menos 6 caracteres.', true, 'alertaPerfil');
-                return;
-            }
-
-            const { error } = await supabaseClient.auth.updateUser({ password: nuevaPassword });
-            if (error) {
-                mostrarAlerta('Error al cambiar contraseña: ' + error.message, true, 'alertaPerfil');
-            } else {
-                mostrarAlerta('¡Contraseña actualizada con éxito!', false, 'alertaPerfil');
-                document.getElementById('nuevaPasswordInput').value = '';
-            }
-        }
-
-        async function verificarSesionYSaludar() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-
-            const seccionForm = document.getElementById('seccionFormulario');
-            const seccionPerfil = document.getElementById('seccionPerfil');
-            const elementoBienvenida = document.getElementById('texto-bienvenida');
-            const elementoEmail = document.getElementById('texto-email-usuario');
-            const panelAdmin = document.getElementById('panelAdmin');
-
-            if (session && session.user) {
-                seccionForm.style.display = 'none';
-                seccionPerfil.style.display = 'block';
-
-                const correo = session.user.email;
-                elementoEmail.innerText = correo;
-
-                if (correo.toLowerCase() === 'nicolas123xz@gmail.com') {
-                    elementoBienvenida.innerHTML = `¡Hola, Administrador! 🛡️`;
-                    panelAdmin.style.display = 'block';
-                } else {
-                    elementoBienvenida.innerHTML = `¡Hola, ${correo}!`;
-                    panelAdmin.style.display = 'none';
-                }
-
-                // Cargar favoritos del usuario actual
-                cargarFavoritos(session.user.id);
-            } else {
-                seccionForm.style.display = 'block';
-                seccionPerfil.style.display = 'none';
+                mostrarNotificacion('¡Contraseña actualizada con éxito!');
+                document.getElementById('nueva-contrasena').value = '';
             }
         }
 
         async function cerrarSesion() {
             await supabaseClient.auth.signOut();
-            document.getElementById('formAcceso').reset();
-            verificarSesionYSaludar();
+            window.location.href = 'index.html';
         }
 
-        document.addEventListener('DOMContentLoaded', verificarSesionYSaludar);
+        document.addEventListener('DOMContentLoaded', inicializarCuenta);
     </script>
 </body>
 </html>
