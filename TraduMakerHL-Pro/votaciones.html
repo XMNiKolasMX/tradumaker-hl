@@ -396,406 +396,525 @@
     </footer>
 
 <script>
-        // CREDENCIALES DE SUPABASE
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ========================================================
+    // 1. CREDENCIALES Y CONFIGURACIÓN INICIAL
+    // ========================================================
+    const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let totalJuegosActuales = 0;
-        let cachedIpUsuario = null;
+    let totalJuegosActuales = 0;
+    let cachedIpUsuario = null;
 
-        // LISTA BLANCA DE CORREOS DE MODERADORES
-        const CORREOS_MODERADORES = [
-            'moderador1@gmail.com',
-            'luismod@gmail.com',
-            'admin@tradumaker.com'
-        ];
+    // Lista blanca opcional de respaldo para correos de moderadores
+    const CORREOS_MODERADORES = [
+        'moderador1@gmail.com',
+        'luismod@gmail.com',
+        'admin@tradumaker.com'
+    ];
 
-        function esModerador(email) {
-            if (!email) return false;
-            const emailLower = email.toLowerCase().trim();
-            return CORREOS_MODERADORES.includes(emailLower) || emailLower.includes('moderador') || emailLower.includes('mod');
-        }
+    function esModerador(email) {
+        if (!email) return false;
+        const emailLower = email.toLowerCase().trim();
+        return CORREOS_MODERADORES.includes(emailLower) || emailLower.includes('moderador') || emailLower.includes('mod');
+    }
 
-        function esFechaVotacionCerrada() {
-            const fechaLimite = new Date('2026-09-30T23:59:59');
-            const ahora = new Date();
-            return ahora > fechaLimite;
-        }
+    function esFechaVotacionCerrada() {
+        const fechaLimite = new Date('2026-09-30T23:59:59');
+        const ahora = new Date();
+        return ahora > fechaLimite;
+    }
 
-        // MENÚ DESPLEGABLE Y CIERRE AL CLICKEAR FUERA
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
+    // ========================================================
+    // 2. MENÚ DESPLEGABLE Y UTILIDADES
+    // ========================================================
+    function toggleMenuDesplegable() {
+        document.getElementById("navDropdown").classList.toggle("show");
+    }
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
                 }
             }
         }
+    }
 
-        function toggleFormulario() {
-            if (esFechaVotacionCerrada()) {
-                alert('La fase de propuestas y votación pública ha finalizado.');
-                return;
-            }
-            if (totalJuegosActuales >= 10) {
-                alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
-                return;
-            }
-            const form = document.getElementById('form-proponer-container');
-            if (form) form.classList.toggle('activo');
+    function toggleFormulario() {
+        if (esFechaVotacionCerrada()) {
+            alert('La fase de propuestas y votación pública ha finalizado.');
+            return;
         }
-
-        function obtenerClientId() {
-            let clientId = localStorage.getItem('tradu_client_id');
-            if (!clientId) {
-                clientId = 'client_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
-                localStorage.setItem('tradu_client_id', clientId);
-            }
-            return clientId;
+        if (totalJuegosActuales >= 10) {
+            alert('Se ha alcanzado el límite máximo de 10 juegos en votación.');
+            return;
         }
+        const form = document.getElementById('form-proponer-container');
+        if (form) form.classList.toggle('activo');
+    }
 
-        async function obtenerIpUsuario() {
-            if (cachedIpUsuario) return cachedIpUsuario;
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                cachedIpUsuario = data.ip;
-                return cachedIpUsuario;
-            } catch (e) {
-                console.warn('No se pudo obtener la IP, continuando sin ella.');
-                return 'desconocida';
-            }
+    function obtenerClientId() {
+        let clientId = localStorage.getItem('tradu_client_id');
+        if (!clientId) {
+            clientId = 'client_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem('tradu_client_id', clientId);
         }
+        return clientId;
+    }
 
-        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL (Actualiza el botón de cuenta)
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-                const { data: perfil } = await supabaseClient
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
-            }
+    async function obtenerIpUsuario() {
+        if (cachedIpUsuario) return cachedIpUsuario;
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            cachedIpUsuario = data.ip;
+            return cachedIpUsuario;
+        } catch (e) {
+            console.warn('No se pudo obtener la IP, continuando sin ella.');
+            return 'desconocida';
         }
+    }
 
-        async function verificarAccesoModerador() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const panelModeracion = document.getElementById('panelModeracion');
+    // ========================================================
+    // 3. VERIFICACIÓN DE SESIÓN Y ROLES
+    // ========================================================
+    async function verificarSesionYRolesGlobal() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
 
-            if (panelModeracion) {
-                if (session && session.user && esModerador(session.user.email)) {
-                    panelModeracion.classList.add('active');
-                    cargarVotosAuditoria();
-                } else {
-                    panelModeracion.classList.remove('active');
-                }
-            }
-        }
-
-        // CARGAR JUEGOS DESDE SUPABASE
-        async function cargarVotaciones() {
-            await verificarAccesoModerador();
-            const grid = document.getElementById('grid-votaciones');
-            if (!grid) return;
-
-            const clientId = obtenerClientId();
-            const ipUsuario = await obtenerIpUsuario();
-            const votacionCerrada = esFechaVotacionCerrada();
-
-            if (votacionCerrada) {
-                const tituloPrin = document.getElementById('titulo-principal');
-                const subEstado = document.getElementById('subtitulo-estado');
-                const descEstado = document.getElementById('descripcion-estado');
-                const btnProponer = document.getElementById('contenedor-btn-proponer');
-
-                if (tituloPrin) tituloPrin.innerHTML = `¡Resultados Oficiales de Ganadores! 🏆 <span class="badge-beta" style="background:#10b981; color:white;">FINALIZADO</span>`;
-                if (subEstado) subEstado.innerHTML = `<i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> <span style="color: #f59e0b; font-weight:700;">¡Los 3 primeros puestos han sido anunciados para traducción!</span>`;
-                if (descEstado) descEstado.innerHTML = `La votación pública ha concluido. A partir de ahora, las funciones de votación están cerradas y el sistema opera en modo de consulta y registro de cuentas de usuario.`;
-                if (btnProponer) btnProponer.style.display = 'none';
-            }
-
-            try {
-                const [resJuegos, resVotosClient, resVotosIp] = await Promise.all([
-                    supabaseClient.from('votaciones').select('*').order('likes', { ascending: false }),
-                    supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('client_id', clientId),
-                    ipUsuario !== 'desconocida' ? supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('ip', ipUsuario) : Promise.resolve({ data: [] })
-                ]);
-
-                if (resJuegos.error) throw resJuegos.error;
-
-                const juegos = resJuegos.data;
-                const votosMap = {};
-
-                (resVotosClient.data || []).forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
-                if (resVotosIp && resVotosIp.data) {
-                    resVotosIp.data.forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
-                }
-
-                totalJuegosActuales = juegos ? juegos.length : 0;
-                const contadorLim = document.getElementById('contador-limite');
-                if (contadorLim) contadorLim.innerText = totalJuegosActuales;
-
-                if (!juegos || juegos.length === 0) {
-                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
-                    return;
-                }
-
-                grid.innerHTML = '';
-
-                juegos.forEach((juego, index) => {
-                    const likes = juego.likes || 0;
-                    const dislikes = juego.dislikes || 0;
-                    const totalVotos = likes + dislikes;
-                    const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
-
-                    let badgeHtml = '';
-                    if (votacionCerrada && index < 3) {
-                        badgeHtml = `<span class="badge-estado badge-true" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">🏆 ¡Ganador #${index + 1}!</span>`;
-                    } else if (juego.en_desarrollo === true) {
-                        badgeHtml = `<span class="badge-estado badge-true">✨ Se traduce</span>`;
-                    } else if (juego.en_desarrollo === false) {
-                        badgeHtml = `<span class="badge-estado badge-false">❌ No se traduce</span>`;
-                    }
-
-                    const tipoVotoPrevio = votosMap[juego.id];
-                    const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
-
-                    let imagenUrl = juego.imagen || '';
-                    if (imagenUrl && !imagenUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
-                        imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
-                    }
-
-                    let botonesAccionHtml = '';
-                    if (votacionCerrada) {
-                        botonesAccionHtml = `<div style="text-align: center; padding: 8px; background: #2a2f3f; border-radius: 6px; font-size: 0.8rem; color: #a0a0b0;">Votación Finalizada</div>`;
-                    } else {
-                        botonesAccionHtml = `
-                            <div class="acciones-votos">
-                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
-                                </button>
-                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
-                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
-                                </button>
-                            </div>
-                        `;
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = 'votacion-card';
-                    card.innerHTML = `
-                        <img src="${imagenUrl}" alt="${juego.titulo}" class="votacion-img" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'">
-                        <div class="votacion-body">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
-                                    ${badgeHtml}
-                                </div>
-                                <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
-                                <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción.'}</p>
-                                
-                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0a0b0;">
-                                    <span>👍 Aprobación</span>
-                                    <span>${porcentajeLikes}%</span>
-                                </div>
-                                <div class="progress-container">
-                                    <div class="progress-bar" style="width: ${porcentajeLikes}%;"></div>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #808090; margin-top: 2px;">
-                                    <span><strong style="color: #10b981;">${likes}</strong> Sí</span>
-                                    <span><strong style="color: #ef4444;">${dislikes}</strong> No</span>
-                                </div>
-                            </div>
-                            ${botonesAccionHtml}
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-
-            } catch (err) {
-                console.error("Error al cargar votaciones:", err);
-                grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al conectar con Supabase.</p>`;
-            }
-        }
-
-        async function votar(idJuego, tipo) {
-            if (esFechaVotacionCerrada()) {
-                alert('La votación pública ha finalizado.');
-                return;
-            }
-
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                alert('A partir del 30 de septiembre, es obligatorio iniciar sesión con una cuenta registrada para participar en las votaciones y dinámicas.');
-                window.location.href = 'cuenta.html';
-                return;
-            }
-
-            const clientId = obtenerClientId();
-            const ipUsuario = await obtenerIpUsuario();
-
-            const { error: errRegistro } = await supabaseClient
-                .from('registro_votos')
-                .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo, ip: ipUsuario }]);
-
-            if (errRegistro) {
-                alert('Ya has registrado un voto para este juego desde esta red o dispositivo.');
-                cargarVotaciones();
-                return;
-            }
-
-            const { data: juegoActual, error: errorFetch } = await supabaseClient
-                .from('votaciones')
-                .select('likes, dislikes')
-                .eq('id', idJuego)
+        if (session && session.user) {
+            const userId = session.user.id;
+            const { data: perfil } = await supabaseClient
+                .from('usuarios_registrados')
+                .select('rol')
+                .eq('id', userId)
                 .single();
 
-            if (errorFetch) {
-                alert('No se pudo actualizar el contador del juego.');
-                return;
-            }
+            const rol = perfil ? perfil.rol : 'usuario';
 
-            let nuevosLikes = juegoActual.likes || 0;
-            let nuevosDislikes = juegoActual.dislikes || 0;
-
-            if (tipo === 'like') {
-                nuevosLikes += 1;
-            } else {
-                nuevosDislikes += 1;
-            }
-
-            const { error: errorUpdate } = await supabaseClient
-                .from('votaciones')
-                .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
-                .eq('id', idJuego);
-
-            if (errorUpdate) {
-                alert('Hubo un error al actualizar los puntos del juego.');
-                return;
-            }
-
-            alert('¡Voto registrado con éxito!');
-            cargarVotaciones();
-        }
-
-        async function agregarJuego(event) {
-            event.preventDefault();
-
-            if (esFechaVotacionCerrada()) {
-                alert('El periodo de propuestas ha finalizado.');
-                return;
-            }
-
-            if (totalJuegosActuales >= 10) {
-                alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
-                return;
-            }
-
-            const titulo = document.getElementById('nuevo-titulo').value;
-            const descripcion = document.getElementById('nuevo-descripcion').value;
-            const imagen = document.getElementById('nuevo-imagen').value;
-
-            const { error } = await supabaseClient
-                .from('votaciones')
-                .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]);
-
-            if (error) {
-                console.error(error);
-                alert('Error al enviar la propuesta.');
-                return;
-            }
-
-            alert('¡Propuesta agregada con éxito!');
-            document.getElementById('form-juego').reset();
-            toggleFormulario();
-            cargarVotaciones();
-        }
-
-        async function cargarVotosAuditoria() {
-            const { data, error } = await supabaseClient
-                .from('registro_votos')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            const tbody = document.getElementById('tablaVotosBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            if (error || !data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #a0a0b0;">No hay votos registrados o error de carga.</td></tr>`;
-                return;
-            }
-
-            data.forEach(voto => {
-                const fechaFormateada = new Date(voto.created_at).toLocaleString();
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${fechaFormateada}</td>
-                    <td style="font-size: 0.8rem; color: #818cf8;">${voto.client_id ? voto.client_id.substring(0, 10) + '...' : 'N/D'}</td>
-                    <td>Juego #${voto.juego_id} (${voto.tipo_voto})</td>
-                    <td>${voto.ip || 'N/D'}</td>
-                    <td>
-                        <button class="btn-anular" onclick="anularVoto('${voto.id}')">
-                            <i class="fa-solid fa-trash-can"></i> Anular
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            enlacesCuenta.forEach(enlace => {
+                if (rol === 'admin') {
+                    enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                } else if (rol === 'moderador') {
+                    enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
+                } else {
+                    enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
+                }
+            });
+        } else {
+            enlacesCuenta.forEach(enlace => {
+                enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
             });
         }
+    }
 
-        async function anularVoto(votoId) {
-            if (!confirm('¿Estás seguro de que deseas anular y eliminar este voto de forma permanente?')) {
-                return;
+    async function verificarAccesoModerador() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const panelModeracion = document.getElementById('panelModeracion');
+
+        if (panelModeracion) {
+            if (session && session.user && (esModerador(session.user.email) || await esRolAdminMod(session.user.id))) {
+                panelModeracion.classList.add('active');
+            } else {
+                panelModeracion.classList.remove('active');
             }
+        }
+    }
 
-            const { error } = await supabaseClient
-                .from('registro_votos')
-                .delete()
-                .eq('id', votoId);
+    async function esRolAdminMod(userId) {
+        const { data: perfil } = await supabaseClient
+            .from('usuarios_registrados')
+            .select('rol')
+            .eq('id', userId)
+            .single();
+        return perfil && (perfil.rol === 'admin' || perfil.rol === 'moderador');
+    }
 
-            if (error) {
-                alert('No se pudo anular el voto: ' + error.message);
-                return;
-            }
+    // ========================================================
+    // 4. CARGAR JUEGOS Y RENDERIZAR VOTACIONES
+    // ========================================================
+    async function cargarVotaciones() {
+        await verificarAccesoModerador();
+        const grid = document.getElementById('grid-votaciones');
+        if (!grid) return;
 
-            alert('Voto anulado correctamente.');
-            cargarVotaciones();
+        const clientId = obtenerClientId();
+        const ipUsuario = await obtenerIpUsuario();
+        const votacionCerrada = esFechaVotacionCerrada();
+
+        if (votacionCerrada) {
+            const tituloPrin = document.getElementById('titulo-principal');
+            const subEstado = document.getElementById('subtitulo-estado');
+            const descEstado = document.getElementById('descripcion-estado');
+            const btnProponer = document.getElementById('contenedor-btn-proponer');
+
+            if (tituloPrin) tituloPrin.innerHTML = `¡Resultados Oficiales de Ganadores! 🏆 <span class="badge-beta" style="background:#10b981; color:white;">FINALIZADO</span>`;
+            if (subEstado) subEstado.innerHTML = `<i class="fa-solid fa-trophy" style="color: #f59e0b;"></i> <span style="color: #f59e0b; font-weight:700;">¡Los 3 primeros puestos han sido anunciados para traducción!</span>`;
+            if (descEstado) descEstado.innerHTML = `La votación pública ha concluido. A partir de ahora, las funciones de votación están cerradas y el sistema opera en modo de consulta y registro de cuentas de usuario.`;
+            if (btnProponer) btnProponer.style.display = 'none';
         }
 
-        // INICIALIZACIÓN AL CARGAR LA PÁGINA
-        document.addEventListener('DOMContentLoaded', () => {
-            verificarSesionYRolesGlobal();
+        try {
+            const [resJuegos, resVotosClient, resVotosIp] = await Promise.all([
+                supabaseClient.from('votaciones').select('*').order('likes', { ascending: false }),
+                supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('client_id', clientId),
+                ipUsuario !== 'desconocida' ? supabaseClient.from('registro_votos').select('juego_id, tipo_voto').eq('ip', ipUsuario) : Promise.resolve({ data: [] })
+            ]);
+
+            if (resJuegos.error) throw resJuegos.error;
+
+            const juegos = resJuegos.data;
+            const votosMap = {};
+
+            (resVotosClient.data || []).forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
+            if (resVotosIp && resVotosIp.data) {
+                resVotosIp.data.forEach(v => { votosMap[v.juego_id] = v.tipo_voto; });
+            }
+
+            totalJuegosActuales = juegos ? juegos.length : 0;
+            const contadorLim = document.getElementById('contador-limite');
+            if (contadorLim) contadorLim.innerText = totalJuegosActuales;
+
+            if (!juegos || juegos.length === 0) {
+                grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            juegos.forEach((juego, index) => {
+                const likes = juego.likes || 0;
+                const dislikes = juego.dislikes || 0;
+                const totalVotos = likes + dislikes;
+                const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
+
+                let badgeHtml = '';
+                if (votacionCerrada && index < 3) {
+                    badgeHtml = `<span class="badge-estado badge-true" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">🏆 ¡Ganador #${index + 1}!</span>`;
+                } else if (juego.en_desarrollo === true) {
+                    badgeHtml = `<span class="badge-estado badge-true">✨ Se traduce</span>`;
+                } else if (juego.en_desarrollo === false) {
+                    badgeHtml = `<span class="badge-estado badge-false">❌ No se traduce</span>`;
+                }
+
+                const tipoVotoPrevio = votosMap[juego.id];
+                const yaVotoEsteJuego = tipoVotoPrevio !== undefined;
+
+                let imagenUrl = juego.imagen || '';
+                if (imagenUrl && !imagenUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                    imagenUrl = `https://wsrv.nl/?url=${encodeURIComponent(imagenUrl)}&w=500&h=300&fit=cover`;
+                }
+
+                let botonesAccionHtml = '';
+                if (votacionCerrada) {
+                    botonesAccionHtml = `<div style="text-align: center; padding: 8px; background: #2a2f3f; border-radius: 6px; font-size: 0.8rem; color: #a0a0b0;">Votación Finalizada</div>`;
+                } else {
+                    botonesAccionHtml = `
+                        <div class="acciones-votos">
+                            <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
+                            </button>
+                            <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'votacion-card';
+                card.innerHTML = `
+                    <img src="${imagenUrl}" alt="${juego.titulo}" class="votacion-img" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop'">
+                    <div class="votacion-body">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 0.8rem; background: #2a2f3f; color: #34d399; padding: 3px 8px; border-radius: 4px; font-weight: 600;">#${index + 1} en ranking</span>
+                                ${badgeHtml}
+                            </div>
+                            <h3 style="color: white; font-size: 1.2rem; margin-bottom: 8px; font-family: 'Cinzel', serif;">${juego.titulo}</h3>
+                            <p style="color: #a0a0b0; font-size: 0.85rem; line-height: 1.4; margin-bottom: 10px;">${juego.descripcion || 'Sin descripción.'}</p>
+                            
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a0a0b0;">
+                                <span>👍 Aprobación</span>
+                                <span>${porcentajeLikes}%</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${porcentajeLikes}%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #808090; margin-top: 2px;">
+                                <span><strong style="color: #10b981;">${likes}</strong> Sí</span>
+                                <span><strong style="color: #ef4444;">${dislikes}</strong> No</span>
+                            </div>
+                        </div>
+                        ${botonesAccionHtml}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+        } catch (err) {
+            console.error("Error al cargar votaciones:", err);
+            grid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al conectar con Supabase.</p>`;
+        }
+    }
+
+    // ========================================================
+    // 5. ACCIONES DE VOTO Y PROPUESTAS
+    // ========================================================
+    async function votar(idJuego, tipo) {
+        if (esFechaVotacionCerrada()) {
+            alert('La votación pública ha finalizado.');
+            return;
+        }
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            alert('A partir del 30 de septiembre, es obligatorio iniciar sesión con una cuenta registrada para participar en las votaciones y dinámicas.');
+            window.location.href = 'cuenta.html';
+            return;
+        }
+
+        const clientId = obtenerClientId();
+        const ipUsuario = await obtenerIpUsuario();
+        const userId = session.user.id;
+
+        const { error: errRegistro } = await supabaseClient
+            .from('registro_votos')
+            .insert([{ client_id: clientId, juego_id: idJuego, tipo_voto: tipo, ip: ipUsuario, usuario_id: userId }]);
+
+        if (errRegistro) {
+            alert('Ya has registrado un voto para este juego desde esta red, cuenta o dispositivo.');
             cargarVotaciones();
-        });
-    </script>
+            return;
+        }
+
+        const { data: juegoActual, error: errorFetch } = await supabaseClient
+            .from('votaciones')
+            .select('likes, dislikes')
+            .eq('id', idJuego)
+            .single();
+
+        if (errorFetch) {
+            alert('No se pudo actualizar el contador del juego.');
+            return;
+        }
+
+        let nuevosLikes = juegoActual.likes || 0;
+        let nuevosDislikes = juegoActual.dislikes || 0;
+
+        if (tipo === 'like') {
+            nuevosLikes += 1;
+        } else {
+            nuevosDislikes += 1;
+        }
+
+        const { error: errorUpdate } = await supabaseClient
+            .from('votaciones')
+            .update({ likes: nuevosLikes, dislikes: nuevosDislikes })
+            .eq('id', idJuego);
+
+        if (errorUpdate) {
+            alert('Hubo un error al actualizar los puntos del juego.');
+            return;
+        }
+
+        alert('¡Voto registrado con éxito!');
+        cargarVotaciones();
+    }
+
+    async function agregarJuego(event) {
+        event.preventDefault();
+
+        if (esFechaVotacionCerrada()) {
+            alert('El periodo de propuestas ha finalizado.');
+            return;
+        }
+
+        if (totalJuegosActuales >= 10) {
+            alert('Se ha alcanzado el límite máximo de 10 juegos. No se pueden agregar más propuestas.');
+            return;
+        }
+
+        const titulo = document.getElementById('nuevo-titulo').value;
+        const descripcion = document.getElementById('nuevo-descripcion').value;
+        const imagen = document.getElementById('nuevo-imagen').value;
+
+        const { error } = await supabaseClient
+            .from('votaciones')
+            .insert([{ titulo, descripcion, imagen, likes: 1, dislikes: 0 }]);
+
+        if (error) {
+            console.error(error);
+            alert('Error al enviar la propuesta.');
+            return;
+        }
+
+        alert('¡Propuesta agregada con éxito!');
+        document.getElementById('form-juego').reset();
+        toggleFormulario();
+        cargarVotaciones();
+    }
+
+    // ========================================================
+    // 6. PANEL DE AUDITORÍA Y MODERACIÓN (CON BANEO SEGURO)
+    // ========================================================
+    async function cargarVotosAuditoria() {
+        abrirModalModeracionVotaciones();
+    }
+
+    async function abrirModalModeracionVotaciones() {
+        let modalExistente = document.getElementById('modalModeracionVotaciones');
+        if (modalExistente) modalExistente.remove();
+
+        const { data: votos, error } = await supabaseClient
+            .from('registro_votos')
+            .select('*, usuarios_registrados(email, rol, banned_until)')
+            .order('created_at', { ascending: false });
+
+        const modalHTML = `
+            <div id="modalModeracionVotaciones" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; font-family: 'Poppins', sans-serif;">
+                <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; padding: 25px; color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #a78bfa;"><i class="fa-solid fa-shield-halved"></i> Panel de Verificación de Votos</h3>
+                        <button onclick="document.getElementById('modalModeracionVotaciones').remove()" style="background: transparent; border: none; color: #8b949e; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; font-size: 0.85rem; color: #8b949e;">
+                        Gestión de registros de votos y control de usuarios (Protegido contra castigos entre rangos administrativos).
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #30363d; color: #8b949e;">
+                                    <th style="padding: 10px;">Usuario / Correo</th>
+                                    <th style="padding: 10px;">Juego / Tipo</th>
+                                    <th style="padding: 10px;">IP / Fecha</th>
+                                    <th style="padding: 10px; text-align: center;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${generarFilasTablaVotos(votos, error)}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    function generarFilasTablaVotos(votos, error) {
+        if (error) return `<tr><td colspan="4" style="color: #f87171; text-align: center; padding: 20px;">Error: ${error.message}</td></tr>`;
+        if (!votos || votos.length === 0) return `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #8b949e;">No hay votos registrados.</td></tr>`;
+
+        return votos.map(v => {
+            const emailUser = v.usuarios_registrados?.email || 'Desconocido / Invitado';
+            const rolUser = v.usuarios_registrados?.rol || 'usuario';
+            const fechaFormateada = v.created_at ? new Date(v.created_at).toLocaleString() : 'N/D';
+            const userIdVal = v.usuario_id || v.user_id || '';
+            
+            return `
+                <tr style="border-bottom: 1px solid #21262d;">
+                    <td style="padding: 10px;">
+                        ${emailUser}<br>
+                        <span style="font-size: 0.7rem; color: #8b949e; background: #21262d; padding: 2px 6px; border-radius: 4px;">${rolUser}</span>
+                    </td>
+                    <td style="padding: 10px;">
+                        Juego #${v.juego_id}<br>
+                        <span style="color: ${v.tipo_voto === 'like' ? '#34d399' : '#f87171'}; font-weight: bold;">${v.tipo_voto}</span>
+                    </td>
+                    <td style="padding: 10px; font-size: 0.75rem; color: #8b949e;">
+                        ${v.ip || 'N/D'}<br>${fechaFormateada}
+                    </td>
+                    <td style="padding: 10px; text-align: center;">
+                        <button onclick="anularVoto('${v.id}')" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; padding: 5px 10px; border-radius: 6px; cursor: pointer; margin-right: 5px;" title="Borrar voto spam">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button onclick="promptBanearUsuario('${userIdVal}', '${emailUser}', '${rolUser}')" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; padding: 5px 10px; border-radius: 6px; cursor: pointer;" title="Banear usuario">
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function anularVoto(votoId) {
+        if (!confirm('¿Estás seguro de que deseas anular y eliminar este voto de forma permanente?')) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('registro_votos')
+            .delete()
+            .eq('id', votoId);
+
+        if (error) {
+            alert('No se pudo anular el voto: ' + error.message);
+            return;
+        }
+
+        alert('Voto anulado correctamente.');
+        if (document.getElementById('modalModeracionVotaciones')) {
+            abrirModalModeracionVotaciones();
+        }
+        cargarVotaciones();
+    }
+
+    function promptBanearUsuario(userId, emailUser, rolUser) {
+        if (!userId) {
+            alert("No se pudo identificar el ID del usuario asociado a este voto (puede tratarse de un invitado anónimo).");
+            return;
+        }
+
+        // REGLA DE SEGURIDAD ESTRICTA: Ningún admin o mod puede ser baneado
+        if (rolUser === 'admin' || rolUser === 'moderador') {
+            alert(`Acción bloqueada: No puedes banear al usuario ${emailUser} porque tiene el rango de ${rolUser}.`);
+            return;
+        }
+
+        const dias = prompt(`¿Cuántos días deseas banear a ${emailUser}?`, "7");
+        if (dias === null) return;
+        
+        const diasNum = parseInt(dias);
+        if (isNaN(diasNum) || diasNum <= 0) {
+            alert("Por favor, ingresa un número de días válido.");
+            return;
+        }
+
+        ejecutarBaneoUsuario(userId, diasNum);
+    }
+
+    async function ejecutarBaneoUsuario(userId, diasBaneo) {
+        const fechaBaneo = new Date();
+        fechaBaneo.setDate(fechaBaneo.getDate() + diasBaneo);
+
+        const { error } = await supabaseClient
+            .from('usuarios_registrados')
+            .update({ banned_until: fechaBaneo.toISOString() })
+            .eq('id', userId);
+
+        if (error) {
+            alert("Error al aplicar el baneo: " + error.message);
+        } else {
+            alert(`Usuario suspendido con éxito por ${diasBaneo} días.`);
+            abrirModalModeracionVotaciones();
+        }
+    }
+
+    // ========================================================
+    // 7. INICIALIZACIÓN GLOBAL AL CARGAR LA PÁGINA
+    // ========================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        verificarSesionYRolesGlobal();
+        cargarVotaciones();
+    });
+</script>
 </body>
 </html>
