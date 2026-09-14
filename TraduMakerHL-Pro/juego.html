@@ -8,10 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
-    
+
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
         /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
@@ -142,7 +142,7 @@
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
-            
+
             <!-- Menú Desplegable (Dropdown) -->
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
@@ -155,6 +155,7 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <!-- Enlace de cuenta dinámico -->
                     <a href="cuenta.html">
                         <i class="fa-solid fa-user"></i> Cuenta 
                         <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
@@ -194,65 +195,6 @@
     </footer>
 
     <script>
-        <!-- Script para el Menú Desplegable y Control de Sesión Global -->
-    <script>
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
-
-        // Cerrar el menú si el usuario hace clic fuera de él
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseGlobal = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseGlobal.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-
-                // Consultar rol en la base de datos
-                const { data: perfil } = await supabaseGlobal
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', verificarSesionYRolesGlobal);
-
-        
         // CREDENCIALES DE SUPABASE
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -273,6 +215,38 @@
                         openDropdown.classList.remove('show');
                     }
                 }
+            }
+        }
+
+        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
+        async function verificarSesionYRolesGlobal() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
+
+            if (session && session.user) {
+                const userId = session.user.id;
+
+                const { data: perfil } = await supabaseClient
+                    .from('usuarios_registrados')
+                    .select('rol')
+                    .eq('id', userId)
+                    .single();
+
+                const rol = perfil ? perfil.rol : 'usuario';
+
+                enlacesCuenta.forEach(enlace => {
+                    if (rol === 'admin') {
+                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
+                    } else if (rol === 'moderador') {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
+                    } else {
+                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
+                    }
+                });
+            } else {
+                enlacesCuenta.forEach(enlace => {
+                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
+                });
             }
         }
 
@@ -374,7 +348,7 @@
 
             btnDescargar.addEventListener('click', async () => {
                 const nuevasDescargas = descargasActuales + 1;
-                
+
                 const { error } = await supabaseClient
                     .from('juegos')
                     .update({ descargas: nuevasDescargas })
@@ -419,8 +393,9 @@
             });
         }
 
-        // Lógica del Easter Egg intermitente / interactivo
+        // Lógica de inicio de página
         document.addEventListener('DOMContentLoaded', () => {
+            verificarSesionYRolesGlobal();
             cargarJuego();
 
             const logoEgg = document.getElementById('easter-egg-logo');
