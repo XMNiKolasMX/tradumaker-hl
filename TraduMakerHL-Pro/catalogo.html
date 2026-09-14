@@ -102,6 +102,26 @@
             display: none;
         }
 
+        /* Estilos del Botón de Favoritos */
+        .btn-favorito {
+            background: rgba(22, 27, 34, 0.8) !important;
+            border: 1px solid var(--border-color, #30363d) !important;
+            border-radius: 50% !important;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-favorito:hover {
+            transform: scale(1.1);
+            background: rgba(22, 27, 34, 1) !important;
+        }
+        .text-warning { color: #f59e0b !important; }
+        .text-secondary { color: #8b949e !important; }
+
         /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
             position: relative;
@@ -193,7 +213,6 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <!-- Enlace preparado para la verificación de sesión y roles -->
                     <a href="cuenta.html">
                         <i class="fa-solid fa-user"></i> Cuenta 
                         <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
@@ -279,6 +298,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let todosLosJuegos = [];
+        let idsFavoritosUsuario = [];
         let vistaActual = 'grid';
 
         // Función para abrir/cerrar el menú desplegable de navegación
@@ -299,9 +319,30 @@
             }
         }
 
+        async function cargarFavoritosUsuario() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session || !session.user) return;
+
+                const { data, error } = await supabaseClient
+                    .from('favoritos') // Ajusta el nombre de tu tabla de favoritos si es distinta (ej: 'juegos_favoritos')
+                    .select('juego_id')
+                    .eq('user_id', session.user.id);
+
+                if (!error && data) {
+                    idsFavoritosUsuario = data.map(fav => fav.juego_id);
+                }
+            } catch (err) {
+                console.error("Error al cargar favoritos:", err);
+            }
+        }
+
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
+                // Cargamos los favoritos del usuario primero si ha iniciado sesión
+                await cargarFavoritosUsuario();
+
                 // Solo cargamos los juegos que ya están traducidos (true) para el catálogo público
                 const { data, error } = await supabaseClient
                     .from('juegos')
@@ -315,6 +356,50 @@
             } catch (err) {
                 console.error(err);
                 contenedor.innerHTML = '<p class="error-msg">Error al conectar con Supabase. Verifica tus credenciales.</p>';
+            }
+        }
+
+        async function toggleFavorito(juegoId, btnElement) {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session || !session.user) {
+                    alert("Debes iniciar sesión para agregar juegos a favoritos.");
+                    window.location.href = "cuenta.html";
+                    return;
+                }
+
+                const userId = session.user.id;
+                const icono = btnElement.querySelector('i');
+                const esFavorito = idsFavoritosUsuario.includes(juegoId);
+
+                if (esFavorito) {
+                    // Eliminar de favoritos
+                    const { error } = await supabaseClient
+                        .from('favoritos')
+                        .delete()
+                        .eq('user_id', userId)
+                        .eq('juego_id', juegoId);
+
+                    if (error) throw error;
+
+                    idsFavoritosUsuario = idsFavoritosUsuario.filter(id => id !== juegoId);
+                    icono.className = 'far text-secondary fa-star fs-5';
+                    btnElement.title = "Agregar a favoritos";
+                } else {
+                    // Agregar a favoritos
+                    const { error } = await supabaseClient
+                        .from('favoritos')
+                        .insert([{ user_id: userId, juego_id: juegoId }]);
+
+                    if (error) throw error;
+
+                    idsFavoritosUsuario.push(juegoId);
+                    icono.className = 'fas text-warning fa-star fs-5';
+                    btnElement.title = "Quitar de favoritos";
+                }
+            } catch (err) {
+                console.error("Error al actualizar favorito:", err);
+                alert("Ocurrió un error al actualizar tus favoritos.");
             }
         }
 
@@ -349,18 +434,31 @@
                 return;
             }
 
-            contenedor.innerHTML = juegos.map(juego => `
-                <div class="game-card">
-                    <div class="game-img-container">
-                        <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                        <span class="game-tag">${juego.categoria || 'RPG Maker'}</span>
+            contenedor.innerHTML = juegos.map(juego => {
+                const esFavorito = idsFavoritosUsuario.includes(juego.id);
+                const claseEstrella = esFavorito ? 'fas text-warning' : 'far text-secondary';
+                const tituloBoton = esFavorito ? "Quitar de favoritos" : "Agregar a favoritos";
+
+                return `
+                    <div class="game-card position-relative">
+                        <!-- Botón de Favorito con Estrellita -->
+                        <button class="btn btn-sm position-absolute top-0 end-0 m-3 btn-favorito" 
+                                onclick="toggleFavorito('${juego.id}', this)"
+                                title="${tituloBoton}">
+                            <i class="${claseEstrella} fa-star fs-5"></i>
+                        </button>
+
+                        <div class="game-img-container">
+                            <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                            <span class="game-tag">${juego.categoria || 'RPG Maker'}</span>
+                        </div>
+                        <div class="game-info">
+                            <h3 class="game-title">${juego.titulo}</h3>
+                            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        </div>
                     </div>
-                    <div class="game-info">
-                        <h3 class="game-title">${juego.titulo}</h3>
-                        <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function cambiarVista(modo) {
