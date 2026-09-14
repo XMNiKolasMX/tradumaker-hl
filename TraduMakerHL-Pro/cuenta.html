@@ -85,6 +85,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
         }
         .btn-action:hover {
             background: #2ea043;
@@ -117,7 +120,7 @@
             100% { opacity: 0; transform: translateY(20px); }
         }
 
-        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        /* Menú Desplegable (Dropdown) */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -196,7 +199,6 @@
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
             
-            <!-- Menú Desplegable (Dropdown) -->
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
                     <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
@@ -228,42 +230,51 @@
                     <p id="user-email">Cargando información...</p>
                 </div>
 
-                <!-- Sección del Panel de Supabase (Si es Admin) -->
-                <div id="admin-panel-section" style="display: none; margin-bottom: 20px;">
-                    <a href="https://supabase.com/dashboard" target="_blank" class="btn-action" style="display: block; text-align: center; text-decoration: none; background: #d97706;">
-                        <i class="fa-solid fa-shield-halved"></i> Ir al Panel de Supabase
-                    </a>
+                <!-- Contenedor dinámico si no hay sesión -->
+                <div id="no-session-section" style="display: none; text-align: center; padding: 20px 0;">
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">No has iniciado sesión o tu sesión ha expirado.</p>
+                    <a href="index.html" class="btn-action"><i class="fa-solid fa-right-to-bracket"></i> Ir a Iniciar Sesión</a>
                 </div>
 
-                <!-- Sección de Mis Juegos Favoritos -->
-                <div class="account-section">
-                    <h3><i class="fa-solid fa-heart" style="color: #f85149;"></i> Mis Juegos Favoritos</h3>
-                    <div id="contenedor-favoritos">
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando tus juegos favoritos...</p>
+                <!-- Secciones protegidas de la cuenta -->
+                <div id="protected-account-content">
+                    <!-- Sección del Panel de Supabase (Si es Admin) -->
+                    <div id="admin-panel-section" style="display: none; margin-bottom: 20px;">
+                        <a href="https://supabase.com/dashboard" target="_blank" class="btn-action" style="background: #d97706;">
+                            <i class="fa-solid fa-shield-halved"></i> Ir al Panel de Supabase
+                        </a>
                     </div>
+
+                    <!-- Sección de Mis Juegos Favoritos -->
+                    <div class="account-section">
+                        <h3><i class="fa-solid fa-heart" style="color: #f85149;"></i> Mis Juegos Favoritos</h3>
+                        <div id="contenedor-favoritos">
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando tus juegos favoritos...</p>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Ajustes de Cuenta -->
+                    <div class="account-section">
+                        <h3><i class="fa-solid fa-gear"></i> Ajustes de Cuenta</h3>
+                        
+                        <div class="form-group">
+                            <label for="nuevo-correo">Nuevo Correo</label>
+                            <input type="email" id="nuevo-correo" class="form-control" placeholder="Actualizar correo">
+                        </div>
+                        <button onclick="cambiarCorreo()" class="btn-action" style="margin-bottom: 20px;">Cambiar Correo</button>
+
+                        <div class="form-group">
+                            <label for="nueva-contrasena">Nueva Contraseña</label>
+                            <input type="password" id="nueva-contrasena" class="form-control" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <button onclick="cambiarContrasena()" class="btn-action">Cambiar Contraseña</button>
+                    </div>
+
+                    <!-- Botón de Cerrar Sesión -->
+                    <button onclick="cerrarSesion()" class="btn-action btn-danger-custom">
+                        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                    </button>
                 </div>
-
-                <!-- Sección de Ajustes de Cuenta -->
-                <div class="account-section">
-                    <h3><i class="fa-solid fa-gear"></i> Ajustes de Cuenta</h3>
-                    
-                    <div class="form-group">
-                        <label for="nuevo-correo">Nuevo Correo</label>
-                        <input type="email" id="nuevo-correo" class="form-control" placeholder="Actualizar correo">
-                    </div>
-                    <button onclick="cambiarCorreo()" class="btn-action" style="margin-bottom: 20px;">Cambiar Correo</button>
-
-                    <div class="form-group">
-                        <label for="nueva-contrasena">Nueva Contraseña</label>
-                        <input type="password" id="nueva-contrasena" class="form-control" placeholder="Mínimo 6 caracteres">
-                    </div>
-                    <button onclick="cambiarContrasena()" class="btn-action">Cambiar Contraseña</button>
-                </div>
-
-                <!-- Botón de Cerrar Sesión -->
-                <button onclick="cerrarSesion()" class="btn-action btn-danger-custom">
-                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-                </button>
             </div>
         </div>
     </main>
@@ -334,12 +345,17 @@
             }, 2500);
         }
 
-        // Cargar datos de la sesión, rol y favoritos
+        // Cargar datos de la sesión de forma segura
         async function inicializarCuenta() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
+            // Damos un pequeño respiro para asegurar que Supabase lea las credenciales locales
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
             
-            if (!session) {
-                window.location.href = 'index.html';
+            if (error || !session) {
+                // Si no hay sesión, ocultamos el contenido protegido y mostramos el aviso amigable
+                document.getElementById('user-greeting').textContent = 'Acceso Restringido';
+                document.getElementById('user-email').textContent = 'Debes iniciar sesión para ver esta sección';
+                document.getElementById('protected-account-content').style.display = 'none';
+                document.getElementById('no-session-section').style.display = 'block';
                 return;
             }
 
@@ -371,7 +387,6 @@
         async function cargarMisFavoritos(userId) {
             const contenedorFavoritos = document.getElementById('contenedor-favoritos');
 
-            // 1. Obtenemos los IDs de los juegos favoritos del usuario
             const { data: favs, error: errorFavs } = await supabaseClient
                 .from('favoritos')
                 .select('juego_id')
@@ -388,10 +403,8 @@
                 return;
             }
 
-            // Extraemos los IDs
             const juegoIds = favs.map(f => f.juego_id);
 
-            // 2. Consultamos los detalles directamente de la tabla 'juegos'
             const { data: juegos, error: errorJuegos } = await supabaseClient
                 .from('juegos')
                 .select('id, titulo, imagen, categoria')
@@ -408,7 +421,6 @@
                 return;
             }
 
-            // 3. Renderizamos las tarjetas en el perfil
             contenedorFavoritos.innerHTML = juegos.map(juego => {
                 return `
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; background: #161b22; padding: 10px; border-radius: 6px; border: 1px solid #30363d;">
