@@ -553,3 +553,135 @@ body {
     border: 1px solid rgba(245, 158, 11, 0.3);
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
 }
+
+/* ========================================================================== */
+/* ESTILOS DEL MODAL DE VERIFICACIÓN +18 Y TÉRMINOS                         */
+/* ========================================================================== */
+
+.verificacion-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 15, 25, 0.98);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    padding: 20px;
+}
+.verificacion-overlay.oculto {
+    display: none;
+}
+.verificacion-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    color: var(--text-main);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+.verificacion-card i.fa-triangle-exclamation {
+    font-size: 2.5rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+.verificacion-card h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: white;
+}
+.verificacion-card > p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+.terminos-scroll-box {
+    text-align: left;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.terminos-scroll-box h4 {
+    color: white;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-family: 'Cinzel', serif;
+}
+.terminos-scroll-box h4:first-child {
+    margin-top: 0;
+}
+.terminos-scroll-box p {
+    margin-bottom: 10px;
+}
+.terminos-check-container {
+    text-align: left;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    cursor: pointer;
+    background: rgba(124, 58, 237, 0.05);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.terminos-check-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+.botones-verificacion {
+    display: flex;
+    gap: 15px;
+}
+.btn-edad {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+.btn-si {
+    background: var(--accent);
+    color: white;
+}
+.btn-si:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+.btn-si:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.btn-no {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+.btn-no:hover {
+    background: #ef4444;
+    color: white;
+}
