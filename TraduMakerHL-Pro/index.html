@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="inicio.css">
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
+ <style>
         /* Estilos actualizados para el Modal con Términos Completos */
         .verificacion-overlay {
             position: fixed;
@@ -32,31 +32,31 @@
             background: #161b22;
             border: 1px solid #2a2f3f;
             border-radius: 16px;
-            max-width: 600px;
+            max-width: 480px; /* Reducido para que no se vea gigantesco */
             width: 100%;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             color: #ffffff;
-            max-height: 90vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
         }
         .verificacion-card i.fa-triangle-exclamation {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: #f59e0b;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .verificacion-card h1 {
             font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            margin-bottom: 10px;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
             color: #fff;
         }
         .verificacion-card > p {
             color: #a0a0b0;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
         }
         
         /* Caja de Términos Desplazable */
@@ -64,62 +64,62 @@
             text-align: left;
             background: #111520;
             border: 1px solid #2a2f3f;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            max-height: 220px;
+            margin-bottom: 15px;
+            max-height: 150px; /* Reducido para que la caja no expanda tanto el modal */
             overflow-y: auto;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: #b0b0c0;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .terminos-scroll-box h4 {
             color: #fff;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            margin-bottom: 4px;
             font-family: 'Cinzel', serif;
         }
         .terminos-scroll-box h4:first-child {
             margin-top: 0;
         }
         .terminos-scroll-box p {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .terminos-check-container {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #e0e0e0;
             cursor: pointer;
             background: rgba(99, 102, 241, 0.05);
-            padding: 10px;
+            padding: 8px 10px;
             border-radius: 6px;
             border: 1px solid rgba(99, 102, 241, 0.2);
         }
         .terminos-check-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             accent-color: #6366f1;
             cursor: pointer;
         }
         .botones-verificacion {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
         .btn-edad {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             transition: all 0.2s;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .btn-si {
             background: #6366f1;
@@ -308,8 +308,6 @@
         .bot-link:hover {
             background: #4752c4;
         }
-
-        /* Corrección del Dropdown para que flote bien alineado */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -337,14 +335,15 @@
             display: none;
             position: absolute;
             right: 0;
-            top: calc(100% + 8px); /* Baja un poquito para que no tape el botón */
+            top: 100%;
             background-color: #161b22;
-            min-width: 240px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.7);
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
             z-index: 1000;
             border: 1px solid var(--border);
             border-radius: 10px;
             overflow: hidden;
+            margin-top: 8px;
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn {
