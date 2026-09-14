@@ -8,10 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
+        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -47,6 +48,11 @@
             border-radius: 10px;
             overflow: hidden;
             margin-top: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-content a {
             color: #ffffff;
@@ -58,6 +64,9 @@
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.2s;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
         }
         .dropdown-content a:hover {
             background-color: rgba(124, 58, 237, 0.15);
@@ -267,7 +276,7 @@
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
-            
+
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
                     <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
@@ -279,10 +288,11 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="cuenta.html">
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
                         <i class="fa-solid fa-user"></i> Cuenta 
-                        <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
                     </a>
+                    <a href="cuenta.html"><i class="fa-solid fa-user"></i> Cuenta</a>
                 </div>
             </div>
 
@@ -294,22 +304,26 @@
 
     <main class="main-content" style="padding-top: 100px; padding-bottom: 60px;">
         <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
-            
+
             <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;">
                 <h1 style="font-family: 'Cinzel', serif; color: white; font-size: 2.5rem; margin-bottom: 15px;" id="titulo-principal">
                     ¿Qué traduciremos después? 🗳️ <span class="badge-beta">LÍMITE: 10 JUEGOS</span>
                 </h1>
-                
+
+                <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;">
                 <p style="color: #34d399; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 0.95rem; margin-bottom: 10px;" id="subtitulo-estado">
                     <i class="fa-solid fa-circle-check"></i> Solo juegos desarrollados en RPG Maker &bull; <span style="color: #f59e0b;">¡Solo los 3 primeros puestos serán traducidos!</span>
                 </p>
 
+                <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;">
                 <p style="color: #a0a0b0; max-width: 700px; margin: 0 auto; font-family: 'Poppins', sans-serif; line-height: 1.6; margin-bottom: 15px;" id="descripcion-estado">
                     Vota por tus favoritos. Puedes votar en diferentes juegos (un voto por juego por red/dispositivo). La votación cierra el <strong style="color: white;">30 de septiembre de 2026</strong>.
                 </p>
                 <div style="display: inline-block; background: rgba(245, 158, 11, 0.1); border: 1px dashed #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px;">
                     <i class="fa-solid fa-calendar-days"></i> Plazo límite: <strong>30 de Septiembre, 2026</strong> | Límite actual: <span id="contador-limite">0</span>/10 juegos registrados.
                 </div>
+                <div>
                 <div id="contenedor-btn-proponer">
                     <button onclick="toggleFormulario()" id="btn-toggle-form" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
                         <i class="fa-solid fa-plus"></i> Proponer un nuevo juego
@@ -383,66 +397,6 @@
     </footer>
 
     <script>
-        <!-- Script para el Menú Desplegable y Control de Sesión Global -->
-    <script>
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
-
-        // Cerrar el menú si el usuario hace clic fuera de él
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseGlobal = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseGlobal.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-
-                // Consultar rol en la base de datos
-                const { data: perfil } = await supabaseGlobal
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', verificarSesionYRolesGlobal);
-
-
-        
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -516,6 +470,7 @@
                 cachedIpUsuario = data.ip;
                 return cachedIpUsuario;
             } catch (e) {
+                console.warn('No se pudo obtener la IP, continuando sin ella.');
                 return 'desconocida';
             }
         }
@@ -558,7 +513,8 @@
 
                 const juegos = resJuegos.data;
                 const votosMap = {};
-                
+
+                // Mapear votos por client_id o por IP para bloquear botones en cualquier navegador de la misma red
                 (resVotosClient.data || []).forEach(v => {
                     votosMap[v.juego_id] = v.tipo_voto;
                 });
@@ -572,19 +528,21 @@
                 document.getElementById('contador-limite').innerText = totalJuegosActuales;
 
                 if (!juegos || juegos.length === 0) {
+                    grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación. ¡Sé el primero en proponer uno!</p>`;
                     grid.innerHTML = `<p style="color: white; text-align: center; grid-column: 1 / -1;">No hay proyectos en votación.</p>`;
                     return;
                 }
 
                 grid.innerHTML = '';
-                
+
                 juegos.forEach((juego, index) => {
                     const likes = juego.likes || 0;
                     const dislikes = juego.dislikes || 0;
                     const totalVotos = likes + dislikes;
                     const porcentajeLikes = totalVotos > 0 ? Math.round((likes / totalVotos) * 100) : 50;
-                    
+
                     let badgeHtml = '';
+                    if (juego.en_desarrollo === true) {
                     // Si ya pasó el 30 de sep, los primeros 3 puestos se marcan como ganadores oficiales
                     if (votacionCerrada && index < 3) {
                         badgeHtml = `<span class="badge-estado badge-true" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">🏆 ¡Ganador #${index + 1}!</span>`;
@@ -645,6 +603,14 @@
                                 </div>
                             </div>
                             
+                            <div class="acciones-votos">
+                                <button onclick="votar(${juego.id}, 'like')" class="btn-voto btn-like" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-up"></i> ${tipoVotoPrevio === 'like' ? 'Tu Voto (Sí)' : 'Sí'}
+                                </button>
+                                <button onclick="votar(${juego.id}, 'dislike')" class="btn-voto btn-dislike" ${yaVotoEsteJuego ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-thumbs-down"></i> ${tipoVotoPrevio === 'dislike' ? 'Tu Voto (No)' : 'No'}
+                                </button>
+                            </div>
                             ${botonesAccionHtml}
                         </div>
                     `;
@@ -674,6 +640,7 @@
             const clientId = obtenerClientId();
             const ipUsuario = await obtenerIpUsuario();
 
+            // Intentamos registrar el voto guardando IP y clientId (la base de datos bloqueará si la IP ya votó por este juego)
             const { error: errRegistro } = await supabaseClient
                 .from('registro_votos')
                 .insert([{ 
@@ -725,7 +692,7 @@
 
         async function agregarJuego(event) {
             event.preventDefault();
-            
+
             if (esFechaVotacionCerrada()) {
                 alert('El periodo de propuestas ha finalizado.');
                 return;
@@ -808,7 +775,7 @@
             cargarVotosAuditoria();
             cargarVotaciones();
         }
-        
+
         document.addEventListener('DOMContentLoaded', cargarVotaciones);
     </script>
 </body>
