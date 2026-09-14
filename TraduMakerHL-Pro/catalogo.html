@@ -80,6 +80,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
+            position: relative;
         }
         .games-grid.mode-list .game-img-container {
             width: 140px;
@@ -96,31 +97,57 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
         }
         .games-grid.mode-compact .game-img-container,
         .games-grid.mode-compact .game-tag {
             display: none;
         }
 
-        /* Estilos del Botón de Favoritos */
+        /* Botón de Favoritos (Estrella) */
         .btn-favorito {
-            background: rgba(22, 27, 34, 0.8) !important;
-            border: 1px solid var(--border-color, #30363d) !important;
-            border-radius: 50% !important;
-            width: 38px;
-            height: 38px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             z-index: 10;
             transition: transform 0.2s, background 0.2s;
         }
         .btn-favorito:hover {
             transform: scale(1.1);
-            background: rgba(22, 27, 34, 1) !important;
+            background: rgba(0, 0, 0, 0.8);
         }
-        .text-warning { color: #f59e0b !important; }
-        .text-secondary { color: #8b949e !important; }
+
+        /* Notificación flotante temporal (Toast) */
+        .toast-notificacion {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            animation: fadeInOut 2.5s ease forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
 
         /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
         .dropdown {
@@ -291,7 +318,7 @@
         </div>
     </footer>
 
-    <!-- Script de Supabase, Menú Desplegable y Lógica del Catálogo -->
+    <!-- Script de Supabase, Menú Desplegable y Lógica del Catálogo con Favoritos -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -319,31 +346,45 @@
             }
         }
 
+        // Sistema de notificaciones flotantes (Toast)
+        function mostrarNotificacion(mensaje) {
+            const viejaNoti = document.querySelector('.toast-notificacion');
+            if (viejaNoti) viejaNoti.remove();
+
+            const noti = document.createElement('div');
+            noti.className = 'toast-notificacion';
+            noti.innerHTML = `<i class="fa-solid fa-star" style="color: #f59e0b; margin-right: 6px;"></i> ${mensaje}`;
+            document.body.appendChild(noti);
+
+            setTimeout(() => {
+                if (noti) noti.remove();
+            }, 2500);
+        }
+
+        // PASO 1: Cargar los favoritos que el usuario tiene guardados en Supabase
         async function cargarFavoritosUsuario() {
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session || !session.user) return;
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                idsFavoritosUsuario = [];
+                return;
+            }
 
-                const { data, error } = await supabaseClient
-                    .from('favoritos') // Ajusta el nombre de tu tabla de favoritos si es distinta (ej: 'juegos_favoritos')
-                    .select('juego_id')
-                    .eq('user_id', session.user.id);
+            const { data, error } = await supabaseClient
+                .from('favoritos')
+                .select('juego_id')
+                .eq('user_id', session.user.id);
 
-                if (!error && data) {
-                    idsFavoritosUsuario = data.map(fav => fav.juego_id);
-                }
-            } catch (err) {
-                console.error("Error al cargar favoritos:", err);
+            if (!error && data) {
+                idsFavoritosUsuario = data.map(fav => fav.juego_id);
             }
         }
 
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
-                // Cargamos los favoritos del usuario primero si ha iniciado sesión
+                // Cargamos los favoritos antes de pintar las tarjetas
                 await cargarFavoritosUsuario();
 
-                // Solo cargamos los juegos que ya están traducidos (true) para el catálogo público
                 const { data, error } = await supabaseClient
                     .from('juegos')
                     .select('*')
@@ -356,50 +397,6 @@
             } catch (err) {
                 console.error(err);
                 contenedor.innerHTML = '<p class="error-msg">Error al conectar con Supabase. Verifica tus credenciales.</p>';
-            }
-        }
-
-        async function toggleFavorito(juegoId, btnElement) {
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session || !session.user) {
-                    alert("Debes iniciar sesión para agregar juegos a favoritos.");
-                    window.location.href = "cuenta.html";
-                    return;
-                }
-
-                const userId = session.user.id;
-                const icono = btnElement.querySelector('i');
-                const esFavorito = idsFavoritosUsuario.includes(juegoId);
-
-                if (esFavorito) {
-                    // Eliminar de favoritos
-                    const { error } = await supabaseClient
-                        .from('favoritos')
-                        .delete()
-                        .eq('user_id', userId)
-                        .eq('juego_id', juegoId);
-
-                    if (error) throw error;
-
-                    idsFavoritosUsuario = idsFavoritosUsuario.filter(id => id !== juegoId);
-                    icono.className = 'far text-secondary fa-star fs-5';
-                    btnElement.title = "Agregar a favoritos";
-                } else {
-                    // Agregar a favoritos
-                    const { error } = await supabaseClient
-                        .from('favoritos')
-                        .insert([{ user_id: userId, juego_id: juegoId }]);
-
-                    if (error) throw error;
-
-                    idsFavoritosUsuario.push(juegoId);
-                    icono.className = 'fas text-warning fa-star fs-5';
-                    btnElement.title = "Quitar de favoritos";
-                }
-            } catch (err) {
-                console.error("Error al actualizar favorito:", err);
-                alert("Ocurrió un error al actualizar tus favoritos.");
             }
         }
 
@@ -426,6 +423,7 @@
             renderizarJuegos(juegosFiltrados);
         }
 
+        // PASO 2: Renderizado de tarjetas incluyendo la estrellita de favoritos
         function renderizarJuegos(juegos) {
             const contenedor = document.getElementById('grid-catalogo');
             
@@ -436,16 +434,17 @@
 
             contenedor.innerHTML = juegos.map(juego => {
                 const esFavorito = idsFavoritosUsuario.includes(juego.id);
-                const claseEstrella = esFavorito ? 'fas text-warning' : 'far text-secondary';
-                const tituloBoton = esFavorito ? "Quitar de favoritos" : "Agregar a favoritos";
+                // Si ya es favorito, se usa icono sólido (fas) y color dorado; si no, vacío (far) y blanco
+                const claseEstrella = esFavorito ? 'fas' : 'far';
+                const colorEstrella = esFavorito ? '#f59e0b' : '#ffffff';
 
                 return `
-                    <div class="game-card position-relative">
+                    <div class="game-card" style="position: relative;">
                         <!-- Botón de Favorito con Estrellita -->
-                        <button class="btn btn-sm position-absolute top-0 end-0 m-3 btn-favorito" 
-                                onclick="toggleFavorito('${juego.id}', this)"
-                                title="${tituloBoton}">
-                            <i class="${claseEstrella} fa-star fs-5"></i>
+                        <button class="btn-favorito" 
+                                data-id="${juego.id}" 
+                                title="${esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+                            <i class="${claseEstrella} fa-star fs-5" style="color: ${colorEstrella};"></i>
                         </button>
 
                         <div class="game-img-container">
@@ -460,6 +459,65 @@
                 `;
             }).join('');
         }
+
+        // PASO 3: Lógica para manejar clics en la estrella (Agregar / Eliminar y persistir en Supabase)
+        document.addEventListener('click', async (e) => {
+            const btnFavorito = e.target.closest('.btn-favorito');
+            if (!btnFavorito) return;
+
+            // Verificar si el usuario ha iniciado sesión
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                mostrarNotificacion('Debes iniciar sesión para agregar favoritos');
+                setTimeout(() => {
+                    window.location.href = 'cuenta.html';
+                }, 1200);
+                return;
+            }
+
+            const userId = session.user.id;
+            const juegoId = btnFavorito.getAttribute('data-id');
+            const icono = btnFavorito.querySelector('i');
+            const esActivo = icono.classList.contains('fas'); // Si ya era favorito
+
+            if (esActivo) {
+                // Eliminar de favoritos en Supabase
+                const { error } = await supabaseClient
+                    .from('favoritos')
+                    .delete()
+                    .eq('user_id', userId)
+                    .eq('juego_id', juegoId);
+
+                if (!error) {
+                    icono.classList.remove('fas');
+                    icono.classList.add('far');
+                    icono.style.color = '#ffffff';
+                    btnFavorito.title = 'Agregar a favoritos';
+                    idsFavoritosUsuario = idsFavoritosUsuario.filter(id => id != juegoId);
+                    mostrarNotificacion('Eliminado de favoritos');
+                } else {
+                    console.error('Error al eliminar:', error.message);
+                    mostrarNotificacion('Error al eliminar de favoritos');
+                }
+            } else {
+                // Agregar a favoritos en Supabase
+                const { error } = await supabaseClient
+                    .from('favoritos')
+                    .insert([{ user_id: userId, juego_id: juegoId }]);
+
+                if (!error) {
+                    icono.classList.remove('far');
+                    icono.classList.add('fas');
+                    icono.style.color = '#f59e0b';
+                    btnFavorito.title = 'Quitar de favoritos';
+                    idsFavoritosUsuario.push(juegoId);
+                    mostrarNotificacion('¡Agregado a favoritos! ⭐');
+                } else {
+                    console.error('Error al agregar:', error.message);
+                    mostrarNotificacion('Error al agregar a favoritos');
+                }
+            }
+        });
 
         function cambiarVista(modo) {
             vistaActual = modo;
@@ -485,7 +543,6 @@
             if (session && session.user) {
                 const userId = session.user.id;
 
-                // Consultar rol en la base de datos
                 const { data: perfil } = await supabaseClient
                     .from('usuarios_registrados')
                     .select('rol')
