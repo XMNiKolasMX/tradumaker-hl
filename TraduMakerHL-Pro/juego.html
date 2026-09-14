@@ -155,10 +155,9 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <!-- Enlace de cuenta dinámico -->
-                    <a href="cuenta.html">
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
                         <i class="fa-solid fa-user"></i> Cuenta 
-                        <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
                     </a>
                 </div>
             </div>
@@ -184,6 +183,7 @@
         <div id="easter-egg-bubble">
             ¡Miau! Aunque ya cambié de fachada, ¡aún sigo formando parte del alma y la historia de TraduMaker HL! 🐾✨
         </div>
+        <!-- Asegúrate de guardar tu logo antiguo en la misma carpeta con este nombre o cambia el src -->
         <img src="logo-antiguo.webp" alt="Logo Antiguo Team HL" id="easter-egg-logo" title="¡Un guiño al pasado!">
     </div>
 
@@ -215,38 +215,6 @@
                         openDropdown.classList.remove('show');
                     }
                 }
-            }
-        }
-
-        // VERIFICACIÓN DE SESIÓN Y ROLES GLOBAL
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-
-                const { data: perfil } = await supabaseClient
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
             }
         }
 
@@ -393,9 +361,8 @@
             });
         }
 
-        // Lógica de inicio de página
+        // Lógica del Easter Egg intermitente / interactivo
         document.addEventListener('DOMContentLoaded', () => {
-            verificarSesionYRolesGlobal();
             cargarJuego();
 
             const logoEgg = document.getElementById('easter-egg-logo');
