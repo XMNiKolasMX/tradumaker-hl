@@ -7,9 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
-
-    <!-- Estilos actualizados para el Modal y Secciones (Separados del Script) -->
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* Estilos actualizados para el Modal con Términos Completos */
         .verificacion-overlay {
             position: fixed;
             top: 0;
@@ -57,7 +58,7 @@
             font-size: 0.85rem;
             margin-bottom: 15px;
         }
-        
+
         /* Caja de Términos Desplazable */
         .terminos-scroll-box {
             text-align: left;
@@ -377,398 +378,398 @@
             display: block;
         }
     </style>
-
-    <!-- SDK de Supabase (Correctamente separado) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Modal de Verificación +18 y Términos y Condiciones Completos -->
-    <div class="verificacion-overlay" id="modalVerificacion">
-        <div class="verificacion-card">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <h1>Restricción de Edad - Contenido Explícito (+18)</h1>
-            <p>Bienvenido a TraduMaker HL. Por favor, lea detenidamente los siguientes términos antes de continuar.</p>
-            
-            <!-- Caja con los Términos y Condiciones Integrales -->
-            <div class="terminos-scroll-box">
-                <h4>1. Mayoría de Edad</h4>
-                <p>El acceso a este sitio web está estrictamente reservado a personas mayores de 18 años (o la mayoría de edad legal en su jurisdicción). Al ingresar, usted declara bajo juramento cumplir con este requisito.</p>
-                
-                <h4>2. Naturaleza del Contenido</h4>
-                <p>Este sitio web recopila, aloja y comparte modificaciones, traducciones y parches en español para videojuegos independientes desarrollados en motores como RPG Maker, los cuales pueden contener material explícito, lenguaje adulto, violencia o temáticas no aptas para menores.</p>
-                
-                <h4>3. Propiedad Intelectual y Parches</h4>
-                <p>TraduMaker HL no reclama la propiedad de los juegos originales ni de los recursos gráficos/narrativos pertenecientes a sus respectivos creadores o desarrolladores originales. Los parches de traducción se distribuyen con fines lúdicos y de preservación cultural sin ánimo de lucro directo.</p>
-                
-                <h4>4. Exención de Responsabilidad</h4>
-                <p>Los administradores de este sitio no se hacen responsables por el mal uso que los usuarios puedan dar a los enlaces o archivos proporcionados. El uso del sitio y la descarga de los archivos corren por cuenta y riesgo exclusivo del usuario.</p>
-                
-                <h4>5. Conducta del Usuario</h4>
-                <p>Queda prohibido intentar vulnerar la seguridad del sitio, extraer bases de datos por medios automatizados o redistribuir contenido malicioso a través de nuestras comunidades asociadas.</p>
-            </div>
 
-            <!-- Casilla de Aceptación -->
-            <label class="terminos-check-container">
-                <input type="checkbox" id="checkTerminos" onchange="actualizarBoton()">
-                <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
-            </label>
+    <!-- Modal de Verificación +18 y Términos y Condiciones Completos -->
+    <div class="verificacion-overlay" id="modalVerificacion">
+        <div class="verificacion-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h1>Restricción de Edad - Contenido Explícito (+18)</h1>
+            <p>Bienvenido a TraduMaker HL. Por favor, lea detenidamente los siguientes términos antes de continuar.</p>
 
-            <!-- Botones de Acción -->
-            <div class="botones-verificacion">
-                <button class="btn-edad btn-no" onclick="rechazarAcceso()">Salir del Sitio</button>
-                <button class="btn-edad btn-si" id="btnIngresar" onclick="aceptarAcceso()" disabled>Acepto los términos y condiciones</button>
-            </div>
-        </div>
-    </div>
+            <!-- Caja con los Términos y Condiciones Integrales -->
+            <div class="terminos-scroll-box">
+                <h4>1. Mayoría de Edad</h4>
+                <p>El acceso a este sitio web está estrictamente reservado a personas mayores de 18 años (o la mayoría de edad legal en su jurisdicción). Al ingresar, usted declara bajo juramento cumplir con este requisito.</p>
 
-    <!-- Navegación Profesional Multi-página -->
-    <header class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
-            </div>
-            
-            <!-- Menú Desplegable (Dropdown) -->
-            <div class="dropdown">
-                <button onclick="toggleMenuDesplegable()" class="dropbtn">
-                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
-                </button>
-                <div id="navDropdown" class="dropdown-content">
-                    <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
-                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
-                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
-                    <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
-                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
-                        <i class="fa-solid fa-user"></i> Cuenta 
-                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-                    </a>
-                </div>
-            </div>
+                <h4>2. Naturaleza del Contenido</h4>
+                <p>Este sitio web recopila, aloja y comparte modificaciones, traducciones y parches en español para videojuegos independientes desarrollados en motores como RPG Maker, los cuales pueden contener material explícito, lenguaje adulto, violencia o temáticas no aptas para menores.</p>
 
-            <div class="nav-version">
-                <span>Versión 2.0</span>
-            </div>
-        </div>
-    </header>
+                <h4>3. Propiedad Intelectual y Parches</h4>
+                <p>TraduMaker HL no reclama la propiedad de los juegos originales ni de los recursos gráficos/narrativos pertenecientes a sus respectivos creadores o desarrolladores originales. Los parches de traducción se distribuyen con fines lúdicos y de preservación cultural sin ánimo de lucro directo.</p>
 
-    <!-- Contenido Principal: Inicio -->
-    <main class="main-content">
-        <!-- Hero Section de Alta Gama -->
-        <section class="hero-section">
-            <div class="hero-overlay"></div>
-            <div class="hero-content">
-                <div class="hero-badge"><i class="fa-solid fa-star"></i> Traducciones Oficiales al Español</div>
-                <h1>El Universo de <span>RPG Maker</span> a tu Alcance</h1>
-                <p>Descubre historias inolvidables, joyas ocultas y mundos independientes traducidos con calidad profesional por apasionados para apasionados.</p>
-                <div class="hero-buttons">
-                    <a href="catalogo.html" class="btn-primary"><i class="fa-solid fa-compass"></i> Explorar Catálogo <i class="fa-solid fa-arrow-right"></i></a>
-                    <a href="apoyanos.html" class="btn-secondary"><i class="fa-solid fa-heart"></i> Apoyar Proyecto</a>
-                </div>
-            </div>
-        </section>
+                <h4>4. Exención de Responsabilidad</h4>
+                <p>Los administradores de este sitio no se hacen responsables por el mal uso que los usuarios puedan dar a los enlaces o archivos proporcionados. El uso del sitio y la descarga de los archivos corren por cuenta y riesgo exclusivo del usuario.</p>
 
-        <!-- Estadísticas Rápidas / Características Pro -->
-        <section class="features-bar">
-            <div class="container features-grid">
-                <div class="feature-item">
-                    <i class="fa-solid fa-language"></i>
-                    <div>
-                        <h3>100% en Español</h3>
-                        <p>Traducciones cuidadas y testeadas</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i class="fa-solid fa-cloud-arrow-down"></i>
-                    <div>
-                        <h3>Cloud Database</h3>
-                        <p>Sincronización instantánea con nuestra base de datos</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i class="fa-solid fa-bolt-lightning"></i>
-                    <div>
-                        <h3>Acceso Directo</h3>
-                        <p>Sin esperas ni acortadores molestos</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                <h4>5. Conducta del Usuario</h4>
+                <p>Queda prohibido intentar vulnerar la seguridad del sitio, extraer bases de datos por medios automatizados o redistribuir contenido malicioso a través de nuestras comunidades asociadas.</p>
+            </div>
 
-        <!-- Banner Interactivo: Votaciones Activas -->
-        <section class="container" style="margin: 3rem auto;">
-            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(15, 23, 42, 0.8)); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; position: relative; overflow: hidden;">
-                <div style="position: absolute; right: -20px; bottom: -20px; font-size: 8rem; color: rgba(124, 58, 237, 0.05); pointer-events: none;">
-                    <i class="fa-solid fa-square-poll-vertical"></i>
-                </div>
-                <div style="flex: 1; min-width: 280px;">
-                    <span style="background: #f59e0b; color: #111520; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">VOTACIONES ABIERTAS</span>
-                    <h2 style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: white; margin-bottom: 0.5rem;">¿Qué juego se traducirá después?</h2>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Elige tu RPG Maker favorito y decide cuáles serán los próximos proyectos en recibir el parche oficial al español antes del 30 de septiembre.</p>
-                </div>
-                <div>
-                    <a href="votaciones.html" style="background: var(--accent); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); transition: transform 0.2s;">
-                        <i class="fa-solid fa-check-to-slot"></i> Ir a Votar Ahora <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
+            <!-- Casilla de Aceptación -->
+            <label class="terminos-check-container">
+                <input type="checkbox" id="checkTerminos" onchange="actualizarBoton()">
+                <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
+            </label>
 
-        <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
-        <section class="container recent-section">
-            <div class="section-header">
-                <div>
-                    <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
-                    <p>Los juegos más recientes añadidos a nuestra base de datos</p>
-                </div>
-                <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
+            <!-- Botones de Acción -->
+            <div class="botones-verificacion">
+                <button class="btn-edad btn-no" onclick="rechazarAcceso()">Salir del Sitio</button>
+                <button class="btn-edad btn-si" id="btnIngresar" onclick="aceptarAcceso()" disabled>Acepto los términos y condiciones</button>
+            </div>
+        </div>
+    </div>
 
-            <div id="grid-recientes" class="games-grid">
-                <div class="loading-skeleton">Cargando catálogo, espere por favor.</div>
-            </div>
-        </section>
+    <!-- Navegación Profesional Multi-página -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
+            </div>
 
-        <!-- SECCIÓN: Horario y Proceso -->
-        <section class="container">
-            <div class="guild-section" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
-                
-                <!-- 1. Horario de Traducción -->
-                <div class="guild-card">
-                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
-                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
-                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
-                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
-                </div>
+            <!-- Menú Desplegable (Dropdown) -->
+            <div class="dropdown">
+                <button onclick="toggleMenuDesplegable()" class="dropbtn">
+                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
+                </button>
+                <div id="navDropdown" class="dropdown-content">
+                    <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
+                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
+                    <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
+                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
+                    <a href="#" style="opacity: 0.7; cursor: default;" onclick="return false;">
+                    <a href="cuenta.html">
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
+                    </a>
+                </div>
+            </div>
 
-                <!-- 2. Proceso de Traducción -->
-                <div class="guild-card">
-                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
-                    <div class="process-list">
-                        <div class="process-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Caza de la Obra</h4>
-                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
-                            </div>
-                        </div>
-                        <div class="process-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Extracción de Textos</h4>
-                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
-                            </div>
-                        </div>
-                        <div class="process-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Traducción Base</h4>
-                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
-                            </div>
-                        </div>
-                        <div class="process-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>Adaptación y Pulido</h4>
-                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
-                            </div>
-                        </div>
-                        <div class="process-step">
-                            <div class="step-number">5</div>
-                            <div class="step-content">
-                                <h4>¡Listo para la Aventura!</h4>
-                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="nav-version">
+                <span>Versión 2.0</span>
+            </div>
+        </div>
+    </header>
 
-            </div>
-        </section>
+    <!-- Contenido Principal: Inicio -->
+    <main class="main-content">
+        <!-- Hero Section de Alta Gama -->
+        <section class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fa-solid fa-star"></i> Traducciones Oficiales al Español</div>
+                <h1>El Universo de <span>RPG Maker</span> a tu Alcance</h1>
+                <p>Descubre historias inolvidables, joyas ocultas y mundos independientes traducidos con calidad profesional por apasionados para apasionados.</p>
+                <div class="hero-buttons">
+                    <a href="catalogo.html" class="btn-primary"><i class="fa-solid fa-compass"></i> Explorar Catálogo <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="apoyanos.html" class="btn-secondary"><i class="fa-solid fa-heart"></i> Apoyar Proyecto</a>
+                </div>
+            </div>
+        </section>
 
-        <!-- SECCIÓN: Bots Oficiales de Discord -->
-        <section class="container" style="margin-bottom: 4rem;">
-            <div class="guild-card">
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
-                    <h2><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Bots de Discord del Servidor</h2>
-                    <span style="background: rgba(88, 101, 242, 0.15); color: #8ea1ff; border: 1px solid rgba(88, 101, 242, 0.3); font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px;"><i class="fa-solid fa-circle" style="font-size: 0.5rem; color: #34d399; margin-right: 4px;"></i> Operando en el Gremio</span>
-                </div>
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Conoce a nuestros bots integrados en el servidor de Discord para mantener a la comunidad al tanto de cada novedad.</p>
-                
-                <div class="bots-grid">
-                    <!-- VotaBot -->
-                    <div class="bot-card">
-                        <div>
-                            <div class="bot-header">
-                                <div class="bot-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
-                                <div class="bot-title">
-                                    <h3>VotaBot</h3>
-                                    <span class="bot-tag">Discord Bot</span>
-                                </div>
-                            </div>
-                            <p class="bot-desc"><em>«¡Hola a todos! Soy VotaBot, el asistente oficial de TraduMaker HL. Estaré por aquí para mantenerles al tanto de cómo van las votaciones para nuestras próximas traducciones de RPG Maker. ¡Revisen la lista y voten por sus favoritos!»</em></p>
-                        </div>
-                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
-                    </div>
+        <!-- Estadísticas Rápidas / Características Pro -->
+        <section class="features-bar">
+            <div class="container features-grid">
+                <div class="feature-item">
+                    <i class="fa-solid fa-language"></i>
+                    <div>
+                        <h3>100% en Español</h3>
+                        <p>Traducciones cuidadas y testeadas</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <div>
+                        <h3>Cloud Database</h3>
+                        <p>Sincronización instantánea con nuestra base de datos</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <div>
+                        <h3>Acceso Directo</h3>
+                        <p>Sin esperas ni acortadores molestos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- FinBot -->
-                    <div class="bot-card">
-                        <div>
-                            <div class="bot-header">
-                                <div class="bot-icon"><i class="fa-solid fa-piggy-bank"></i></div>
-                                <div class="bot-title">
-                                    <h3>FinBot</h3>
-                                    <span class="bot-tag">Discord Bot</span>
-                                </div>
-                            </div>
-                            <p class="bot-desc"><em>«¡Qué tal, banda! Me llamo FinBot. Por acá estaré rondando para avisarles en cuanto un juego llegue al 100% y quede listo en español. Cero rodeos: juego completado, juego que anunciamos por estos lares. ¡A darle!»</em></p>
-                        </div>
-                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
-                    </div>
+        <!-- Banner Interactivo: Votaciones Activas -->
+        <section class="container" style="margin: 3rem auto;">
+            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(15, 23, 42, 0.8)); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; position: relative; overflow: hidden;">
+                <div style="position: absolute; right: -20px; bottom: -20px; font-size: 8rem; color: rgba(124, 58, 237, 0.05); pointer-events: none;">
+                    <i class="fa-solid fa-square-poll-vertical"></i>
+                </div>
+                <div style="flex: 1; min-width: 280px;">
+                    <span style="background: #f59e0b; color: #111520; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px;">VOTACIONES ABIERTAS</span>
+                    <h2 style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: white; margin-bottom: 0.5rem;">¿Qué juego se traducirá después?</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Elige tu RPG Maker favorito y decide cuáles serán los próximos proyectos en recibir el parche oficial al español antes del 30 de septiembre.</p>
+                </div>
+                <div>
+                    <a href="votaciones.html" style="background: var(--accent); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); transition: transform 0.2s;">
+                        <i class="fa-solid fa-check-to-slot"></i> Ir a Votar Ahora <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-                    <!-- TraduBot -->
-                    <div class="bot-card">
-                        <div>
-                            <div class="bot-header">
-                                <div class="bot-icon"><i class="fa-solid fa-language"></i></div>
-                                <div class="bot-title">
-                                    <h3>TraduBot</h3>
-                                    <span class="bot-tag">Discord Bot</span>
-                                </div>
-                            </div>
-                            <p class="bot-desc"><em>«¡Qué tal, banda! Me llamo TraduBot. Por acá estaré al pie del cañón avisándoles cada vez que arranquemos un nuevo proyecto de traducción o cuando haya actualizaciones en el porcentaje de los juegos en curso. Para que le echen un ojo a cómo va el horno y qué se está cocinando. ¡Seguimos dándole!»</em></p>
-                        </div>
-                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Sección de Juegos Recientes (Cargados de Supabase) -->
+        <section class="container recent-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fa-solid fa-bolt"></i> Últimos Lanzamientos</h2>
+                    <p>Los juegos más recientes añadidos a nuestra base de datos</p>
+                </div>
+                <a href="catalogo.html" class="view-all-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
 
-        <!-- Sección de Comunidad y Alianzas -->
-        <section class="container" style="margin-bottom: 4rem;">
-            <div class="guild-card" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(to bottom, var(--bg-card), #111827);">
-                <i class="fa-solid fa-users-viewfinder" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: white; justify-content: center; margin-bottom: 1rem;">Únete a la Comunidad HL</h2>
-                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto; font-size: 0.95rem;">Forma parte de nuestro servidor de Discord para reportar bugs, proponer ideas de traducción, enterarte de los estrenos en primicia y convivir con más amantes del rol.</p>
-                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                    <a href="https://discord.gg/gkAe3CmK86" target="_blank" style="background: #5865F2; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-brands fa-discord"></i> Servidor de Discord
-                    </a>
-                    <a href="https://www.youtube.com/@nikolashl" target="_blank" style="background: #FF0000; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-brands fa-youtube"></i> Canal de YouTube
-                    </a>
-                </div>
-            </div>
-        </section>
-    </main>
+            <div id="grid-recientes" class="games-grid">
+                <div class="loading-skeleton">Cargando catálogo, espere por favor.</div>
+            </div>
+        </section>
 
-    <!-- Footer Profesional -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-info">
-                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
-                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
-            </div>
-            <div class="footer-links">
-                <h4>Enlaces</h4>
-                <a href="index.html">Inicio</a>
-                <a href="catalogo.html">Catálogo</a>
-                <a href="nosotros.html">Sobre Nosotros</a>
-                <a href="avances.html">Avances de Traducción</a>
-                <a href="apoyanos.html">Apóyanos</a>
-            </div>
-            <div class="footer-socials">
-                <h4>Síguenos</h4>
-                <div class="social-icons">
-                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
-                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+        <!-- SECCIÓN: Horario y Proceso -->
+        <section class="container">
+            <div class="guild-section" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
 
-    <!-- Scripts (Verificación de Edad + Supabase) -->
-    <script>
-        // Comprobar si ya pasó la verificación de edad en este navegador
-        document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem('tradu_verificado') === 'true') {
-                document.getElementById('modalVerificacion').classList.add('oculto');
-            }
-        });
+                <!-- 1. Horario de Traducción -->
+                <div class="guild-card">
+                    <div class="schedule-status"><i class="fa-solid fa-clock"></i> Hora de Perú (PET)</div>
+                    <h2><i class="fa-solid fa-calendar-days"></i> Horario de Traducción</h2>
+                    <div class="schedule-time">Sábados y Domingos<br>5:00 PM – 10:00 PM</div>
+                    <p class="schedule-desc">Estos son los horarios que dedicamos para traducir y programar los parches de los juegos.</p>
+                </div>
+
+                <!-- 2. Proceso de Traducción -->
+                <div class="guild-card">
+                    <h2><i class="fa-solid fa-scroll"></i> El Arte de Traducir</h2>
+                    <div class="process-list">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Caza de la Obra</h4>
+                                <p>Conseguimos el juego, lo testeamos y verificamos que valga totalmente la pena.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Extracción de Textos</h4>
+                                <p>Sacamos todas las líneas de código y diálogos directos a un formato limpio.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Traducción Base</h4>
+                                <p>Pasamos todo al español cuidando cada onomatopeya y términos del lore.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Adaptación y Pulido</h4>
+                                <p>Reestructuramos párrafos para que el mensaje golpee con fuerza.</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>¡Listo para la Aventura!</h4>
+                                <p>Empaquetamos el parche y lo subimos directo a la nube sin acortadores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECCIÓN: Bots Oficiales de Discord -->
+        <section class="container" style="margin-bottom: 4rem;">
+            <div class="guild-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+                    <h2><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Bots de Discord del Servidor</h2>
+                    <span style="background: rgba(88, 101, 242, 0.15); color: #8ea1ff; border: 1px solid rgba(88, 101, 242, 0.3); font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px;"><i class="fa-solid fa-circle" style="font-size: 0.5rem; color: #34d399; margin-right: 4px;"></i> Operando en el Gremio</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Conoce a nuestros bots integrados en el servidor de Discord para mantener a la comunidad al tanto de cada novedad.</p>
+
+                <div class="bots-grid">
+                    <!-- VotaBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
+                                <div class="bot-title">
+                                    <h3>VotaBot</h3>
+                                    <span class="bot-tag">Discord Bot</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc"><em>«¡Hola a todos! Soy VotaBot, el asistente oficial de TraduMaker HL. Estaré por aquí para mantenerles al tanto de cómo van las votaciones para nuestras próximas traducciones de RPG Maker. ¡Revisen la lista y voten por sus favoritos!»</em></p>
+                        </div>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
+                    </div>
+
+                    <!-- FinBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+                                <div class="bot-title">
+                                    <h3>FinBot</h3>
+                                    <span class="bot-tag">Discord Bot</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc"><em>«¡Qué tal, banda! Me llamo FinBot. Por acá estaré rondando para avisarles en cuanto un juego llegue al 100% y quede listo en español. Cero rodeos: juego completado, juego que anunciamos por estos lares. ¡A darle!»</em></p>
+                        </div>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
+                    </div>
+
+                    <!-- TraduBot -->
+                    <div class="bot-card">
+                        <div>
+                            <div class="bot-header">
+                                <div class="bot-icon"><i class="fa-solid fa-language"></i></div>
+                                <div class="bot-title">
+                                    <h3>TraduBot</h3>
+                                    <span class="bot-tag">Discord Bot</span>
+                                </div>
+                            </div>
+                            <p class="bot-desc"><em>«¡Qué tal, banda! Me llamo TraduBot. Por acá estaré al pie del cañón avisándoles cada vez que arranquemos un nuevo proyecto de traducción o cuando haya actualizaciones en el porcentaje de los juegos en curso. Para que le echen un ojo a cómo va el horno y qué se está cocinando. ¡Seguimos dándole!»</em></p>
+                        </div>
+                        <a href="https://discord.gg/gkAe3CmK86" target="_blank" class="bot-link"><i class="fa-brands fa-discord"></i> Interactuar en Discord</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Comunidad y Alianzas -->
+        <section class="container" style="margin-bottom: 4rem;">
+            <div class="guild-card" style="text-align: center; padding: 3rem 2rem; background: linear-gradient(to bottom, var(--bg-card), #111827);">
+                <i class="fa-solid fa-users-viewfinder" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: white; justify-content: center; margin-bottom: 1rem;">Únete a la Comunidad HL</h2>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto; font-size: 0.95rem;">Forma parte de nuestro servidor de Discord para reportar bugs, proponer ideas de traducción, enterarte de los estrenos en primicia y convivir con más amantes del rol.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank" style="background: #5865F2; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-brands fa-discord"></i> Servidor de Discord
+                    </a>
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank" style="background: #FF0000; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-brands fa-youtube"></i> Canal de YouTube
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Profesional -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
+                <p>Tu portal de confianza para traducciones de RPG Maker al español.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="nosotros.html">Sobre Nosotros</a>
+                <a href="avances.html">Avances de Traducción</a>
+                <a href="apoyanos.html">Apóyanos</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Síguenos</h4>
+                <div class="social-icons">
+                    <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://x.com/NiKolas_HL" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts (Verificación de Edad + Supabase) -->
+    <script>
+        // Comprobar si ya pasó la verificación de edad en este navegador
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem('tradu_verificado') === 'true') {
+                document.getElementById('modalVerificacion').classList.add('oculto');
+            }
+        });
+
         function actualizarBoton() {
-            const aceptado = document.getElementById('checkTerminos').checked;
-            document.getElementById('btnIngresar').disabled = !aceptado;
-        }
+            const aceptado = document.getElementById('checkTerminos').checked;
+            document.getElementById('btnIngresar').disabled = !aceptado;
+        }
 
-        function aceptarAcceso() {
-            localStorage.setItem('tradu_verificado', 'true');
-            document.getElementById('modalVerificacion').classList.add('oculto');
-        }
+        function aceptarAcceso() {
+            localStorage.setItem('tradu_verificado', 'true');
+            document.getElementById('modalVerificacion').classList.add('oculto');
+        }
 
-        function rechazarAcceso() {
-            window.location.href = 'https://www.google.com';
-        }
+        function rechazarAcceso() {
+            window.location.href = 'https://www.google.com';
+        }
 
-        // Lógica de Supabase para Juegos Recientes
-        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Lógica de Supabase para Juegos Recientes
+        const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function toggleMenuDesplegable() {
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
+        function toggleMenuDesplegable() {
+            document.getElementById("navDropdown").classList.toggle("show");
+        }
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const contenedorRecientes = document.getElementById('grid-recientes');
+        document.addEventListener('DOMContentLoaded', async () => {
+            const contenedorRecientes = document.getElementById('grid-recientes');
 
-            try {
-                const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
-                    .from('juegos')
-                    .select('*')
-                    .eq('traducido', true)
-                    .order('id', { ascending: false })
-                    .limit(4);
+            try {
+                const { data: juegosRecientes, error: errorRecientes } = await supabaseClient
+                    .from('juegos')
+                    .select('*')
+                    .eq('traducido', true)
+                    .order('id', { ascending: false })
+                    .limit(4);
 
-                if (errorRecientes) throw errorRecientes;
+                if (errorRecientes) throw errorRecientes;
 
-                if (!juegosRecientes || juegosRecientes.length === 0) {
-                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
-                } else {
-                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
-                        <div class="game-card">
-                            <div class="game-img-container">
-                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
-                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
-                            </div>
-                            <div class="game-info">
-                                <h3 class="game-title">${juego.titulo}</h3>
-                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (err) {
-                console.error(err);
-                if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
-            }
-        });
-    </script>
+                if (!juegosRecientes || juegosRecientes.length === 0) {
+                    contenedorRecientes.innerHTML = '<p class="no-games">No hay juegos traducidos todavía en Supabase.</p>';
+                } else {
+                    contenedorRecientes.innerHTML = juegosRecientes.map(juego => `
+                        <div class="game-card">
+                            <div class="game-img-container">
+                                <img src="${juego.imagen}" alt="${juego.titulo}" class="game-img" onerror="this.src='https://via.placeholder.com/300x200?text=TraduMakerHL'">
+                                <span class="game-tag">${juego.motor || 'RPG Maker'}</span>
+                            </div>
+                            <div class="game-info">
+                                <h3 class="game-title">${juego.titulo}</h3>
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+                if (contenedorRecientes) contenedorRecientes.innerHTML = '<p class="error-msg">Error al conectar con Supabase.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
