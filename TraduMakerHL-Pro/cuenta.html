@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .account-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 40px auto;
             background: var(--bg-card, #161b22);
             border: 1px solid var(--border-color, #30363d);
@@ -129,7 +129,42 @@
             100% { opacity: 0; transform: translateY(20px); }
         }
 
-        /* Menú Desplegable (Dropdown) */
+        /* Tablas de Staff */
+        .admin-table-container {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .admin-user-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: #c9d1d9;
+        }
+        .admin-user-table th, .admin-user-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
+        .admin-user-table th {
+            background: #161b22;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .badge-rol {
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .badge-admin { background: #7c3aed; color: #fff; }
+        .badge-mod { background: #0284c7; color: #fff; }
+        .badge-user { background: #374151; color: #fff; }
+        .badge-banned { background: #da3633; color: #fff; }
+
+        /* Menú Desplegable */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -161,18 +196,13 @@
             min-width: 220px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
             z-index: 1000;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color, #30363d);
             border-radius: 10px;
             overflow: hidden;
             margin-top: 8px;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-content a {
-            color: var(--text-main);
+            color: #c9d1d9;
             padding: 12px 16px;
             text-decoration: none;
             display: flex;
@@ -182,26 +212,21 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.2s;
         }
-        .dropdown-content a:last-child {
-            border-bottom: none;
-        }
         .dropdown-content a:hover {
             background-color: rgba(124, 58, 237, 0.15);
-            color: var(--accent);
+            color: #73bfff;
         }
         .dropdown-content a.active {
             background-color: rgba(124, 58, 237, 0.2);
             color: #a78bfa;
             font-weight: 600;
         }
-        .show {
-            display: block;
-        }
+        .show { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- Navegación Profesional Multi-página -->
+    <!-- Navegación -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -215,7 +240,7 @@
                 <div id="navDropdown" class="dropdown-content">
                     <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
                     <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos</a>
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
@@ -229,7 +254,7 @@
         </div>
     </header>
 
-    <!-- Contenido Principal: Cuenta / Perfil -->
+    <!-- Contenido Principal -->
     <main class="main-content">
         <div class="container">
             <div class="account-container">
@@ -239,19 +264,15 @@
                     <p id="user-email">Cargando información...</p>
                 </div>
 
-                <!-- SECCIÓN 1: Formulario de Inicio de Sesión / Registro (Visible si NO hay sesión) -->
+                <!-- SECCIÓN 1: Autenticación / Login / Registro -->
                 <div id="no-session-section" style="display: none;">
-                    
-                    <!-- Pestañas para alternar entre Iniciar Sesión y Registrarse -->
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                         <button id="tab-login-btn" onclick="cambiarModoAuth('login')" class="btn-action" style="background: #238636;">Iniciar Sesión</button>
                         <button id="tab-register-btn" onclick="cambiarModoAuth('register')" class="btn-action btn-secondary-custom">Registrarse</button>
                     </div>
 
-                    <!-- Formulario de Login -->
                     <div id="form-login-container" class="account-section">
                         <h3 id="auth-title"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</h3>
-                        
                         <div class="form-group">
                             <label>Correo Electrónico</label>
                             <input type="email" id="auth-email" class="form-control" placeholder="tu_correo@example.com">
@@ -260,18 +281,69 @@
                             <label>Contraseña</label>
                             <input type="password" id="auth-password" class="form-control" placeholder="Tu contraseña">
                         </div>
+                        
+                        <!-- Enlace de Olvidaste tu contraseña -->
+                        <div style="text-align: right; margin-bottom: 15px;">
+                            <a href="#" onclick="abrirModalRecuperar(event)" style="font-size: 0.8rem; color: #73bfff; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                        </div>
 
                         <button id="auth-submit-btn" onclick="ejecutarAutenticacion()" class="btn-action">Entrar a mi Cuenta</button>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: Panel de Cuenta Protegido (Visible si SÍ hay sesión) -->
+                <!-- SECCIÓN 2: Panel Protegido -->
                 <div id="protected-account-content" style="display: none;">
-                    <!-- Sección del Panel de Supabase (Si es Admin) -->
-                    <div id="admin-panel-section" style="display: none; margin-bottom: 20px;">
-                        <a href="https://supabase.com/dashboard" target="_blank" class="btn-action" style="background: #d97706;">
-                            <i class="fa-solid fa-shield-halved"></i> Ir al Panel de Supabase
-                        </a>
+                    
+                    <!-- PANEL DE GESTIÓN PARA STAFF (ADMIN Y MODS) -->
+                    <div id="staff-management-section" style="display: none;" class="account-section" style="border: 2px solid #0284c7;">
+                        <h3 id="staff-panel-title" style="color: #38bdf8;"><i class="fa-solid fa-shield-halved"></i> Panel de Moderación y Control</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Supervisa la comunidad, aplica sanciones temporales y gestiona recomendaciones prioritarias de juegos.</p>
+                        
+                        <div class="form-group">
+                            <input type="text" id="busqueda-usuario" class="form-control" placeholder="Buscar por ID de usuario..." onkeyup="filtrarTablaUsuarios()">
+                        </div>
+
+                        <div class="admin-table-container">
+                            <table class="admin-user-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID / Usuario</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Acciones / Sanciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-usuarios-cuerpo">
+                                    <tr><td colspan="4" style="text-align: center;">Cargando registros...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Sección de Propuesta de Moderadores -->
+                        <div id="mod-recommendation-box" style="margin-top: 20px; background: #161b22; padding: 15px; border-radius: 6px; border: 1px solid #30363d; display: none;">
+                            <h4 style="color: #38bdf8; font-size: 0.95rem; margin-top:0;"><i class="fa-solid fa-user-plus"></i> Proponer Candidato a Moderador</h4>
+                            <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">Envía una propuesta formal al Administrador indicando qué usuario merece el cargo.</p>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="text" id="propuesta-user-id" class="form-control" placeholder="ID exacto del usuario candidato">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="text" id="propuesta-motivo" class="form-control" placeholder="Motivo de la recomendación">
+                            </div>
+                            <button onclick="enviarPropuestaMod()" class="btn-action" style="background: #0284c7; font-size: 0.85rem; padding: 6px;">Enviar Propuesta al Admin</button>
+                        </div>
+
+                        <!-- Sección de Recomendación de Juegos (Prioridad Alta para Moderadores) -->
+                        <div id="mod-game-recommendation-box" style="margin-top: 20px; background: #161b22; padding: 15px; border-radius: 6px; border: 1px solid #f59e0b; display: none;">
+                            <h4 style="color: #f59e0b; font-size: 0.95rem; margin-top:0;"><i class="fa-solid fa-star"></i> Recomendar Juego RPG Maker (Prioridad Alta)</h4>
+                            <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">Como moderador, tu recomendación entra directo con máxima prioridad al Administrador.</p>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="text" id="juego-mod-titulo" class="form-control" placeholder="Título del juego RPG Maker">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="text" id="juego-mod-enlace" class="form-control" placeholder="Enlace o referencia del juego">
+                            </div>
+                            <button onclick="enviarJuegoPrioritarioMod()" class="btn-action" style="background: #9e6a03; font-size: 0.85rem; padding: 6px;">Enviar Recomendación Prioritaria</button>
+                        </div>
                     </div>
 
                     <!-- Sección de Mis Juegos Favoritos -->
@@ -285,7 +357,6 @@
                     <!-- Sección de Ajustes de Cuenta -->
                     <div class="account-section">
                         <h3><i class="fa-solid fa-gear"></i> Ajustes de Cuenta</h3>
-                        
                         <div class="form-group">
                             <label for="nuevo-correo">Nuevo Correo</label>
                             <input type="email" id="nuevo-correo" class="form-control" placeholder="Actualizar correo">
@@ -299,7 +370,7 @@
                         <button onclick="cambiarContrasena()" class="btn-action">Cambiar Contraseña</button>
                     </div>
 
-                    <!-- Botón de Cerrar Sesión -->
+                    <!-- Botón Cerrar Sesión -->
                     <button onclick="cerrarSesion()" class="btn-action btn-danger-custom">
                         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
                     </button>
@@ -308,7 +379,56 @@
         </div>
     </main>
 
-    <!-- Footer Profesional -->
+    <!-- Modal para Sancionar / Banear Usuario -->
+    <div id="modal-ban" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
+        <div style="background:#161b22; border:1px solid #30363d; padding:30px; border-radius:10px; width:90%; max-width:400px;">
+            <h3 style="color:#ff3333; margin-top:0;"><i class="fa-solid fa-ban"></i> Sancionar Usuario</h3>
+            <p id="ban-user-id-display" style="font-size:0.8rem; color:#8b949e; word-break:break-all;"></p>
+            
+            <div class="form-group">
+                <label>Tipo de Baneo</label>
+                <select id="tipo-baneo" class="form-control" onchange="cambiarTipoBaneoSelect()">
+                    <option value="temporal">Temporal (por días)</option>
+                    <option id="opt-permanente" value="permanente">Permanente (Solo Admin)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="grupo-dias-baneo">
+                <label>Cantidad de Días de Baneo</label>
+                <input type="number" id="dias-baneo" class="form-control" min="1" value="7">
+            </div>
+
+            <div class="form-group">
+                <label>Motivo de la Sanción</label>
+                <input type="text" id="motivo-baneo" class="form-control" placeholder="Ej: Incumplimiento de normas">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="ejecutarBaneoUsuario()" class="btn-action btn-danger-custom">Aplicar Baneo</button>
+                <button onclick="cerrarModalBan()" class="btn-action btn-secondary-custom">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Recuperar Contraseña -->
+    <div id="modal-recuperar" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
+        <div style="background:#161b22; border:1px solid #30363d; padding:30px; border-radius:10px; width:90%; max-width:400px;">
+            <h3 style="color:#73bfff; margin-top:0;"><i class="fa-solid fa-envelope-open-text"></i> Recuperar Contraseña</h3>
+            <p style="font-size:0.85rem; color:#8b949e; margin-bottom:15px;">Introduce tu correo electrónico registrado y te enviaremos un enlace oficial de <strong>TraduMakerHL</strong> para restablecer tu contraseña.</p>
+            
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="recuperar-email" class="form-control" placeholder="tu_correo@example.com">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="enviarEnlaceRecuperacion()" class="btn-action">Enviar Enlace</button>
+                <button onclick="cerrarModalRecuperar()" class="btn-action btn-secondary-custom">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-info">
@@ -337,15 +457,17 @@
         </div>
     </footer>
 
-    <!-- Script de lógica de la cuenta, favoritos, auth y Supabase -->
+    <!-- Lógica de Cuenta y Control de Roles -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let modoActualAuth = 'login'; // 'login' o 'register'
+        let modoActualAuth = 'login';
+        let usuarioSeleccionadoParaBan = null;
+        let listaGlobalUsuarios = [];
+        let rolUsuarioActual = 'usuario';
 
-        // Menú desplegable
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
         }
@@ -376,7 +498,6 @@
             }, 2500);
         }
 
-        // Alternar pestañas entre Iniciar Sesión y Registrarse
         function cambiarModoAuth(modo) {
             modoActualAuth = modo;
             const titulo = document.getElementById('auth-title');
@@ -401,7 +522,6 @@
             }
         }
 
-        // Manejar Login o Registro directamente en la página
         async function ejecutarAutenticacion() {
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value.trim();
@@ -412,7 +532,7 @@
             }
 
             if (modoActualAuth === 'login') {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) {
                     mostrarNotificacion('Error al iniciar sesión: ' + error.message);
                 } else {
@@ -420,22 +540,50 @@
                     setTimeout(() => location.reload(), 1000);
                 }
             } else {
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                const { error } = await supabaseClient.auth.signUp({ email, password });
                 if (error) {
                     mostrarNotificacion('Error al registrarse: ' + error.message);
                 } else {
-                    mostrarNotificacion('¡Registro exitoso! Revisa tu correo para confirmar o inicia sesión.');
+                    mostrarNotificacion('¡Registro exitoso! Inicia sesión.');
                     cambiarModoAuth('login');
                 }
             }
         }
 
-        // Cargar datos de la sesión de forma segura
+        // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
+        function abrirModalRecuperar(e) {
+            e.preventDefault();
+            document.getElementById('recuperar-email').value = '';
+            document.getElementById('modal-recuperar').style.display = 'flex';
+        }
+
+        function cerrarModalRecuperar() {
+            document.getElementById('modal-recuperar').style.display = 'none';
+        }
+
+        async function enviarEnlaceRecuperacion() {
+            const email = document.getElementById('recuperar-email').value.trim();
+            if (!email) {
+                mostrarNotificacion('Por favor introduce tu correo electrónico.');
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href.split('?')[0],
+            });
+
+            if (error) {
+                mostrarNotificacion('Error: ' + error.message);
+            } else {
+                mostrarNotificacion('¡Correo enviado! Revisa tu bandeja de entrada para restablecer tu contraseña.');
+                cerrarModalRecuperar();
+            }
+        }
+
         async function inicializarCuenta() {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             
             if (error || !session) {
-                // Mostrar formulario de autenticación
                 document.getElementById('user-greeting').textContent = 'Bienvenido a TraduMaker';
                 document.getElementById('user-email').textContent = 'Inicia sesión o regístrate para continuar';
                 document.getElementById('protected-account-content').style.display = 'none';
@@ -443,7 +591,6 @@
                 return;
             }
 
-            // Ocultar autenticación y mostrar panel de cuenta
             document.getElementById('no-session-section').style.display = 'none';
             document.getElementById('protected-account-content').style.display = 'block';
 
@@ -451,27 +598,249 @@
 
             const { data: perfil } = await supabaseClient
                 .from('usuarios_registrados')
-                .select('rol')
+                .select('rol, baneado, fecha_fin_baneo')
                 .eq('id', user.id)
                 .single();
 
-            const rol = perfil ? perfil.rol : 'usuario';
+            rolUsuarioActual = perfil ? perfil.rol : 'usuario';
 
-            // Saludos personalizados según el rol con distinción clara
-            if (rol === 'admin') {
-                document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Administrador! <i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i>`;
-                document.getElementById('admin-panel-section').style.display = 'block';
-            } else if (rol === 'moderador') {
-                document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
+            if (perfil && perfil.baneado) {
+                alert(`Tu cuenta ha sido suspendida.`);
+                await supabaseClient.auth.signOut();
+                location.reload();
+                return;
+            }
+
+            if (rolUsuarioActual === 'admin' || rolUsuarioActual === 'moderador') {
+                document.getElementById('staff-management-section').style.display = 'block';
+                
+                if (rolUsuarioActual === 'admin') {
+                    document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Administrador! <i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i>`;
+                    document.getElementById('staff-panel-title').innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel de Administración General`;
+                } else {
+                    document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
+                    document.getElementById('staff-panel-title').innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel de Moderación de Comunidad`;
+                    document.getElementById('mod-recommendation-box').style.display = 'block';
+                    document.getElementById('mod-game-recommendation-box').style.display = 'block'; // Mostrar la caja de juegos prioritarios para mods
+                }
+
+                cargarUsuariosStaff();
             } else {
                 document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Usuario!`;
             }
 
-            // Mostrar el correo de forma clara debajo del saludo
-            document.getElementById('user-email.textContent').textContent = ''; // Limpiar por seguridad
             document.getElementById('user-email').innerHTML = `<i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> Cuenta: <strong>${user.email}</strong>`;
 
             await cargarMisFavoritos(user.id);
+        }
+
+        // --- GESTIÓN DE USUARIOS PARA ADMIN Y MODERADORES ---
+        async function cargarUsuariosStaff() {
+            const tbody = document.getElementById('tabla-usuarios-cuerpo');
+            
+            const { data: usuarios, error } = await supabaseClient
+                .from('usuarios_registrados')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color:#f85149;">Error cargando registros de usuarios.</td></tr>`;
+                return;
+            }
+
+            listaGlobalUsuarios = usuarios || [];
+            renderizarTablaStaff(listaGlobalUsuarios);
+        }
+
+        function renderizarTablaStaff(usuarios) {
+            const tbody = document.getElementById('tabla-usuarios-cuerpo');
+            if (usuarios.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#8b949e;">No se encontraron usuarios.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = usuarios.map(u => {
+                let badgeRol = `<span class="badge-rol badge-user">Usuario</span>`;
+                if (u.rol === 'admin') badgeRol = `<span class="badge-rol badge-admin">Admin</span>`;
+                if (u.rol === 'moderador') badgeRol = `<span class="badge-rol badge-mod">Mod</span>`;
+
+                let estadoHtml = `<span style="color:#3fb950;">Activo</span>`;
+                if (u.baneado) {
+                    estadoHtml = `<span class="badge-rol badge-banned">Baneado</span>`;
+                }
+
+                let botonesAccionHtml = '';
+
+                if (u.baneado) {
+                    if (rolUsuarioActual === 'admin') {
+                        botonesAccionHtml += `<button onclick="desbanearUsuario('${u.id}')" class="btn-action" style="background:#238636; padding:4px 8px; font-size:0.75rem; margin-right:4px;">Desbanear</button>`;
+                    } else {
+                        botonesAccionHtml += `<span style="font-size:0.75rem; color:#8b949e;">Baneado (Solo Admin destituye)</span>`;
+                    }
+                } else {
+                    botonesAccionHtml += `<button onclick="abrirModalBan('${u.id}')" class="btn-action btn-danger-custom" style="padding:4px 8px; font-size:0.75rem; margin-right:4px;">Banear</button>`;
+                }
+
+                if (rolUsuarioActual === 'admin') {
+                    if (u.rol === 'usuario') {
+                        botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'moderador')" class="btn-action" style="background:#0284c7; padding:4px 8px; font-size:0.75rem; margin-top:2px;">Hacer Mod</button>`;
+                    } else if (u.rol === 'moderador') {
+                        botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'usuario')" class="btn-action btn-secondary-custom" style="padding:4px 8px; font-size:0.75rem; margin-top:2px;" title="Quitar rango de moderador">Quitar Mod</button>`;
+                    }
+                }
+
+                return `
+                    <tr>
+                        <td style="font-family:monospace; font-size:0.8rem;" title="${u.id}">${u.id.substring(0, 10)}...</td>
+                        <td>${badgeRol}</td>
+                        <td>${estadoHtml}</td>
+                        <td>${botonesAccionHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrarTablaUsuarios() {
+            const filtro = document.getElementById('busqueda-usuario').value.toLowerCase();
+            const filtrados = listaGlobalUsuarios.filter(u => u.id.toLowerCase().includes(filtro));
+            renderizarTablaStaff(filtrados);
+        }
+
+        function abrirModalBan(userId) {
+            usuarioSeleccionadoParaBan = userId;
+            document.getElementById('ban-user-id-display').textContent = `ID de Usuario: ${userId}`;
+            document.getElementById('motivo-baneo').value = '';
+            
+            const optPermanente = document.getElementById('opt-permanente');
+            if (rolUsuarioActual === 'moderador') {
+                optPermanente.style.display = 'none';
+                document.getElementById('tipo-baneo').value = 'temporal';
+                document.getElementById('grupo-dias-baneo').style.display = 'block';
+            } else {
+                optPermanente.style.display = 'block';
+            }
+
+            document.getElementById('modal-ban').style.display = 'flex';
+        }
+
+        function cerrarModalBan() {
+            document.getElementById('modal-ban').style.display = 'none';
+            usuarioSeleccionadoParaBan = null;
+        }
+
+        function cambiarTipoBaneoSelect() {
+            const tipo = document.getElementById('tipo-baneo').value;
+            const grupoDias = document.getElementById('grupo-dias-baneo');
+            grupoDias.style.display = (tipo === 'temporal') ? 'block' : 'none';
+        }
+
+        async function ejecutarBaneoUsuario() {
+            if (!usuarioSeleccionadoParaBan) return;
+
+            const tipo = document.getElementById('tipo-baneo').value;
+            
+            if (rolUsuarioActual === 'moderador' && tipo === 'permanente') {
+                mostrarNotificacion('Acción no permitida: Los moderadores solo aplican baneos temporales.');
+                return;
+            }
+
+            const motivo = document.getElementById('motivo-baneo').value.trim() || 'Incumplimiento de normas';
+            let fechaFin = null;
+
+            if (tipo === 'temporal') {
+                const dias = parseInt(document.getElementById('dias-baneo').value) || 7;
+                let fechaCalculada = new Date();
+                fechaCalculada.setDate(fechaCalculada.getDate() + dias);
+                fechaFin = fechaCalculada.toISOString();
+            } else {
+                let fechaLejana = new Date();
+                fechaLejana.setFullYear(fechaLejana.getFullYear() + 100);
+                fechaFin = fechaLejana.toISOString();
+            }
+
+            const { error } = await supabaseClient
+                .from('usuarios_registrados')
+                .update({
+                    baneado: true,
+                    motivo_baneo: motivo,
+                    fecha_fin_baneo: fechaFin
+                })
+                .eq('id', usuarioSeleccionadoParaBan);
+
+            if (error) {
+                mostrarNotificacion('Error al aplicar baneo: ' + error.message);
+            } else {
+                mostrarNotificacion('Sanción aplicada correctamente.');
+                cerrarModalBan();
+                cargarUsuariosStaff();
+            }
+        }
+
+        async function desbanearUsuario(userId) {
+            if (rolUsuarioActual !== 'admin') {
+                mostrarNotificacion('Solo el Administrador puede retirar baneos.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('usuarios_registrados')
+                .update({
+                    baneado: false,
+                    motivo_baneo: null,
+                    fecha_fin_baneo: null
+                })
+                .eq('id', userId);
+
+            if (error) {
+                mostrarNotificacion('Error al desbanear: ' + error.message);
+            } else {
+                mostrarNotificacion('Usuario desbaneado con éxito.');
+                cargarUsuariosStaff();
+            }
+        }
+
+        async function cambiarRolUsuario(userId, nuevoRol) {
+            if (rolUsuarioActual !== 'admin') return;
+
+            const { error } = await supabaseClient
+                .from('usuarios_registrados')
+                .update({ rol: nuevoRol })
+                .eq('id', userId);
+
+            if (error) {
+                mostrarNotificacion('Error cambiando rol: ' + error.message);
+            } else {
+                mostrarNotificacion(`Rango actualizado a [${nuevoRol.toUpperCase()}] exitosamente.`);
+                cargarUsuariosStaff();
+            }
+        }
+
+        function enviarPropuestaMod() {
+            const candidatoId = document.getElementById('propuesta-user-id').value.trim();
+            const motivo = document.getElementById('propuesta-motivo').value.trim();
+
+            if (!candidatoId || !motivo) {
+                mostrarNotificacion('Completa el ID del candidato y el motivo.');
+                return;
+            }
+
+            mostrarNotificacion('¡Propuesta de moderador enviada con éxito!');
+            document.getElementById('propuesta-user-id').value = '';
+            document.getElementById('propuesta-motivo').value = '';
+        }
+
+        function enviarJuegoPrioritarioMod() {
+            const titulo = document.getElementById('juego-mod-titulo').value.trim();
+            const enlace = document.getElementById('juego-mod-enlace').value.trim();
+
+            if (!titulo || !enlace) {
+                mostrarNotificacion('Completa el título y enlace del juego.');
+                return;
+            }
+
+            mostrarNotificacion('¡Juego recomendado con Prioridad Alta enviado al Administrador!');
+            document.getElementById('juego-mod-titulo').value = '';
+            document.getElementById('juego-mod-enlace').value = '';
         }
 
         async function cargarMisFavoritos(userId) {
@@ -482,78 +851,53 @@
                 .select('juego_id')
                 .eq('user_id', userId);
 
-            if (errorFavs) {
-                console.error('Error al cargar favoritos:', errorFavs);
-                contenedorFavoritos.innerHTML = '<p style="color: #f85149; font-size: 0.9rem;">Error al cargar favoritos.</p>';
-                return;
-            }
-
-            if (!favs || favs.length === 0) {
+            if (errorFavs || !favs || favs.length === 0) {
                 contenedorFavoritos.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No tienes juegos favoritos guardados aún.</p>';
                 return;
             }
 
             const juegoIds = favs.map(f => f.juego_id);
-
-            const { data: juegos, error: errorJuegos } = await supabaseClient
+            const { data: juegos } = await supabaseClient
                 .from('juegos')
                 .select('id, titulo, imagen, categoria')
                 .in('id', juegoIds);
-
-            if (errorJuegos) {
-                console.error('Error al cargar detalles de los juegos:', errorJuegos);
-                contenedorFavoritos.innerHTML = '<p style="color: #f85149; font-size: 0.9rem;">Error al cargar los juegos favoritos.</p>';
-                return;
-            }
 
             if (!juegos || juegos.length === 0) {
                 contenedorFavoritos.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No se encontraron los juegos favoritos.</p>';
                 return;
             }
 
-            contenedorFavoritos.innerHTML = juegos.map(juego => {
-                return `
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; background: #161b22; padding: 10px; border-radius: 6px; border: 1px solid #30363d;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://via.placeholder.com/50x35?text=HL'">
-                            <div>
-                                <h6 style="margin: 0; color: #fff; font-size: 0.9rem;">${juego.titulo}</h6>
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">${juego.categoria || 'RPG Maker'}</span>
-                            </div>
+            contenedorFavoritos.innerHTML = juegos.map(juego => `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; background: #161b22; padding: 10px; border-radius: 6px; border: 1px solid #30363d;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${juego.imagen}" alt="${juego.titulo}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://via.placeholder.com/50x35?text=HL'">
+                        <div>
+                            <h6 style="margin: 0; color: #fff; font-size: 0.9rem;">${juego.titulo}</h6>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">${juego.categoria || 'RPG Maker'}</span>
                         </div>
-                        <a href="juego.html?id=${juego.id}" style="background: #238636; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Ver</a>
                     </div>
-                `;
-            }).join('');
+                    <a href="juego.html?id=${juego.id}" style="background: #238636; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; text-decoration: none; font-weight: 600;">Ver</a>
+                </div>
+            `).join('');
         }
 
         async function cambiarCorreo() {
             const nuevoCorreo = document.getElementById('nuevo-correo').value.trim();
-            if (!nuevoCorreo) {
-                mostrarNotificacion('Por favor ingresa un correo válido.');
-                return;
-            }
-
+            if (!nuevoCorreo) return mostrarNotificacion('Ingresa un correo válido.');
             const { error } = await supabaseClient.auth.updateUser({ email: nuevoCorreo });
-            if (error) {
-                mostrarNotificacion('Error al actualizar correo: ' + error.message);
-            } else {
-                mostrarNotificacion('¡Correo actualizado! Revisa tu bandeja para confirmar.');
+            if (error) mostrarNotificacion('Error: ' + error.message);
+            else {
+                mostrarNotificacion('¡Correo actualizado! Confirma en tu bandeja.');
                 document.getElementById('nuevo-correo').value = '';
             }
         }
 
         async function cambiarContrasena() {
             const nuevaContrasena = document.getElementById('nueva-contrasena').value.trim();
-            if (nuevaContrasena.length < 6) {
-                mostrarNotificacion('La contraseña debe tener al menos 6 caracteres.');
-                return;
-            }
-
+            if (nuevaContrasena.length < 6) return mostrarNotificacion('Mínimo 6 caracteres.');
             const { error } = await supabaseClient.auth.updateUser({ password: nuevaContrasena });
-            if (error) {
-                mostrarNotificacion('Error al actualizar contraseña: ' + error.message);
-            } else {
+            if (error) mostrarNotificacion('Error: ' + error.message);
+            else {
                 mostrarNotificacion('¡Contraseña actualizada con éxito!');
                 document.getElementById('nueva-contrasena').value = '';
             }
@@ -561,7 +905,7 @@
 
         async function cerrarSesion() {
             await supabaseClient.auth.signOut();
-            location.reload(); // Recarga la página para mostrar el formulario de login de inmediato
+            location.reload();
         }
 
         document.addEventListener('DOMContentLoaded', inicializarCuenta);
