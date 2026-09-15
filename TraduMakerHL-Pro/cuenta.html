@@ -300,8 +300,8 @@
                         
                         <!-- Enlace de Olvidaste tu contraseña -->
                         <div style="text-align: right; margin-bottom: 15px;">
-                            <a href="#" onclick="abrirModalRecuperar(event)" style="font-size: 0.8rem; color: #73bfff; text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                        </div>
+    <a href="#" onclick="abrirModalRecuperar(event)" style="font-size: 0.8rem; color: #73bfff; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+</div>
 
                         <button id="auth-submit-btn" onclick="ejecutarAutenticacion()" class="btn-action">Entrar a mi Cuenta</button>
                     </div>
@@ -520,6 +520,10 @@
             const btnSubmit = document.getElementById('auth-submit-btn');
             const btnLoginTab = document.getElementById('tab-login-btn');
             const btnRegisterTab = document.getElementById('tab-register-btn');
+            
+            // Buscamos el contenedor del enlace de recuperación (lo ideal es envolverlo en un div con un id o seleccionarlo por su contenido)
+            // Si le pusiste un id como id="forgot-password-link" al div contenedor, puedes ocultarlo así:
+            const linkRecuperar = document.getElementById('forgot-password-link');
 
             if (modo === 'login') {
                 titulo.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión`;
@@ -528,6 +532,7 @@
                 btnLoginTab.className = 'btn-action';
                 btnRegisterTab.style.background = '';
                 btnRegisterTab.className = 'btn-action btn-secondary-custom';
+                if (linkRecuperar) linkRecuperar.style.display = 'block'; // Mostrar en login
             } else {
                 titulo.innerHTML = `<i class="fa-solid fa-user-plus"></i> Crear una Cuenta`;
                 btnSubmit.textContent = 'Registrarse';
@@ -535,6 +540,7 @@
                 btnRegisterTab.className = 'btn-action';
                 btnLoginTab.style.background = '';
                 btnLoginTab.className = 'btn-action btn-secondary-custom';
+                if (linkRecuperar) linkRecuperar.style.display = 'none'; // Ocultar en registro
             }
         }
 
