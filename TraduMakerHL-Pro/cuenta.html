@@ -264,6 +264,22 @@
                     <p id="user-email">Cargando información...</p>
                 </div>
 
+                <!-- SECCIÓN ESPECIAL: Restablecer Contraseña desde Correo -->
+                <div id="recovery-password-section" class="account-section" style="display: none; border: 2px solid #73bfff;">
+                    <h3 style="color: #73bfff;"><i class="fa-solid fa-key"></i> Restablecer tu Contraseña</h3>
+                    <p style="font-size: 0.85rem; color: #8b949e; margin-bottom: 15px;">Introduce tu nueva contraseña para recuperar el acceso a tu cuenta.</p>
+                    
+                    <div class="form-group">
+                        <label>Nueva Contraseña</label>
+                        <input type="password" id="recup-nueva-pass" class="form-control" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <div class="form-group">
+                        <label>Repetir Nueva Contraseña</label>
+                        <input type="password" id="recup-repetir-pass" class="form-control" placeholder="Repite tu contraseña">
+                    </div>
+                    <button onclick="guardarNuevaContrasenaRecuperacion()" class="btn-action">Actualizar Contraseña</button>
+                </div>
+
                 <!-- SECCIÓN 1: Autenticación / Login / Registro -->
                 <div id="no-session-section" style="display: none;">
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
@@ -410,7 +426,7 @@
         </div>
     </div>
 
-    <!-- Modal para Recuperar Contraseña -->
+    <!-- Modal para Solicitar Recuperación de Contraseña -->
     <div id="modal-recuperar" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
         <div style="background:#161b22; border:1px solid #30363d; padding:30px; border-radius:10px; width:90%; max-width:400px;">
             <h3 style="color:#73bfff; margin-top:0;"><i class="fa-solid fa-envelope-open-text"></i> Recuperar Contraseña</h3>
@@ -544,13 +560,13 @@
                 if (error) {
                     mostrarNotificacion('Error al registrarse: ' + error.message);
                 } else {
-                    mostrarNotificacion('¡Registro exitoso! Inicia sesión.');
+                    mostrarNotificacion('¡Registro exitoso! Ya puedes iniciar sesión.');
                     cambiarModoAuth('login');
                 }
             }
         }
 
-        // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
+        // --- GESTIÓN DE RECUPERACIÓN DE CONTRASEÑA ---
         function abrirModalRecuperar(e) {
             e.preventDefault();
             document.getElementById('recuperar-email').value = '';
@@ -569,7 +585,7 @@
             }
 
             const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href.split('?')[0],
+                redirectTo: 'https://tradumaker-hl.onrender.com/cuenta.html',
             });
 
             if (error) {
@@ -580,7 +596,52 @@
             }
         }
 
+        async function detectarModoRecuperacionURL() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const type = hashParams.get('type');
+
+            if (type === 'recovery') {
+                document.getElementById('no-session-section').style.display = 'none';
+                document.getElementById('protected-account-content').style.display = 'none';
+                document.getElementById('recovery-password-section').style.display = 'block';
+                document.getElementById('user-greeting').textContent = 'Restablecer Acceso';
+                document.getElementById('user-email').textContent = 'Crea una nueva contraseña segura';
+                return true;
+            }
+            return false;
+        }
+
+        async function guardarNuevaContrasenaRecuperacion() {
+            const pass1 = document.getElementById('recup-nueva-pass').value.trim();
+            const pass2 = document.getElementById('recup-repetir-pass').value.trim();
+
+            if (!pass1 || pass1.length < 6) {
+                mostrarNotificacion('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            if (pass1 !== pass2) {
+                mostrarNotificacion('Las contraseñas no coinciden.');
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.updateUser({ password: pass1 });
+
+            if (error) {
+                mostrarNotificacion('Error al actualizar: ' + error.message);
+            } else {
+                mostrarNotificacion('¡Contraseña actualizada con éxito! Redirigiendo...');
+                setTimeout(() => {
+                    window.location.href = 'cuenta.html';
+                }, 2000);
+            }
+        }
+
         async function inicializarCuenta() {
+            // Verificar si el usuario viene del correo con un enlace de recuperación
+            const esRecuperacion = await detectarModoRecuperacionURL();
+            if (esRecuperacion) return;
+
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             
             if (error || !session) {
