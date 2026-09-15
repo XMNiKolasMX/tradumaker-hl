@@ -335,7 +335,7 @@
                         <!-- Sección de Recomendación de Juegos (Prioridad Alta para Moderadores) -->
                         <div id="mod-game-recommendation-box" style="margin-top: 20px; background: #161b22; padding: 15px; border-radius: 6px; border: 1px solid #f59e0b; display: none;">
                             <h4 style="color: #f59e0b; font-size: 0.95rem; margin-top:0;"><i class="fa-solid fa-star"></i> Recomendar Juego RPG Maker (Prioridad Alta)</h4>
-                            <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">Como moderador, tu recomendación entra directo con máxima prioridad al Administrador.</p>
+                            <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">Como moderador, tu recomendación va directa a Supabase con máxima prioridad para el Administrador.</p>
                             <div class="form-group" style="margin-bottom: 10px;">
                                 <input type="text" id="juego-mod-titulo" class="form-control" placeholder="Título del juego RPG Maker">
                             </div>
@@ -621,7 +621,7 @@
                     document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
                     document.getElementById('staff-panel-title').innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel de Moderación de Comunidad`;
                     document.getElementById('mod-recommendation-box').style.display = 'block';
-                    document.getElementById('mod-game-recommendation-box').style.display = 'block'; // Mostrar la caja de juegos prioritarios para mods
+                    document.getElementById('mod-game-recommendation-box').style.display = 'block';
                 }
 
                 cargarUsuariosStaff();
@@ -829,7 +829,7 @@
             document.getElementById('propuesta-motivo').value = '';
         }
 
-        function enviarJuegoPrioritarioMod() {
+        async function enviarJuegoPrioritarioMod() {
             const titulo = document.getElementById('juego-mod-titulo').value.trim();
             const enlace = document.getElementById('juego-mod-enlace').value.trim();
 
@@ -838,9 +838,31 @@
                 return;
             }
 
-            mostrarNotificacion('¡Juego recomendado con Prioridad Alta enviado al Administrador!');
-            document.getElementById('juego-mod-titulo').value = '';
-            document.getElementById('juego-mod-enlace').value = '';
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                mostrarNotificacion('Debes iniciar sesión para enviar una recomendación.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('juegos_recomendados')
+                .insert([
+                    { 
+                        user_id: session.user.id, 
+                        titulo_juego: titulo, 
+                        enlace: enlace, 
+                        tipo: 'moderador',
+                        votos: 1 
+                    }
+                ]);
+
+            if (error) {
+                mostrarNotificacion('Error al guardar la recomendación: ' + error.message);
+            } else {
+                mostrarNotificacion('¡Juego recomendado con Prioridad Alta guardado en Supabase!');
+                document.getElementById('juego-mod-titulo').value = '';
+                document.getElementById('juego-mod-enlace').value = '';
+            }
         }
 
         async function cargarMisFavoritos(userId) {
