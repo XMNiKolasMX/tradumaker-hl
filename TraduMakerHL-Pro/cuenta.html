@@ -448,7 +448,6 @@
             document.getElementById('protected-account-content').style.display = 'block';
 
             const user = session.user;
-            document.getElementById('user-email').textContent = user.email;
 
             const { data: perfil } = await supabaseClient
                 .from('usuarios_registrados')
@@ -458,14 +457,19 @@
 
             const rol = perfil ? perfil.rol : 'usuario';
 
+            // Saludos personalizados según el rol con distinción clara
             if (rol === 'admin') {
-                document.getElementById('user-greeting').innerHTML = `¡Hola, Administrador! <i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i>`;
+                document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Administrador! <i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i>`;
                 document.getElementById('admin-panel-section').style.display = 'block';
             } else if (rol === 'moderador') {
-                document.getElementById('user-greeting').innerHTML = `¡Hola, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
+                document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Moderador! <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>`;
             } else {
-                document.getElementById('user-greeting').textContent = `¡Bienvenido de nuevo!`;
+                document.getElementById('user-greeting').innerHTML = `¡Bienvenido, Usuario!`;
             }
+
+            // Mostrar el correo de forma clara debajo del saludo
+            document.getElementById('user-email.textContent').textContent = ''; // Limpiar por seguridad
+            document.getElementById('user-email').innerHTML = `<i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> Cuenta: <strong>${user.email}</strong>`;
 
             await cargarMisFavoritos(user.id);
         }
