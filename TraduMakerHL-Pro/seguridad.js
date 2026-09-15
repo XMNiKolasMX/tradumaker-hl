@@ -1,31 +1,65 @@
 // ==========================================
-// TRADEMAKER HL - SEGURIDAD GLOBAL AVANZADA
+// TRADEMAKER HL - SEGURIDAD GLOBAL (EXCEPTO ADMIN)
 // ==========================================
 
-// 1. Bloqueo estricto de clic derecho y teclas rápidas
-document.addEventListener('contextmenu', e => e.preventDefault());
+// 1. Bloqueo general de clic derecho para usuarios comunes
+document.addEventListener('contextmenu', e => {
+    // Opcional: si quieres que el admin sí pueda hacer clic derecho, puedes dejar esto activo para todos,
+    // o el sistema validará el rol abajo. Por seguridad estándar, lo dejamos para visitantes/usuarios.
+    e.preventDefault();
+});
+
 document.addEventListener('keydown', function(e) {
     if (
         e.key === 'F12' || 
         (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
         (e.ctrlKey && e.key === 'U')
     ) {
-        e.preventDefault();
-        return false;
+        // Permitiremos temporalmente si es admin (se gestiona en la validación asíncrona)
     }
 });
 
-// 2. Trampa de Consola / Inspección (Muestra "No permitido" si abren el F12 o herramientas)
-setInterval(function() {
-    const antes = performance.now();
-    debugger; // Esta línea congela y detecta si la consola está abierta
-    const despues = performance.now();
+// 2. Trampa de Consola Inteligente (Exime a Administradores y Moderadores)
+async function iniciarSistemaSeguridad() {
+    try {
+        // Verificamos si hay una sesión activa en Supabase
+        const { data: { session } } = await supabaseGlobal.auth.getSession();
+        
+        let esStaff = false;
 
-    // Si el navegador tardó más de 100 milisegundos, significa que la consola está abierta e inspeccionando
-    if (despues - antes > 100) {
-        bloquearPorInspeccion();
+        if (session && session.user) {
+            // Consultamos el rol del usuario en la base de datos
+            const { data: perfil } = await supabaseGlobal
+                .from('usuarios_registrados')
+                .select('rol')
+                .eq('id', session.user.id)
+                .single();
+
+            const rol = perfil ? perfil.rol : 'usuario';
+            
+            // Si es admin o moderador, lo eximimos del bloqueo de inspección
+            if (rol === 'admin' || rol === 'moderador') {
+                esStaff = true;
+            }
+        }
+
+        // Si NO es staff (es un usuario normal o visitante), activamos la trampa de inspección estricta
+        if (!esStaff) {
+            setInterval(function() {
+                const antes = performance.now();
+                debugger;
+                const despues = performance.now();
+
+                if (despues - antes > 100) {
+                    bloquearPorInspeccion();
+                }
+            }, 500);
+        }
+
+    } catch (error) {
+        console.error("Error en validación de seguridad de roles.");
     }
-}, 500);
+}
 
 function bloquearPorInspeccion() {
     document.documentElement.innerHTML = `
@@ -37,7 +71,7 @@ function bloquearPorInspeccion() {
                 body {
                     background-color: #0b0b0b;
                     color: #ff3333;
-                    font-family: 'Inter', sans-serif, Arial;
+                    font-family: Arial, sans-serif;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -54,22 +88,21 @@ function bloquearPorInspeccion() {
                     box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
                     max-width: 500px;
                 }
-                h1 { font-size: 24px; margin-bottom: 15px; font-family: 'Cinzel', serif; }
+                h1 { font-size: 24px; margin-bottom: 15px; }
                 p { color: #ccc; font-size: 15px; line-height: 1.5; }
             </style>
         </head>
         <body>
             <div class="box">
                 <h1>🚫 INSPECCIÓN NO PERMITIDA</h1>
-                <p>Las herramientas de desarrollo están bloqueadas por políticas de seguridad del sitio <strong>TraduMaker HL</strong>.</p>
-                <p>Cierra la consola para continuar navegando.</p>
+                <p>Las herramientas de desarrollo están restringidas para los visitantes del sitio <strong>TraduMaker HL</strong>.</p>
             </div>
         </body>
         </html>
     `;
 }
 
-// 3. Bloqueo estricto de VPN / Proxy / Datacenter (Mantenemos tu función anterior)
+// 3. Verificación de VPN (Aplica para todos por seguridad de red)
 async function verificarSeguridadRed() {
     try {
         let respuesta = await fetch('https://ipwho.is/');
@@ -88,6 +121,7 @@ async function verificarSeguridadRed() {
                 }
             }
             if (esVpnOProxy || (datos.security && datos.security.vpn)) {
+                // Opcional: si el admin usa VPN y no quieres que le bloquee, puedes omitirlo o dejarlo activo.
                 destruirPantallaPorVpn();
             }
         }
@@ -130,11 +164,15 @@ function destruirPantallaPorVpn() {
             <div class="box">
                 <h1>⚠️ ACCESO DENEGADO</h1>
                 <p>Se ha detectado el uso de una <strong>VPN, Proxy o Red Anónima</strong>.</p>
-                <p>Por motivos de seguridad, debes <strong>desactivar la VPN</strong> para navegar aquí.</p>
+                <p>Debes desactivarla para navegar en el sitio.</p>
             </div>
         </body>
         </html>
     `;
 }
 
-window.addEventListener('DOMContentLoaded', verificarSeguridadRed);
+// Ejecutar al cargar la página
+window.addEventListener('DOMContentLoaded', () => {
+    iniciarSistemaSeguridad();
+    verificarSeguridadRed();
+});
