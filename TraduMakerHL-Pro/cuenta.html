@@ -299,7 +299,7 @@
                         </div>
                         
                         <div id="forgot-password-link" style="text-align: right; margin-bottom: 15px;">
-                        <a href="#" onclick="abrirModalRecuperar(event)" style="font-size: 0.8rem; color: #73bfff; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                            <a href="#" onclick="abrirModalRecuperar(event)" style="font-size: 0.8rem; color: #73bfff; text-decoration: none;">¿Olvidaste tu contraseña?</a>
                         </div>
 
                         <button id="auth-submit-btn" onclick="ejecutarAutenticacion()" class="btn-action">Entrar a mi Cuenta</button>
@@ -519,9 +519,6 @@
             const btnSubmit = document.getElementById('auth-submit-btn');
             const btnLoginTab = document.getElementById('tab-login-btn');
             const btnRegisterTab = document.getElementById('tab-register-btn');
-            
-            // Buscamos el contenedor del enlace de recuperación (lo ideal es envolverlo en un div con un id o seleccionarlo por su contenido)
-            // Si le pusiste un id como id="forgot-password-link" al div contenedor, puedes ocultarlo así:
             const linkRecuperar = document.getElementById('forgot-password-link');
 
             if (modo === 'login') {
@@ -531,7 +528,7 @@
                 btnLoginTab.className = 'btn-action';
                 btnRegisterTab.style.background = '';
                 btnRegisterTab.className = 'btn-action btn-secondary-custom';
-                if (linkRecuperar) linkRecuperar.style.display = 'block'; // Mostrar en login
+                if (linkRecuperar) linkRecuperar.style.display = 'block';
             } else {
                 titulo.innerHTML = `<i class="fa-solid fa-user-plus"></i> Crear una Cuenta`;
                 btnSubmit.textContent = 'Registrarse';
@@ -539,7 +536,7 @@
                 btnRegisterTab.className = 'btn-action';
                 btnLoginTab.style.background = '';
                 btnLoginTab.className = 'btn-action btn-secondary-custom';
-                if (linkRecuperar) linkRecuperar.style.display = 'none'; // Ocultar en registro
+                if (linkRecuperar) linkRecuperar.style.display = 'none';
             }
         }
 
@@ -643,7 +640,6 @@
         }
 
         async function inicializarCuenta() {
-            // Verificar si el usuario viene del correo con un enlace de recuperación
             const esRecuperacion = await detectarModoRecuperacionURL();
             if (esRecuperacion) return;
 
@@ -737,21 +733,29 @@
 
                 let botonesAccionHtml = '';
 
-                if (u.baneado) {
-                    if (rolUsuarioActual === 'admin') {
-                        botonesAccionHtml += `<button onclick="desbanearUsuario('${u.id}')" class="btn-action" style="background:#238636; padding:4px 8px; font-size:0.75rem; margin-right:4px;">Desbanear</button>`;
-                    } else {
-                        botonesAccionHtml += `<span style="font-size:0.75rem; color:#8b949e;">Baneado (Solo Admin destituye)</span>`;
-                    }
-                } else {
-                    botonesAccionHtml += `<button onclick="abrirModalBan('${u.id}')" class="btn-action btn-danger-custom" style="padding:4px 8px; font-size:0.75rem; margin-right:4px;">Banear</button>`;
-                }
+                // REGLA DE SEGURIDAD Y JERARQUÍA:
+                // Cuentas con rol 'admin' no pueden ser baneadas ni editadas por moderadores u otros administradores
+                const esDestinatarioAdmin = (u.rol === 'admin');
 
-                if (rolUsuarioActual === 'admin') {
-                    if (u.rol === 'usuario') {
-                        botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'moderador')" class="btn-action" style="background:#0284c7; padding:4px 8px; font-size:0.75rem; margin-top:2px;">Hacer Mod</button>`;
-                    } else if (u.rol === 'moderador') {
-                        botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'usuario')" class="btn-action btn-secondary-custom" style="padding:4px 8px; font-size:0.75rem; margin-top:2px;" title="Quitar rango de moderador">Quitar Mod</button>`;
+                if (esDestinatarioAdmin) {
+                    botonesAccionHtml = `<span style="font-size:0.75rem; color:#8b949e;"><i class="fa-solid fa-lock"></i> Protegido (Admin)</span>`;
+                } else {
+                    if (u.baneado) {
+                        if (rolUsuarioActual === 'admin') {
+                            botonesAccionHtml += `<button onclick="desbanearUsuario('${u.id}')" class="btn-action" style="background:#238636; padding:4px 8px; font-size:0.75rem; margin-right:4px;">Desbanear</button>`;
+                        } else {
+                            botonesAccionHtml += `<span style="font-size:0.75rem; color:#8b949e;">Baneado (Solo Admin destituye)</span>`;
+                        }
+                    } else {
+                        botonesAccionHtml += `<button onclick="abrirModalBan('${u.id}')" class="btn-action btn-danger-custom" style="padding:4px 8px; font-size:0.75rem; margin-right:4px;">Banear</button>`;
+                    }
+
+                    if (rolUsuarioActual === 'admin') {
+                        if (u.rol === 'usuario') {
+                            botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'moderador')" class="btn-action" style="background:#0284c7; padding:4px 8px; font-size:0.75rem; margin-top:2px;">Hacer Mod</button>`;
+                        } else if (u.rol === 'moderador') {
+                            botonesAccionHtml += `<button onclick="cambiarRolUsuario('${u.id}', 'usuario')" class="btn-action btn-secondary-custom" style="padding:4px 8px; font-size:0.75rem; margin-top:2px;" title="Quitar rango de moderador">Quitar Mod</button>`;
+                        }
                     }
                 }
 
