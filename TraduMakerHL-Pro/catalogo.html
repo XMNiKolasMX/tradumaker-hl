@@ -65,6 +65,25 @@
             border-color: transparent;
         }
 
+        /* Botón de Agregar Juego (Solo Admin) */
+        .btn-agregar-admin {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn-agregar-admin:hover {
+            background: #2ea043;
+        }
+
         /* Modos de visualización del contenedor */
         .games-grid.mode-grid {
             display: grid;
@@ -126,6 +145,63 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
+        /* Modal para Agregar Juego */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 5px;
+        }
+        .form-control {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.95rem;
+        }
+        .form-control:focus {
+            border-color: #73bfff;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         /* Notificación flotante temporal (Toast) */
         .toast-notificacion {
             position: fixed;
@@ -149,7 +225,7 @@
             100% { opacity: 0; transform: translateY(20px); }
         }
 
-        /* Estilos del Menú Desplegable (Dropdown) en el Navbar */
+        /* Menú Desplegable (Dropdown) */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -167,7 +243,6 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
         }
         .dropbtn:hover {
             background: rgba(124, 58, 237, 0.3);
@@ -181,18 +256,13 @@
             min-width: 220px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
             z-index: 1000;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color, #30363d);
             border-radius: 10px;
             overflow: hidden;
             margin-top: 8px;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-content a {
-            color: var(--text-main);
+            color: #c9d1d9;
             padding: 12px 16px;
             text-decoration: none;
             display: flex;
@@ -202,33 +272,22 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.2s;
         }
-        .dropdown-content a:last-child {
-            border-bottom: none;
-        }
         .dropdown-content a:hover {
             background-color: rgba(124, 58, 237, 0.15);
-            color: var(--accent);
+            color: #73bfff;
         }
-        .dropdown-content a.active {
-            background-color: rgba(124, 58, 237, 0.2);
-            color: #a78bfa;
-            font-weight: 600;
-        }
-        .show {
-            display: block;
-        }
+        .show { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- Navegación Profesional Multi-página -->
+    <!-- Navegación -->
     <header class="navbar">
         <div class="nav-container">
             <div class="logo">
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
             
-            <!-- Menú Desplegable (Dropdown) -->
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
                     <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
@@ -236,14 +295,11 @@
                 <div id="navDropdown" class="dropdown-content">
                     <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
                     <a href="catalogo.html" class="active"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
+                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos</a>
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="cuenta.html">
-                        <i class="fa-solid fa-user"></i> Cuenta 
-                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-                    </a>
+                    <a href="cuenta.html"><i class="fa-solid fa-user"></i> Cuenta</a>
                 </div>
             </div>
 
@@ -253,15 +309,23 @@
         </div>
     </header>
 
-    <!-- Contenido Principal: Catálogo -->
+    <!-- Contenido Principal -->
     <main class="main-content">
         <section class="container catalog-page-section">
-            <div class="catalog-header-banner">
-                <h1>Catálogo de Traducciones</h1>
-                <p>Explora todos los juegos disponibles en nuestra base de datos en la nube.</p>
+            <div class="catalog-header-banner" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1>Catálogo de Traducciones</h1>
+                    <p>Explora todos los juegos disponibles en nuestra base de datos en la nube.</p>
+                </div>
+                <!-- Botón Agregar Juego (Oculto por defecto hasta verificar si es Admin) -->
+                <div id="admin-add-container" style="display: none;">
+                    <button onclick="abrirModalAgregarJuego()" class="btn-agregar-admin">
+                        <i class="fa-solid fa-plus"></i> Agregar Juego
+                    </button>
+                </div>
             </div>
 
-            <!-- Controles de Búsqueda, Orden y Vistas -->
+            <!-- Controles -->
             <div class="catalog-top-controls">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -282,14 +346,90 @@
                 </div>
             </div>
 
-            <!-- Contenedor Dinámico del Catálogo -->
+            <!-- Contenedor del Catálogo -->
             <div id="grid-catalogo" class="games-grid mode-grid">
                 <div class="loading-skeleton">Cargando catálogo completo, espere por favor.</div>
             </div>
         </section>
     </main>
 
-    <!-- Footer Profesional -->
+    <!-- MODAL PARA AGREGAR JUEGO (Solo Administradores) -->
+    <div id="modal-agregar-juego" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color: #73bfff; margin-top: 0; margin-bottom: 20px;"><i class="fa-solid fa-gamepad"></i> Agregar Nuevo Juego al Catálogo</h3>
+            
+            <div class="form-group">
+                <label>Título del Juego *</label>
+                <input type="text" id="nuevo-titulo" class="form-control" placeholder="Ej: RPG Game Español">
+            </div>
+
+            <div class="form-group">
+                <label>Traductor *</label>
+                <select id="nuevo-traductor" class="form-control">
+                    <option value="Niko">Niko</option>
+                    <option value="ℝ𝕆ℕ𝕀ℕ 𝕂𝔼𝕐𝔸ℝ𝕌 [BLXF]">ℝ𝕆ℕ𝕀ℕ 𝕂𝔼𝕐𝔸ℝ𝕌 [BLXF]</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Categoría</label>
+                <input type="text" id="nuevo-categoria" class="form-control" placeholder="Ej: RPG Maker / Terror / Aventura">
+            </div>
+
+            <div class="form-group">
+                <label>URL de la Imagen</label>
+                <input type="text" id="nuevo-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+            </div>
+
+            <div class="form-group">
+                <label>Enlace de Descarga (Traducción)</label>
+                <input type="text" id="nuevo-enlace" class="form-control" placeholder="https://mega.nz/...">
+            </div>
+
+            <div class="form-group">
+                <label>Enlace Original</label>
+                <input type="text" id="nuevo-enlace-original" class="form-control" placeholder="Enlace del juego original en inglés/japonés">
+            </div>
+
+            <div class="form-group">
+                <label>Desarrollador</label>
+                <input type="text" id="nuevo-desarrollador" class="form-control" placeholder="Nombre del creador">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Peso (Tamaño)</label>
+                    <input type="text" id="nuevo-peso" class="form-control" placeholder="Ej: 450 MB">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>RAM Requerida</label>
+                    <input type="text" id="nuevo-ram" class="form-control" placeholder="Ej: 2 GB">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="nuevo-descripcion" class="form-control" rows="3" placeholder="Sinopsis o detalles del juego..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Descargas (Número inicial)</label>
+                <input type="number" id="nuevo-descargas" class="form-control" value="0" min="0">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="nuevo-traducido" checked>
+                <label for="nuevo-traducido" style="margin: 0; color: #fff; cursor: pointer;">¿Está 100% traducido y disponible?</label>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button onclick="guardarNuevoJuego()" class="btn-agregar-admin" style="flex: 1; justify-content: center;">Guardar Juego</button>
+                <button onclick="cerrarModalAgregarJuego()" class="btn-agregar-admin" style="background: #21262d; border: 1px solid #30363d; flex: 1; justify-content: center;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-info">
@@ -318,7 +458,7 @@
         </div>
     </footer>
 
-    <!-- Script de Supabase, Menú Desplegable y Lógica del Catálogo con Favoritos -->
+    <!-- Lógica y Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -328,12 +468,10 @@
         let idsFavoritosUsuario = [];
         let vistaActual = 'grid';
 
-        // Función para abrir/cerrar el menú desplegable de navegación
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
         }
 
-        // Cerrar el menú si el usuario hace clic fuera de él
         window.onclick = function(event) {
             if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -346,14 +484,13 @@
             }
         }
 
-        // Sistema de notificaciones flotantes (Toast)
         function mostrarNotificacion(mensaje) {
             const viejaNoti = document.querySelector('.toast-notificacion');
             if (viejaNoti) viejaNoti.remove();
 
             const noti = document.createElement('div');
             noti.className = 'toast-notificacion';
-            noti.innerHTML = `<i class="fa-solid fa-star" style="color: #f59e0b; margin-right: 6px;"></i> ${mensaje}`;
+            noti.innerHTML = `<i class="fa-solid fa-circle-info" style="color: #73bfff; margin-right: 6px;"></i> ${mensaje}`;
             document.body.appendChild(noti);
 
             setTimeout(() => {
@@ -361,7 +498,75 @@
             }, 2500);
         }
 
-        // PASO 1: Cargar los favoritos que el usuario tiene guardados en Supabase
+        // Verificar si el usuario actual es Administrador para mostrar el botón de agregar
+        async function verificarRolAdmin() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return;
+
+            const { data: perfil } = await supabaseClient
+                .from('usuarios_registrados')
+                .select('rol')
+                .eq('id', session.user.id)
+                .single();
+
+            if (perfil && perfil.rol === 'admin') {
+                document.getElementById('admin-add-container').style.display = 'block';
+            }
+        }
+
+        function abrirModalAgregarJuego() {
+            document.getElementById('modal-agregar-juego').style.display = 'flex';
+        }
+
+        function cerrarModalAgregarJuego() {
+            document.getElementById('modal-agregar-juego').style.display = 'none';
+        }
+
+        async function guardarNuevoJuego() {
+            const titulo = document.getElementById('nuevo-titulo').value.trim();
+            const traductor = document.getElementById('nuevo-traductor').value;
+            const categoria = document.getElementById('nuevo-categoria').value.trim();
+            const imagen = document.getElementById('nuevo-imagen').value.trim();
+            const enlace = document.getElementById('nuevo-enlace').value.trim();
+            const enlace_original = document.getElementById('nuevo-enlace-original').value.trim();
+            const desarrollador = document.getElementById('nuevo-desarrollador').value.trim();
+            const peso = document.getElementById('nuevo-peso').value.trim();
+            const ram = document.getElementById('nuevo-ram').value.trim();
+            const descripcion = document.getElementById('nuevo-descripcion').value.trim();
+            const descargas = parseInt(document.getElementById('nuevo-descargas').value) || 0;
+            const traducido = document.getElementById('nuevo-traducido').checked;
+
+            if (!titulo) {
+                mostrarNotificacion('El título del juego es obligatorio.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('juegos')
+                .insert([{
+                    titulo,
+                    traductor,
+                    categoria,
+                    imagen,
+                    enlace,
+                    enlace_original,
+                    desarrollador,
+                    peso,
+                    ram,
+                    descripcion,
+                    descargas,
+                    traducido
+                }]);
+
+            if (error) {
+                mostrarNotificacion('Error al guardar: ' + error.message);
+            } else {
+                mostrarNotificacion('¡Juego agregado con éxito! 🚀');
+                cerrarModalAgregarJuego();
+                cargarCatalogo(); // Recargar catálogo
+            }
+        }
+
         async function cargarFavoritosUsuario() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -382,8 +587,8 @@
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
-                // Cargamos los favoritos antes de pintar las tarjetas
                 await cargarFavoritosUsuario();
+                await verificarRolAdmin();
 
                 const { data, error } = await supabaseClient
                     .from('juegos')
@@ -404,12 +609,10 @@
             const textoBusqueda = document.getElementById('input-buscar').value.toLowerCase();
             const orden = document.getElementById('sortSelect').value;
 
-            // 1. Filtrar por texto
             let juegosFiltrados = todosLosJuegos.filter(juego => 
                 juego.titulo.toLowerCase().includes(textoBusqueda)
             );
 
-            // 2. Ordenar alfabéticamente (A-Z / Z-A)
             juegosFiltrados.sort((a, b) => {
                 const tituloA = a.titulo.toLowerCase();
                 const tituloB = b.titulo.toLowerCase();
@@ -423,7 +626,6 @@
             renderizarJuegos(juegosFiltrados);
         }
 
-        // PASO 2: Renderizado de tarjetas incluyendo la estrellita de favoritos
         function renderizarJuegos(juegos) {
             const contenedor = document.getElementById('grid-catalogo');
             
@@ -434,13 +636,12 @@
 
             contenedor.innerHTML = juegos.map(juego => {
                 const esFavorito = idsFavoritosUsuario.includes(juego.id);
-                // Si ya es favorito, se usa icono sólido (fas) y color dorado; si no, vacío (far) y blanco
                 const claseEstrella = esFavorito ? 'fas' : 'far';
                 const colorEstrella = esFavorito ? '#f59e0b' : '#ffffff';
+                const traductorNombre = juego.traductor || 'Niko';
 
                 return `
                     <div class="game-card" style="position: relative;">
-                        <!-- Botón de Favorito con Estrellita -->
                         <button class="btn-favorito" 
                                 data-id="${juego.id}" 
                                 title="${esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
@@ -453,6 +654,7 @@
                         </div>
                         <div class="game-info">
                             <h3 class="game-title">${juego.titulo}</h3>
+                            <p style="font-size: 0.75rem; color: #8b949e; margin-bottom: 8px;"><i class="fa-solid fa-pen-nib"></i> Traductor: <strong style="color: #73bfff;">${traductorNombre}</strong></p>
                             <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                         </div>
                     </div>
@@ -460,28 +662,23 @@
             }).join('');
         }
 
-        // PASO 3: Lógica para manejar clics en la estrella (Agregar / Eliminar y persistir en Supabase)
         document.addEventListener('click', async (e) => {
             const btnFavorito = e.target.closest('.btn-favorito');
             if (!btnFavorito) return;
 
-            // Verificar si el usuario ha iniciado sesión
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 mostrarNotificacion('Debes iniciar sesión para agregar favoritos');
-                setTimeout(() => {
-                    window.location.href = 'cuenta.html';
-                }, 1200);
+                setTimeout(() => { window.location.href = 'cuenta.html'; }, 1200);
                 return;
             }
 
             const userId = session.user.id;
             const juegoId = btnFavorito.getAttribute('data-id');
             const icono = btnFavorito.querySelector('i');
-            const esActivo = icono.classList.contains('fas'); // Si ya era favorito
+            const esActivo = icono.classList.contains('fas');
 
             if (esActivo) {
-                // Eliminar de favoritos en Supabase
                 const { error } = await supabaseClient
                     .from('favoritos')
                     .delete()
@@ -492,15 +689,10 @@
                     icono.classList.remove('fas');
                     icono.classList.add('far');
                     icono.style.color = '#ffffff';
-                    btnFavorito.title = 'Agregar a favoritos';
                     idsFavoritosUsuario = idsFavoritosUsuario.filter(id => id != juegoId);
                     mostrarNotificacion('Eliminado de favoritos');
-                } else {
-                    console.error('Error al eliminar:', error.message);
-                    mostrarNotificacion('Error al eliminar de favoritos');
                 }
             } else {
-                // Agregar a favoritos en Supabase
                 const { error } = await supabaseClient
                     .from('favoritos')
                     .insert([{ user_id: userId, juego_id: juegoId }]);
@@ -509,12 +701,8 @@
                     icono.classList.remove('far');
                     icono.classList.add('fas');
                     icono.style.color = '#f59e0b';
-                    btnFavorito.title = 'Quitar de favoritos';
                     idsFavoritosUsuario.push(juegoId);
                     mostrarNotificacion('¡Agregado a favoritos! ⭐');
-                } else {
-                    console.error('Error al agregar:', error.message);
-                    mostrarNotificacion('Error al agregar a favoritos');
                 }
             }
         });
@@ -528,47 +716,8 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Escuchar cambios en la barra de búsqueda
         document.getElementById('input-buscar').addEventListener('input', aplicarFiltrosYOrden);
-
         document.addEventListener('DOMContentLoaded', cargarCatalogo);
     </script>
-
-    <!-- Script de verificación de sesión y roles global -->
-    <script>
-        async function verificarSesionYRolesGlobal() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const enlacesCuenta = document.querySelectorAll('a[href="cuenta.html"]');
-
-            if (session && session.user) {
-                const userId = session.user.id;
-
-                const { data: perfil } = await supabaseClient
-                    .from('usuarios_registrados')
-                    .select('rol')
-                    .eq('id', userId)
-                    .single();
-
-                const rol = perfil ? perfil.rol : 'usuario';
-
-                enlacesCuenta.forEach(enlace => {
-                    if (rol === 'admin') {
-                        enlace.innerHTML = `<i class="fa-solid fa-shield-halved" style="color: #a78bfa;"></i> Panel Admin`;
-                    } else if (rol === 'moderador') {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i> Panel Mod`;
-                    } else {
-                        enlace.innerHTML = `<i class="fa-solid fa-user-check"></i> Mi Cuenta`;
-                    }
-                });
-            } else {
-                enlacesCuenta.forEach(enlace => {
-                    enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', verificarSesionYRolesGlobal);
-    </script>
-    <script src="seguridad.js"></script>
 </body>
 </html>
