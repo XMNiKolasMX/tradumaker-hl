@@ -145,7 +145,40 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
-        /* Modal para Agregar Juego */
+        /* Botones de Gestión Admin en Tarjeta */
+        .admin-card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .btn-admin-edit {
+            background: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-admin-edit:hover {
+            background: #0369a1;
+        }
+        .btn-admin-delete {
+            background: #da3633;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-admin-delete:hover {
+            background: #f85149;
+        }
+
+        /* Modal Formulario */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -325,7 +358,7 @@
                 </div>
             </div>
 
-            <!-- Controles -->
+            <!-- Controles de Filtros -->
             <div class="catalog-top-controls">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -348,15 +381,17 @@
 
             <!-- Contenedor del Catálogo -->
             <div id="grid-catalogo" class="games-grid mode-grid">
-                <div class="loading-skeleton">Cargando catálogo completo, espere por favor.</div>
+                <div class="loading-skeleton">Cargando catálogo completo, espere por favor...</div>
             </div>
         </section>
     </main>
 
-    <!-- MODAL PARA AGREGAR JUEGO (Solo Administradores) -->
+    <!-- MODAL PARA AGREGAR / EDITAR JUEGO (Solo Administradores) -->
     <div id="modal-agregar-juego" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color: #73bfff; margin-top: 0; margin-bottom: 20px;"><i class="fa-solid fa-gamepad"></i> Agregar Nuevo Juego al Catálogo</h3>
+            <h3 id="modal-titulo-header" style="color: #73bfff; margin-top: 0; margin-bottom: 20px;">
+                <i class="fa-solid fa-gamepad"></i> Agregar Nuevo Juego
+            </h3>
             
             <div class="form-group">
                 <label>Título del Juego *</label>
@@ -366,7 +401,7 @@
             <div class="form-group">
                 <label>Traductor *</label>
                 <select id="nuevo-traductor" class="form-control">
-                    <option value="Niko">Niko</option>
+                    <option value="NiKo">NiKo</option>
                     <option value="ℝ𝕆ℕ𝕀ℕ 𝕂𝔼𝕐𝔸ℝ𝕌 [BLXF]">ℝ𝕆ℕ𝕀ℕ 𝕂𝔼𝕐𝔸ℝ𝕌 [BLXF]</option>
                 </select>
             </div>
@@ -458,7 +493,7 @@
         </div>
     </footer>
 
-    <!-- Lógica y Supabase -->
+    <!-- Lógica JavaScript y Conexión Supabase -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -467,6 +502,8 @@
         let todosLosJuegos = [];
         let idsFavoritosUsuario = [];
         let vistaActual = 'grid';
+        let esUsuarioAdmin = false;
+        let juegoEditandoId = null;
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -498,7 +535,7 @@
             }, 2500);
         }
 
-        // Verificar si el usuario actual es Administrador para mostrar el botón de agregar
+        // Verificar si la cuenta activa es Administrador
         async function verificarRolAdmin() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) return;
@@ -510,11 +547,53 @@
                 .single();
 
             if (perfil && perfil.rol === 'admin') {
+                esUsuarioAdmin = true;
                 document.getElementById('admin-add-container').style.display = 'block';
             }
         }
 
+        // Abrir Modal para AGREGAR
         function abrirModalAgregarJuego() {
+            juegoEditandoId = null;
+            document.getElementById('modal-titulo-header').innerHTML = `<i class="fa-solid fa-gamepad"></i> Agregar Nuevo Juego`;
+            
+            document.getElementById('nuevo-titulo').value = '';
+            document.getElementById('nuevo-traductor').value = 'NiKo';
+            document.getElementById('nuevo-categoria').value = '';
+            document.getElementById('nuevo-imagen').value = '';
+            document.getElementById('nuevo-enlace').value = '';
+            document.getElementById('nuevo-enlace-original').value = '';
+            document.getElementById('nuevo-desarrollador').value = '';
+            document.getElementById('nuevo-peso').value = '';
+            document.getElementById('nuevo-ram').value = '';
+            document.getElementById('nuevo-descripcion').value = '';
+            document.getElementById('nuevo-descargas').value = '0';
+            document.getElementById('nuevo-traducido').checked = true;
+
+            document.getElementById('modal-agregar-juego').style.display = 'flex';
+        }
+
+        // Abrir Modal para EDITAR
+        function abrirModalEditarJuego(id) {
+            const juego = todosLosJuegos.find(j => j.id == id);
+            if (!juego) return;
+
+            juegoEditandoId = id;
+            document.getElementById('modal-titulo-header').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Juego`;
+
+            document.getElementById('nuevo-titulo').value = juego.titulo || '';
+            document.getElementById('nuevo-traductor').value = juego.traductor || 'NiKo';
+            document.getElementById('nuevo-categoria').value = juego.categoria || '';
+            document.getElementById('nuevo-imagen').value = juego.imagen || '';
+            document.getElementById('nuevo-enlace').value = juego.enlace || '';
+            document.getElementById('nuevo-enlace-original').value = juego.enlace_original || '';
+            document.getElementById('nuevo-desarrollador').value = juego.desarrollador || '';
+            document.getElementById('nuevo-peso').value = juego.peso || '';
+            document.getElementById('nuevo-ram').value = juego.ram || '';
+            document.getElementById('nuevo-descripcion').value = juego.descripcion || '';
+            document.getElementById('nuevo-descargas').value = juego.descargas || 0;
+            document.getElementById('nuevo-traducido').checked = juego.traducido ?? true;
+
             document.getElementById('modal-agregar-juego').style.display = 'flex';
         }
 
@@ -522,6 +601,7 @@
             document.getElementById('modal-agregar-juego').style.display = 'none';
         }
 
+        // Guardar o Actualizar Juego
         async function guardarNuevoJuego() {
             const titulo = document.getElementById('nuevo-titulo').value.trim();
             const traductor = document.getElementById('nuevo-traductor').value;
@@ -541,32 +621,65 @@
                 return;
             }
 
-            const { error } = await supabaseClient
-                .from('juegos')
-                .insert([{
-                    titulo,
-                    traductor,
-                    categoria,
-                    imagen,
-                    enlace,
-                    enlace_original,
-                    desarrollador,
-                    peso,
-                    ram,
-                    descripcion,
-                    descargas,
-                    traducido
-                }]);
+            const datosJuego = {
+                titulo,
+                traductor,
+                categoria,
+                imagen,
+                enlace,
+                enlace_original,
+                desarrollador,
+                peso,
+                ram,
+                descripcion,
+                descargas,
+                traducido
+            };
+
+            let error;
+
+            if (juegoEditandoId) {
+                const res = await supabaseClient
+                    .from('juegos')
+                    .update(datosJuego)
+                    .eq('id', juegoEditandoId);
+                error = res.error;
+            } else {
+                const res = await supabaseClient
+                    .from('juegos')
+                    .insert([datosJuego]);
+                error = res.error;
+            }
 
             if (error) {
                 mostrarNotificacion('Error al guardar: ' + error.message);
             } else {
-                mostrarNotificacion('¡Juego agregado con éxito! 🚀');
+                mostrarNotificacion(juegoEditandoId ? '¡Juego actualizado con éxito! ✏️' : '¡Juego agregado con éxito! 🚀');
                 cerrarModalAgregarJuego();
-                cargarCatalogo(); // Recargar catálogo
+                cargarCatalogo();
             }
         }
 
+        // Eliminar Juego (Solo Admin)
+        async function eliminarJuegoAdmin(id, titulo) {
+            if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el juego "${titulo}"?`)) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('juegos')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                mostrarNotificacion('Error al eliminar: ' + error.message);
+            } else {
+                mostrarNotificacion('¡Juego eliminado del catálogo! 🗑️');
+                cargarCatalogo();
+            }
+        }
+
+        // Cargar Favoritos
         async function cargarFavoritosUsuario() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -584,6 +697,7 @@
             }
         }
 
+        // Cargar Catálogo Completo
         async function cargarCatalogo() {
             const contenedor = document.getElementById('grid-catalogo');
             try {
@@ -616,11 +730,7 @@
             juegosFiltrados.sort((a, b) => {
                 const tituloA = a.titulo.toLowerCase();
                 const tituloB = b.titulo.toLowerCase();
-                if (orden === 'asc') {
-                    return tituloA.localeCompare(tituloB);
-                } else {
-                    return tituloB.localeCompare(tituloA);
-                }
+                return orden === 'asc' ? tituloA.localeCompare(tituloB) : tituloB.localeCompare(tituloA);
             });
 
             renderizarJuegos(juegosFiltrados);
@@ -638,7 +748,19 @@
                 const esFavorito = idsFavoritosUsuario.includes(juego.id);
                 const claseEstrella = esFavorito ? 'fas' : 'far';
                 const colorEstrella = esFavorito ? '#f59e0b' : '#ffffff';
-                const traductorNombre = juego.traductor || 'Niko';
+                const traductorNombre = juego.traductor || 'NiKo';
+
+                // Botones Admin (Editar y Eliminar)
+                const botonesAdminHtml = esUsuarioAdmin ? `
+                    <div class="admin-card-actions">
+                        <button onclick="abrirModalEditarJuego('${juego.id}')" class="btn-admin-edit" title="Editar juego">
+                            <i class="fa-solid fa-pen-to-square"></i> Editar
+                        </button>
+                        <button onclick="eliminarJuegoAdmin('${juego.id}', '${juego.titulo.replace(/'/g, "\\'")}')" class="btn-admin-delete" title="Eliminar juego">
+                            <i class="fa-solid fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                ` : '';
 
                 return `
                     <div class="game-card" style="position: relative;">
@@ -654,14 +776,20 @@
                         </div>
                         <div class="game-info">
                             <h3 class="game-title">${juego.titulo}</h3>
-                            <p style="font-size: 0.75rem; color: #8b949e; margin-bottom: 8px;"><i class="fa-solid fa-pen-nib"></i> Traductor: <strong style="color: #73bfff;">${traductorNombre}</strong></p>
-                            <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <p style="font-size: 0.75rem; color: #8b949e; margin-bottom: 8px;">
+                                <i class="fa-solid fa-pen-nib"></i> Traductor: <strong style="color: #73bfff;">${traductorNombre}</strong>
+                            </p>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <a href="juego.html?id=${juego.id}" class="btn-enter">Entrar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            </div>
+                            ${botonesAdminHtml}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
+        // Manejo de Clics en la Estrella de Favorito
         document.addEventListener('click', async (e) => {
             const btnFavorito = e.target.closest('.btn-favorito');
             if (!btnFavorito) return;
