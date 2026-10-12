@@ -315,14 +315,14 @@
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Supervisa la comunidad, aplica sanciones temporales y gestiona recomendaciones prioritarias de juegos.</p>
                         
                         <div class="form-group">
-                            <input type="text" id="busqueda-usuario" class="form-control" placeholder="Buscar por ID de usuario..." onkeyup="filtrarTablaUsuarios()">
+                            <input type="text" id="busqueda-usuario" class="form-control" placeholder="Buscar por correo o ID..." onkeyup="filtrarTablaUsuarios()">
                         </div>
 
                         <div class="admin-table-container">
                             <table class="admin-user-table">
                                 <thead>
                                     <tr>
-                                        <th>ID / Usuario</th>
+                                        <th>Correo / Usuario</th>
                                         <th>Rol</th>
                                         <th>Estado</th>
                                         <th>Acciones / Sanciones</th>
@@ -339,7 +339,7 @@
                             <h4 style="color: #38bdf8; font-size: 0.95rem; margin-top:0;"><i class="fa-solid fa-user-plus"></i> Proponer Candidato a Moderador</h4>
                             <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">Envía una propuesta formal al Administrador indicando qué usuario merece el cargo.</p>
                             <div class="form-group" style="margin-bottom: 10px;">
-                                <input type="text" id="propuesta-user-id" class="form-control" placeholder="ID exacto del usuario candidato">
+                                <input type="text" id="propuesta-user-id" class="form-control" placeholder="Correo o ID exacto del candidato">
                             </div>
                             <div class="form-group" style="margin-bottom: 10px;">
                                 <input type="text" id="propuesta-motivo" class="form-control" placeholder="Motivo de la recomendación">
@@ -398,7 +398,7 @@
     <div id="modal-ban" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
         <div style="background:#161b22; border:1px solid #30363d; padding:30px; border-radius:10px; width:90%; max-width:400px;">
             <h3 style="color:#ff3333; margin-top:0;"><i class="fa-solid fa-ban"></i> Sancionar Usuario</h3>
-            <p id="ban-user-id-display" style="font-size:0.8rem; color:#8b949e; word-break:break-all;"></p>
+            <p id="ban-user-id-display" style="font-size:0.85rem; color:#73bfff; word-break:break-all; font-weight: 600;"></p>
             
             <div class="form-group">
                 <label>Tipo de Baneo</label>
@@ -482,6 +482,7 @@
         let usuarioSeleccionadoParaBan = null;
         let listaGlobalUsuarios = [];
         let rolUsuarioActual = 'usuario';
+        let idUsuarioActual = null; // Guardamos el ID del usuario en sesión
 
         function toggleMenuDesplegable() {
             document.getElementById("navDropdown").classList.toggle("show");
@@ -657,6 +658,7 @@
             document.getElementById('protected-account-content').style.display = 'block';
 
             const user = session.user;
+            idUsuarioActual = user.id; // Almacenamos el ID de la sesión activa
 
             const { data: perfil } = await supabaseClient
                 .from('usuarios_registrados')
@@ -722,6 +724,9 @@
             }
 
             tbody.innerHTML = usuarios.map(u => {
+                // Obtener nombre visual: prioriza email, sino muestra ID recortado
+                const nombreVisual = u.email ? u.email : (u.id ? `${u.id.substring(0, 10)}...` : 'Usuario sin email');
+
                 let badgeRol = `<span class="badge-rol badge-user">Usuario</span>`;
                 if (u.rol === 'admin') badgeRol = `<span class="badge-rol badge-admin">Admin</span>`;
                 if (u.rol === 'moderador') badgeRol = `<span class="badge-rol badge-mod">Mod</span>`;
@@ -733,11 +738,15 @@
 
                 let botonesAccionHtml = '';
 
-                // REGLA DE SEGURIDAD Y JERARQUÍA:
-                // Cuentas con rol 'admin' no pueden ser baneadas ni editadas por moderadores u otros administradores
+                // REGLAS DE SEGURIDAD Y PROTECCIÓN:
+                // 1. Un usuario no puede auto-banearse o cambiar su propio rango
+                const esUsuarioEnSesion = (u.id === idUsuarioActual);
+                // 2. Administradores protegidos contra baneos/cambios de mod
                 const esDestinatarioAdmin = (u.rol === 'admin');
 
-                if (esDestinatarioAdmin) {
+                if (esUsuarioEnSesion) {
+                    botonesAccionHtml = `<span style="font-size:0.75rem; color:#73bfff; font-weight:600;"><i class="fa-solid fa-user-check"></i> Tu Cuenta (Sesión Activa)</span>`;
+                } else if (esDestinatarioAdmin) {
                     botonesAccionHtml = `<span style="font-size:0.75rem; color:#8b949e;"><i class="fa-solid fa-lock"></i> Protegido (Admin)</span>`;
                 } else {
                     if (u.baneado) {
@@ -747,7 +756,7 @@
                             botonesAccionHtml += `<span style="font-size:0.75rem; color:#8b949e;">Baneado (Solo Admin destituye)</span>`;
                         }
                     } else {
-                        botonesAccionHtml += `<button onclick="abrirModalBan('${u.id}')" class="btn-action btn-danger-custom" style="padding:4px 8px; font-size:0.75rem; margin-right:4px;">Banear</button>`;
+                        botonesAccionHtml += `<button onclick="abrirModalBan('${u.id}', '${nombreVisual}')" class="btn-action btn-danger-custom" style="padding:4px 8px; font-size:0.75rem; margin-right:4px;">Banear</button>`;
                     }
 
                     if (rolUsuarioActual === 'admin') {
@@ -761,7 +770,7 @@
 
                 return `
                     <tr>
-                        <td style="font-family:monospace; font-size:0.8rem;" title="${u.id}">${u.id.substring(0, 10)}...</td>
+                        <td style="font-size:0.85rem; font-weight: 500;" title="ID: ${u.id}">${nombreVisual}</td>
                         <td>${badgeRol}</td>
                         <td>${estadoHtml}</td>
                         <td>${botonesAccionHtml}</td>
@@ -772,13 +781,17 @@
 
         function filtrarTablaUsuarios() {
             const filtro = document.getElementById('busqueda-usuario').value.toLowerCase();
-            const filtrados = listaGlobalUsuarios.filter(u => u.id.toLowerCase().includes(filtro));
+            const filtrados = listaGlobalUsuarios.filter(u => {
+                const emailStr = (u.email || '').toLowerCase();
+                const idStr = (u.id || '').toLowerCase();
+                return emailStr.includes(filtro) || idStr.includes(filtro);
+            });
             renderizarTablaStaff(filtrados);
         }
 
-        function abrirModalBan(userId) {
+        function abrirModalBan(userId, nombreMostrar) {
             usuarioSeleccionadoParaBan = userId;
-            document.getElementById('ban-user-id-display').textContent = `ID de Usuario: ${userId}`;
+            document.getElementById('ban-user-id-display').textContent = `Usuario a Sancionar: ${nombreMostrar}`;
             document.getElementById('motivo-baneo').value = '';
             
             const optPermanente = document.getElementById('opt-permanente');
@@ -890,7 +903,7 @@
             const motivo = document.getElementById('propuesta-motivo').value.trim();
 
             if (!candidatoId || !motivo) {
-                mostrarNotificacion('Completa el ID del candidato y el motivo.');
+                mostrarNotificacion('Completa el usuario candidato y el motivo.');
                 return;
             }
 
