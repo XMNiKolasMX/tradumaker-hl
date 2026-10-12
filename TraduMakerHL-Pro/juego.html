@@ -269,6 +269,9 @@
 
                 if (error) throw error;
 
+                // Definir el traductor (por defecto NiKo si viniera vacío)
+                const traductorNombre = juego.traductor || 'NiKo';
+
                 container.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #1a1e29; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3f;">
                         
@@ -297,6 +300,7 @@
                             <section style="background: #111520; padding: 25px; border-radius: 8px;">
                                 <h3 style="color: white; margin-bottom: 15px; border-bottom: 1px solid #2a2f3f; padding-bottom: 10px;">Información Técnica</h3>
                                 <ul style="list-style: none; padding: 0; color: #a0a0b0; display: flex; flex-direction: column; gap: 10px;">
+                                    <li><strong style="color: white;"><i class="fa-solid fa-pen-nib" style="color: #73bfff; margin-right: 5px;"></i> Traductor:</strong> <span style="color: #73bfff; font-weight: 600;">${traductorNombre}</span></li>
                                     <li><strong style="color: white;">Sistema:</strong> Windows 7/8/10</li>
                                     <li><strong style="color: white;">RAM:</strong> ${juego.ram || 'No especificado'}</li>
                                     <li><strong style="color: white;">Espacio:</strong> ${juego.peso || 'No especificado'}</li>
@@ -395,8 +399,8 @@
 
         // Inicialización al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
-            verificarSesionYRolesGlobal(); // <-- Esto comprueba el rol y actualiza el botón de cuenta
-            cargarJuego();                 // <-- Esto carga la info del juego
+            verificarSesionYRolesGlobal();
+            cargarJuego();
 
             const logoEgg = document.getElementById('easter-egg-logo');
             const bubbleEgg = document.getElementById('easter-egg-bubble');
