@@ -76,6 +76,77 @@
         .show {
             display: block;
         }
+
+        /* Estilos personalizados para el Staff */
+        .staff-section {
+            margin-top: 3rem;
+        }
+        .staff-section h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .staff-section h2 i { color: var(--gold); }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .staff-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .staff-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+        .staff-card.leader { border-color: rgba(245, 158, 11, 0.5); }
+        .staff-card.admin { border-color: rgba(167, 139, 250, 0.5); }
+
+        .staff-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            letter-spacing: 0.5px;
+        }
+        .badge-leader { background: rgba(245, 158, 11, 0.2); color: var(--gold); border: 1px solid var(--gold); }
+        .badge-admin { background: rgba(167, 139, 250, 0.2); color: #a78bfa; border: 1px solid #a78bfa; }
+        .badge-mod { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+
+        .staff-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.25rem;
+            color: white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .staff-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -116,45 +187,93 @@
     <main class="main-content">
         <section class="container about-page-section">
             <div class="catalog-header-banner">
-                <h1>Detrás de la Pantalla de Carga</h1>
-                <p>Un poco sobre cómo nació este viaje, quiénes estamos metidos en el rollo y qué nos impulsa a seguir traduciendo.</p>
+                <h1>Detrás de TraduMaker HL</h1>
+                <p>Conoce la historia del proyecto, nuestra comunidad y al equipo que hace posible que disfrutemos las mejores traducciones al español.</p>
             </div>
 
             <div class="about-grid">
                 <div class="about-card">
                     <div class="about-icon"><i class="fa-solid fa-bullseye"></i></div>
-                    <h2>¿Qué demonios es esto? (Misión)</h2>
-                    <p>Básicamente, mi meta (y la del proyecto) es que cualquier joyita oculta hecha en motores como RPG Maker que solo esté en inglés o japonés llegue limpia y en nuestro idioma a la comunidad hispanohablante. Hay historias increíbles, giros de guion brutales y mundos que la gente se pierde solo por la barrera del idioma. Aquí venimos a romper eso.</p>
+                    <h2>Nuestra Misión</h2>
+                    <p>Somos una pequeña comunidad apasionada por los juegos desarrollados en RPG Maker, abarcando títulos tanto <strong>NSFW</strong> como <strong>SFW</strong>. Nuestro principal objetivo es romper la barrera del idioma para que increíbles historias y joyas independientes originales en inglés o japonés puedan ser disfrutadas totalmente en español por la comunidad hispanohablante.</p>
                 </div>
 
                 <div class="about-card">
                     <div class="about-icon"><i class="fa-solid fa-rocket"></i></div>
-                    <h2>¿Quiénes andamos por aquí?</h2>
-                    <p>Pues al principio era el típico proyecto solitario de fin de semana traduciendo por puro amor al arte. Con el tiempo, esto se ha convertido en un punto de encuentro entre jugadores, traductores y frikis del software libre que queremos hacer las cosas bien. Lo que ves ahora es una evolución brutal para que descargar y probar juegos sea más fácil que nunca.</p>
+                    <h2>La Comunidad</h2>
+                    <p>Lo que comenzó como un espacio dedicado a compartir traducciones por puro entusiasmo, se ha convertido en un punto de encuentro para jugadores, traductores y apasionados de los RPGs. Trabajamos continuamente para mantener un espacio organizado, seguro y con la mejor calidad técnica para que descubrir y disfrutar de nuevos títulos sea más accesible que nunca.</p>
                 </div>
             </div>
 
             <!-- Sección de Valores o Características Destacadas -->
             <div class="values-section">
-                <h2>Nuestras Reglas de Partida</h2>
+                <h2>Nuestros Pilares</h2>
                 <div class="values-grid">
                     <div class="value-box">
                         <i class="fa-solid fa-heart-pulse"></i>
-                        <h3>Amor al detalle</h3>
-                        <p>No uso traductores automáticos fríos. Me tomo el tiempo de pulir cada línea para que los chistes, el drama y la esencia de los creadores originales se sientan naturales en español.</p>
+                        <h3>Traducciones Cuidadas</h3>
+                        <p>Nos enfocamos en ofrecer adaptaciones fluidas y trabajadas, respetando el tono, el humor y la esencia original pensada por los desarrolladores.</p>
                     </div>
                     <div class="value-box">
                         <i class="fa-solid fa-shield-halved"></i>
-                        <h3>Cero abusos</h3>
-                        <p>Odiava entrar a páginas llenas de publicidad invasiva, acortadores truchos y virus. Aquí las descargas van directas al grano, limpias y seguras para que te pongas a jugar sin rodeos.</p>
+                        <h3>Acceso Directo y Limpio</h3>
+                        <p>Priorizamos la comodidad del usuario. Buscamos ofrecer accesos directos, seguros y libres de publicidad invasiva para garantizar una experiencia sin complicaciones.</p>
                     </div>
                     <div class="value-box">
                         <i class="fa-solid fa-code-branch"></i>
-                        <h3>Evolucionando el inventario</h3>
-                        <p>La web ha mejorado un montón. Ahora estamos conectados a la nube y herramientas modernas para que la base de datos de juegos cargue rápido y siempre esté al día.</p>
+                        <h3>Innovación Constante</h3>
+                        <p>Mejoramos continuamente nuestra plataforma con base de datos en la nube y paneles en tiempo real para mantener el catálogo e información de avances siempre al día.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Sección Oficial del Staff -->
+            <div class="staff-section">
+                <h2><i class="fa-solid fa-crown"></i> Equipo de Staff Oficial</h2>
+                <div class="staff-grid">
+                    
+                    <!-- Lider -->
+                    <div class="staff-card leader">
+                        <span class="staff-badge badge-leader"><i class="fa-solid fa-star"></i> Fundador & Líder</span>
+                        <h3 class="staff-name">@Niko</h3>
+                        <p class="staff-desc">Al frente de la plataforma y del servidor, encargado de coordinar los proyectos y mantener viva la comunidad de juegos y traducciones.</p>
+                    </div>
+
+                    <!-- Administrador -->
+                    <div class="staff-card admin">
+                        <span class="staff-badge badge-admin"><i class="fa-solid fa-shield-halved"></i> Administrador</span>
+                        <h3 class="staff-name">@ℝ𝕆ℕ𝕀ℕ 𝕂𝔼𝕐𝔸ℝ𝕌</h3>
+                        <p class="staff-desc">Administrador e integrante clave del equipo. Gracias a su gran talento para traducir, comparte y publica directamente sus juegos traducidos para el disfrute de toda la comunidad.</p>
+                    </div>
+
+                    <!-- Moderadores -->
+                    <div class="staff-card">
+                        <span class="staff-badge badge-mod"><i class="fa-solid fa-user-shield"></i> Moderador</span>
+                        <h3 class="staff-name">@[Tartarus]</h3>
+                        <p class="staff-desc">El alma alegre del equipo, encargado de mantener el orden dentro de la comunidad y alegrar el día a todos con memorables memes en los canales oficiales.</p>
+                    </div>
+
+                    <div class="staff-card">
+                        <span class="staff-badge badge-mod"><i class="fa-solid fa-user-shield"></i> Moderador</span>
+                        <h3 class="staff-name">@Jack</h3>
+                        <p class="staff-desc">El erudito del grupo y mente maestra conocedora a detalle de todo el lore de los juegos de <em>Leaf Geometry</em>. Una auténtica enciclopedia andante.</p>
+                    </div>
+
+                    <div class="staff-card">
+                        <span class="staff-badge badge-mod"><i class="fa-solid fa-user-shield"></i> Moderador</span>
+                        <h3 class="staff-name">@Sentinel</h3>
+                        <p class="staff-desc">Siempre vigilante para garantizar la buena convivencia en el servidor, asegurándose de que la comunidad sea un entorno seguro y agradable para todos.</p>
+                    </div>
+
+                    <div class="staff-card">
+                        <span class="staff-badge badge-mod"><i class="fa-solid fa-user-shield"></i> Moderador</span>
+                        <h3 class="staff-name">@𝑳𝒚𝒓𝒂𝒆𝒏𝒐𝒔❦ ❦</h3>
+                        <p class="staff-desc">Pieza fundamental del equipo de moderación, siempre atento a las necesidades de los miembros y apoyando activamente para el constante crecimiento del servidor.</p>
+                    </div>
+
+                </div>
+            </div>
+
         </section>
     </main>
 
@@ -163,18 +282,18 @@
         <div class="footer-content">
             <div class="footer-info">
                 <div class="logo"><i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span></div>
-                <p>El refugio definitivo para jugar RPGs independientes en español, hecho por fans para fans.</p>
+                <p>El punto de encuentro para disfrutar los mejores RPGs independientes en español, hechos por fans para fans.</p>
             </div>
             <div class="footer-links">
                 <h4>Mapa del Sitio</h4>
                 <a href="index.html">Inicio</a>
                 <a href="catalogo.html">Catálogo</a>
                 <a href="nosotros.html">Sobre Nosotros</a>
-                <a href="avances.html"> Avances de Traducción</a>
+                <a href="avances.html">Avances de Traducción</a>
                 <a href="apoyanos.html">Apóyanos</a>
             </div>
             <div class="footer-socials">
-                <h4>Pásate a saludar</h4>
+                <h4>Comunidad</h4>
                 <div class="social-icons">
                     <a href="https://www.youtube.com/@nikolashl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
                     <a href="https://discord.gg/gkAe3CmK86" target="_blank"><i class="fa-brands fa-discord"></i></a>
@@ -183,7 +302,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 TraduMaker HL. ¡Gracias por pasarte por la taberna!</p>
+            <p>&copy; 2026 TraduMaker HL. Todos los derechos reservados.</p>
         </div>
     </footer>
 
