@@ -609,7 +609,7 @@
         </div>
     </footer>
 
-    <!-- Script Único Consolidado (Conexión, Lógica, Menú y Verificación de Sesión + Admin Estado) -->
+    <!-- Script Único Consolidado -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -759,24 +759,37 @@
         async function cambiarEstadoTraduccion(idJuego, nuevoEstado) {
             if (!window.esAdminGlobal) {
                 alert("Acceso denegado. Solo los administradores pueden cambiar el estado.");
-                aplicarFiltrosYBusqueda(); // Revertir visualmente
+                aplicarFiltrosYBusqueda();
                 return;
             }
 
             try {
+                // Actualizar en Supabase
                 const { error } = await supabaseClient
                     .from('estado_juegos')
                     .update({ estado: nuevoEstado })
                     .eq('id', idJuego);
 
-                if (error) throw error;
+                if (error) {
+                    console.error("Error devuelto por Supabase:", error);
+                    alert("Error al guardar en Supabase: " + error.message);
+                    aplicarFiltrosYBusqueda();
+                    return;
+                }
 
+                // Actualizar localmente la lista en memoria
                 const juego = window.listaProyectosGlobal.find(j => j.id === idJuego);
-                if (juego) juego.estado = nuevoEstado;
+                if (juego) {
+                    juego.estado = nuevoEstado;
+                }
+
+                // Volver a renderizar para reflejar los cambios visuales de inmediato
+                aplicarFiltrosYBusqueda();
 
             } catch (err) {
-                console.error("Error al actualizar estado:", err);
-                alert("No se pudo actualizar el estado en la base de datos.");
+                console.error("Error de conexión:", err);
+                alert("Error de conexión al intentar guardar en Supabase.");
+                aplicarFiltrosYBusqueda();
             }
         }
 
@@ -831,7 +844,7 @@
                 const estadoActual = juego.estado || 'Traduciendo ahora';
                 const esFav = favs.includes(juego.id);
 
-                // Control visual diferenciado para Admin vs Usuario normal
+                // Control visual de Estado según el Rol
                 let controlEstadoHtml = '';
                 if (window.esAdminGlobal) {
                     controlEstadoHtml = `
@@ -845,9 +858,9 @@
                         </div>
                     `;
                 } else {
-                    let colorEstado = '#34d399';
-                    if (estadoActual === 'En Pausa') colorEstado = '#f59e0b';
-                    if (estadoActual === 'Cancelado') colorEstado = '#ef4444';
+                    let colorEstado = '#34d399'; // Verde
+                    if (estadoActual === 'En Pausa') colorEstado = '#f59e0b'; // Naranja
+                    if (estadoActual === 'Cancelado') colorEstado = '#ef4444'; // Rojo
 
                     controlEstadoHtml = `
                         <div style="margin-top: 8px; font-size: 0.75rem; color: ${colorEstado}; font-weight: 600;">
