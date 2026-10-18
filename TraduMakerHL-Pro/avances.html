@@ -429,7 +429,6 @@
     </style>
 </head>
 <body>
-
     <!-- Navegación -->
     <header class="navbar">
         <div class="nav-container">
@@ -449,9 +448,8 @@
                     <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
                     <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
                     <a href="cuenta.html" class="nav-cuenta-link">
-    <i class="fa-solid fa-user"></i> Cuenta 
-    <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-</a>
+                        <i class="fa-solid fa-user"></i> Cuenta 
+                        <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
                     </a>
                 </div>
             </div>
@@ -611,7 +609,7 @@
         </div>
     </footer>
 
-    <!-- Script Único Consolidado (Conexión, Lógica, Menú y Verificación de Sesión) -->
+    <!-- Script Único Consolidado (Conexión, Lógica, Menú y Verificación de Sesión + Admin Estado) -->
     <script>
         const SUPABASE_URL = 'https://vdwixgqicpdkyhslmqou.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_yJfaiIVchThcK4RADkdmnA_uvsr84h3';
@@ -620,6 +618,7 @@
         window.listaProyectosGlobal = [];
         window.filtroActualEstado = 'todos';
         window.filtroActualMotor = 'todos';
+        window.esAdminGlobal = false;
 
         // Menú desplegable global
         function toggleMenuDesplegable() {
@@ -653,6 +652,7 @@
                     .single();
 
                 const rol = perfil ? perfil.rol : 'usuario';
+                window.esAdminGlobal = (rol === 'admin');
 
                 enlacesCuenta.forEach(enlace => {
                     if (rol === 'admin') {
@@ -664,18 +664,19 @@
                     }
                 });
             } else {
+                window.esAdminGlobal = false;
                 enlacesCuenta.forEach(enlace => {
                     enlace.innerHTML = `<i class="fa-solid fa-user"></i> Cuenta <span style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>`;
                 });
             }
+
+            renderizarGrid(window.listaProyectosGlobal);
         }
 
         // Inicialización al cargar el DOM
         document.addEventListener('DOMContentLoaded', async () => {
-            // Ejecutar verificación de sesión en paralelo
-            verificarSesionYRolesGlobal();
+            await verificarSesionYRolesGlobal();
 
-            // Carga de proyectos desde Supabase
             try {
                 const { data: juegosEstados, error: errorEstados } = await supabaseClient
                     .from('estado_juegos')
@@ -754,6 +755,31 @@
             aplicarFiltrosYBusqueda();
         }
 
+        // Función para cambiar estado desde la tarjeta (Solo administradores)
+        async function cambiarEstadoTraduccion(idJuego, nuevoEstado) {
+            if (!window.esAdminGlobal) {
+                alert("Acceso denegado. Solo los administradores pueden cambiar el estado.");
+                aplicarFiltrosYBusqueda(); // Revertir visualmente
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('estado_juegos')
+                    .update({ estado: nuevoEstado })
+                    .eq('id', idJuego);
+
+                if (error) throw error;
+
+                const juego = window.listaProyectosGlobal.find(j => j.id === idJuego);
+                if (juego) juego.estado = nuevoEstado;
+
+            } catch (err) {
+                console.error("Error al actualizar estado:", err);
+                alert("No se pudo actualizar el estado en la base de datos.");
+            }
+        }
+
         function aplicarFiltrosYBusqueda() {
             const textoBusqueda = document.getElementById('searchInput').value.toLowerCase().trim();
             const criterioOrden = document.getElementById('sortSelect').value;
@@ -802,7 +828,33 @@
                 const imagenSrc = (juego.imagen && juego.imagen.trim() !== '') ? juego.imagen : 'https://via.placeholder.com/400x250?text=TraduMaker+HL';
                 const motor = juego.motor || 'RPG Maker';
                 const fechaEstimada = (juego.fecha_estimada && juego.fecha_estimada.trim() !== '') ? juego.fecha_estimada : 'Por definir';
+                const estadoActual = juego.estado || 'Traduciendo ahora';
                 const esFav = favs.includes(juego.id);
+
+                // Control visual diferenciado para Admin vs Usuario normal
+                let controlEstadoHtml = '';
+                if (window.esAdminGlobal) {
+                    controlEstadoHtml = `
+                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1);">
+                            <label style="font-size: 0.7rem; color: var(--gold); display: block; margin-bottom: 3px;"><i class="fa-solid fa-lock"></i> Estado (Admin):</label>
+                            <select class="sort-select" style="width: 100%; font-size: 0.8rem; padding: 6px;" onchange="cambiarEstadoTraduccion(${juego.id}, this.value)">
+                                <option value="Traduciendo ahora" ${estadoActual === 'Traduciendo ahora' ? 'selected' : ''}>Traduciendo ahora</option>
+                                <option value="En Pausa" ${estadoActual === 'En Pausa' ? 'selected' : ''}>En Pausa</option>
+                                <option value="Cancelado" ${estadoActual === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    let colorEstado = '#34d399';
+                    if (estadoActual === 'En Pausa') colorEstado = '#f59e0b';
+                    if (estadoActual === 'Cancelado') colorEstado = '#ef4444';
+
+                    controlEstadoHtml = `
+                        <div style="margin-top: 8px; font-size: 0.75rem; color: ${colorEstado}; font-weight: 600;">
+                            <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> ${estadoActual}
+                        </div>
+                    `;
+                }
 
                 return `
                     <div class="project-card">
@@ -816,7 +868,7 @@
                         <div class="project-body">
                             <h3 class="project-title" title="${juego.titulo}">${juego.titulo}</h3>
                             <div class="project-meta-date">
-                                <i class="fa-regular fa-calendar-days"></i> Fecha de Lanzamiento: <strong>${fechaEstimada}</strong>
+                                <i class="fa-regular fa-calendar-days"></i> Lanzamiento: <strong>${fechaEstimada}</strong>
                             </div>
                             
                             <div class="progress-container">
@@ -828,6 +880,8 @@
                                     <div class="progress-bar-fill" style="width: ${porcentaje}%;"></div>
                                 </div>
                             </div>
+
+                            ${controlEstadoHtml}
                         </div>
                         <div class="project-footer">
                             <button class="btn-details" onclick="abrirModalProyecto(${juego.id})">
