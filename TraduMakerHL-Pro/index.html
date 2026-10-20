@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TraduMaker HL - Inicio | RPG Maker en Español</title>
-    
-    <!-- Red de Archivos Hermanos (Proyectos Relacionados) -->
-    <meta name="related-projects" content="Visual Kei Vault: https://visual-kei-vault.onrender.com/index.html | J-Music Concerts: https://j-music-mgs0.onrender.com">
-
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="inicio.css">
@@ -341,7 +337,7 @@
             right: 0;
             top: 100%;
             background-color: #161b22;
-            min-width: 240px;
+            min-width: 220px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
             z-index: 1000;
             border: 1px solid var(--border);
@@ -377,6 +373,9 @@
             background-color: rgba(124, 58, 237, 0.2);
             color: #a78bfa;
             font-weight: 600;
+        }
+        .dropdown-content.show {
+            display: block;
         }
         .dropdown-divider {
             height: 1px;
@@ -441,7 +440,7 @@
                 <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
             </div>
 
-            <!-- Menú Desplegable (Dropdown) con Mis Otras Páginas -->
+            <!-- Menú Desplegable (Dropdown) -->
             <div class="dropdown">
                 <button onclick="toggleMenuDesplegable()" class="dropbtn">
                     <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
@@ -458,11 +457,11 @@
                         <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
                     </a>
                     
-                    <!-- Sección de Mis Otras Páginas -->
+                    <!-- Mis otras páginas -->
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-header-label">Mis Otras Páginas</div>
-                    <a href="https://visual-kei-vault.onrender.com/index.html" target="_blank"><i class="fa-solid fa-compact-disc" style="color: #f59e0b;"></i> Visual Kei Vault <span style="font-size: 0.55rem; background: #222; color: #aaa; padding: 1px 4px; border-radius: 3px; margin-left: auto;">MP3 Vault</span></a>
-                    <a href="https://j-music-mgs0.onrender.com" target="_blank"><i class="fa-solid fa-video" style="color: #ec4899;"></i> J-Music Concerts <span style="font-size: 0.55rem; background: #222; color: #aaa; padding: 1px 4px; border-radius: 3px; margin-left: auto;">DVD/Blu-ray</span></a>
+                    <a href="https://visual-kei-vault.onrender.com/index.html" target="_blank"><i class="fa-solid fa-compact-disc"></i> Visual Kei Vault</a>
+                    <a href="https://j-music-mgs0.onrender.com" target="_blank"><i class="fa-solid fa-video"></i> J-Music Concerts</a>
                 </div>
             </div>
 
@@ -471,6 +470,8 @@
             </div>
         </div>
     </header>
+</body>
+</html>
 
     <!-- Contenido Principal: Inicio -->
     <main class="main-content">
